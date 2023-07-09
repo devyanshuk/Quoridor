@@ -10,5 +10,7 @@ namespace Quoridor.Core.Environment
         {
             _board = board;
         }
+
+        
     }
 }

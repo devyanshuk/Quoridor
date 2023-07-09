@@ -11,15 +11,16 @@
     <None Remove="Game\" />
     <None Remove="Entities\" />
     <None Remove="Environment\" />
+    <None Remove="Utils\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Castle.Windsor" Version="5.1.2" />
-    <PackageReference Include="Castle.Core" Version="4.4.1" />
+    <PackageReference Include="Castle.Windsor" Version="5.1.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DependencyRegistry\" />
     <Folder Include="Game\" />
     <Folder Include="Entities\" />
     <Folder Include="Environment\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>

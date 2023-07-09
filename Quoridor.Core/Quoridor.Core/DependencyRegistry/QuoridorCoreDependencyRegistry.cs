@@ -14,13 +14,15 @@ namespace Quoridor.Core.DependencyRegistry
             return new IRegistration[]
             {
                 //LifestyleSingleton
+                Component.For<ICell>().ImplementedBy<Cell>().LifestyleSingleton(),
+                Component.For<IWall>().ImplementedBy<Wall>().LifestyleSingleton(),
                 Component.For<IBoard>().ImplementedBy<Board>().LifestyleSingleton(),
                 Component.For<IGameLogic>().ImplementedBy<GameLogic>().LifestyleSingleton(),
                 Component.For<IGameEnvironment>().ImplementedBy<GameEnvironment>().LifestyleSingleton(),
 
                 //Factory
-                Component.For<IBoardFactory>().AsFactory(),
-                Component.For<IWallFactory>().AsFactory(),
+                Component.For<IWallFactory>().AsFactory().LifestyleTransient(),
+                Component.For<ICellFactory>().AsFactory().LifestyleTransient(),
             };
         }
     }

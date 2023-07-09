@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Quoridor.Core.Environment
 {
     public class Wall : IWall
     {
         public Placement Placement { get; private set; }
+        public Vector2 From { get; private set; }
+        public Vector2 To { get; private set; }
 
-        public Wall(Placement placement)
+        public Wall(Placement placement, Vector2 from, Vector2 to)
         {
-            this.Placement = placement;
+            Placement = placement;
+            From = from;
+            To = to;
         }
     }
 }
