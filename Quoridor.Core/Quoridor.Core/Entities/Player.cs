@@ -5,10 +5,14 @@ namespace Quoridor.Core.Entities
 {
     public class Player
     {
-        public Cell Cell { get; private set; }
+        public int NumWalls { get; set; }
 
-        public Player()
+        public Cell Cell { get; private set; }
+        
+
+        public Player(int numWalls)
         {
+            NumWalls = numWalls;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Quoridor.Core.Environment
+namespace Quoridor.Core.Utils
 {
     public enum Placement
     {

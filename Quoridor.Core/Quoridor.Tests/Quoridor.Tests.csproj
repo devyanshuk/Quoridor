@@ -10,6 +10,19 @@
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="NSubstitute" Version="5.0.0" />
+    <PackageReference Include="FluentAssertions" Version="6.11.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Environment\" />
+    <None Remove="NSubstitute" />
+    <None Remove="FluentAssertions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Environment\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
+  </ItemGroup>
 </Project>

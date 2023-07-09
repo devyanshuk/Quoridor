@@ -32,6 +32,11 @@ namespace Quoridor.Core.Utils
             return obj != null && obj is Vector2 && Equals((Vector2)obj);
         }
 
+        public override string ToString()
+        {
+            return $"({X}, {Y})";
+        }
+
         public override int GetHashCode()
         {
             throw new NotImplementedException();
