@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
+using Quoridor.Core.Utils;
 
 namespace Quoridor.Core.Environment
 {
     public class Cell : ICell
     {
         public Vector2 Position { get; private set; }
-        public HashSet<Vector2> Neighbors { get; private set; }
 
         private readonly IBoard _board;
 
@@ -15,16 +14,23 @@ namespace Quoridor.Core.Environment
         {
             Position = position;
             _board = board;
-            Neighbors = new HashSet<Vector2>();
-            SetNeighbors(position);
         }
 
-        public void SetNeighbors(Vector2 position)
+        public IEnumerable<ICell> GetNeighbors(ICell refCell)
         {
-            Neighbors.Clear();
+            var refPos = refCell.Position;
 
+            if (refPos.Y + 1 < _board.Dimension)
+                yield return _board.Cells[refPos.X, refPos.Y + 1];
 
-         
+            if (refPos.Y - 1 >= 0)
+                yield return _board.Cells[refPos.X, refPos.Y - 1];
+
+            if (refPos.X + 1 < _board.Dimension)
+                yield return _board.Cells[refPos.X + 1, refPos.Y];
+
+            if (refPos.X - 1 > 0)
+                yield return _board.Cells[refPos.X - 1, refPos.Y];
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Numerics;
+using Quoridor.Core.Utils;
 
 namespace Quoridor.Core.Environment
 {
