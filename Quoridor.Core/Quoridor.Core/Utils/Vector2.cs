@@ -39,7 +39,7 @@ namespace Quoridor.Core.Utils
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return HashCode.Combine(X, Y);
         }
     }
 }

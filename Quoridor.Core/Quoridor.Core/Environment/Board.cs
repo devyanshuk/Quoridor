@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
+using Quoridor.Core.Utils.CustomExceptions;
 
 namespace Quoridor.Core.Environment
 {
@@ -10,11 +11,11 @@ namespace Quoridor.Core.Environment
         public int Dimension { get; private set; }
         public Cell[,] Cells { get; private set; }
 
-        private readonly IWallFactory _wallFactory;
+        public HashSet<IWall> Walls { get; set; }
 
-        public Board(IWallFactory wallFactory)
+        public Board()
         {
-            _wallFactory = wallFactory;
+            Walls = new HashSet<IWall>();
         }
 
         public void SetDimension(int dimension)
@@ -37,11 +38,20 @@ namespace Quoridor.Core.Environment
 
         public void AddWall(Vector2 from, Vector2 to)
         {
-            if (from.X != to.X && from.Y != to.Y)
-                throw new Exception($"{from} -> {to} : Not a valid wall");
-            var orientation = from.X == to.X ? Placement.Horizontal : Placement.Vertical;
-            var wall = _wallFactory.Create(orientation, from, to);
+            if ((from.X != to.X && from.Y != to.Y) || ((to.X - from.X) > 2) || (to.Y - from.Y) > 2)
+                throw new InvalidWallException($"{from} -> {to} : Not a valid wall");
 
+            var orientation = from.X == to.X ? Placement.Horizontal : Placement.Vertical;
+            var wall = new Wall(orientation, from, to);
+
+            if (Walls.Contains(wall))
+                throw new WallAlreadyPresentException($"Wall {from} -> {to} already present");
+
+            
+
+
+
+            Walls.Add(wall);
         }
 
         public IEnumerable<Cell> Neighbors(Cell refCell)

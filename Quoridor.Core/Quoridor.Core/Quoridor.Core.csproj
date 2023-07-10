@@ -12,6 +12,7 @@
     <None Remove="Entities\" />
     <None Remove="Environment\" />
     <None Remove="Utils\" />
+    <None Remove="Utils\CustomExceptions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
@@ -22,5 +23,6 @@
     <Folder Include="Entities\" />
     <Folder Include="Environment\" />
     <Folder Include="Utils\" />
+    <Folder Include="Utils\CustomExceptions\" />
   </ItemGroup>
 </Project>

@@ -19,5 +19,19 @@ namespace Quoridor.Core.Environment
         }
 
         public Wall() { }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Wall)) return false;
+            var wall = obj as Wall;
+            return wall.Placement == Placement &&
+                wall.From == From &&
+                wall.To == To;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Placement, From, To);
+        }
     }
 }
