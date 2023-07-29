@@ -74,6 +74,25 @@ namespace Quoridor.Tests.Environment
             a.Should().Throw<WallAlreadyPresentException>();
         }
 
+        [TestCase(5, 5, North, 5, 4)]
+        [TestCase(5, 5, South, 5, 6)]
+        [TestCase(3, 4, East, 4, 4)]
+        public void Should_Throw_If_Wall_Added_WRT_Another_Cell_Is_Already_Present(
+            int f_x, int f_y, Direction placement, int t_x, int t_y)
+        {
+            //Arrange
+            var gameEnv = CreateGameEnvironment(f_x, f_y, placement, t_x, t_y);
+            var from = new Vector2(f_x, f_y);
+            var to = new Vector2(t_x, t_y);
+
+            //Act
+            gameEnv.AddWall(from, placement);
+            Action a = () => gameEnv.AddWall(to, placement.Opposite());
+
+            //Assert
+            a.Should().Throw<WallAlreadyPresentException>();
+        }
+
         private IGameEnvironment CreateGameEnvironment(int f_x, int f_y, Direction dir, int t_x, int t_y)
         {
             var board = new Board();
