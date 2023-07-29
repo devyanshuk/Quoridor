@@ -11,7 +11,10 @@ namespace Quoridor.Core.Environment
 
         void Initialize();
         void SetDimension(int dimension);
-        void AddWall(Vector2 from, Vector2 to);
+
+        Cell GetCell(Vector2 vec);
+        Cell GetCellAt(Vector2 from, Direction dir);
+
         IEnumerable<Cell> Neighbors(Cell refCell);
     }
 }

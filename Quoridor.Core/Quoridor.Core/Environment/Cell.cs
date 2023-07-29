@@ -6,7 +6,10 @@ namespace Quoridor.Core.Environment
     {
         public Vector2 Position { get; private set; }
 
-        public Wall[] Walls { get; set; } = new Wall[4];
+        /// <summary>
+        /// eg. Walls[0] != null indicates that there's a wall above the cell
+        /// </summary>
+        public IWall[] Walls { get; set; } = new IWall[4];
 
         public Cell(Vector2 position)
         {
@@ -16,6 +19,15 @@ namespace Quoridor.Core.Environment
         public bool IsAccessible(Direction direction)
         {
             return Walls[(int)direction] == null;
+        }
+
+        public bool AddWall(IWall wall)
+        {
+            if (!IsAccessible(wall.Placement))
+                return false;
+
+            Walls[(int)wall.Placement] = wall;
+            return true;
         }
     }
 }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +13,7 @@
     <None Remove="Environment\" />
     <None Remove="Utils\" />
     <None Remove="Utils\CustomExceptions\" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
@@ -24,5 +25,6 @@
     <Folder Include="Environment\" />
     <Folder Include="Utils\" />
     <Folder Include="Utils\CustomExceptions\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

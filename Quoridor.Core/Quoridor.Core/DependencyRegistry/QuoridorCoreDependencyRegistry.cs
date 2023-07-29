@@ -19,6 +19,9 @@ namespace Quoridor.Core.DependencyRegistry
 
                 //LifestyleTransient
                 Component.For<IWall>().ImplementedBy<Wall>().LifestyleTransient(),
+
+                //Factory
+                Component.For<IWallFactory>().AsFactory().LifestyleTransient(),
             };
         }
     }

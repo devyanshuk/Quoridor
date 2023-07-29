@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
-using Quoridor.Core.Utils.CustomExceptions;
 
 namespace Quoridor.Core.Environment
 {
@@ -11,12 +10,7 @@ namespace Quoridor.Core.Environment
         public int Dimension { get; private set; }
         public Cell[,] Cells { get; private set; }
 
-        public HashSet<IWall> Walls { get; set; }
-
-        public Board()
-        {
-            Walls = new HashSet<IWall>();
-        }
+        public Board() { }
 
         public void SetDimension(int dimension)
         {
@@ -27,6 +21,18 @@ namespace Quoridor.Core.Environment
             Initialize();
         }
 
+        public Cell GetCell(Vector2 vec) => Cells[vec.X, vec.Y];
+
+        public Cell GetCellAt(Vector2 from, Direction dir)
+        {
+            switch(dir)
+            {
+                case Direction.South: return Cells[from.X, from.Y + 1];
+                case Direction.North: return Cells[from.X, from.Y - 1];
+                case Direction.East : return Cells[from.X + 1, from.Y];
+                default             : return Cells[from.X - 1, from.Y];
+            }
+        }
 
         public void Initialize()
         {
@@ -34,24 +40,6 @@ namespace Quoridor.Core.Environment
             for (int i = 0; i < Dimension; i++)
                 for (int j = 0; j < Dimension; j++)
                     Cells[i, j] = new Cell(new Vector2(i, j));
-        }
-
-        public void AddWall(Vector2 from, Vector2 to)
-        {
-            if ((from.X != to.X && from.Y != to.Y) || ((to.X - from.X) > 2) || (to.Y - from.Y) > 2)
-                throw new InvalidWallException($"{from} -> {to} : Not a valid wall");
-
-            var orientation = from.X == to.X ? Placement.Horizontal : Placement.Vertical;
-            var wall = new Wall(orientation, from, to);
-
-            if (Walls.Contains(wall))
-                throw new WallAlreadyPresentException($"Wall {from} -> {to} already present");
-
-            
-
-
-
-            Walls.Add(wall);
         }
 
         public IEnumerable<Cell> Neighbors(Cell refCell)

@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Quoridor.Core.Environment;
+using Quoridor.Core.Utils;
 
 namespace Quoridor.Core.Game
 {
@@ -8,9 +9,11 @@ namespace Quoridor.Core.Game
     {
         private readonly IGameEnvironment _gameEnvironment;
 
-        public GameLogic(IGameEnvironment gameEnvironment)
+        public GameLogic(
+            IGameEnvironment gameEnvironment)
         {
             _gameEnvironment = gameEnvironment;
         }
+
     }
 }
