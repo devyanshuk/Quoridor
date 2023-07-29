@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
 using Quoridor.Core.Extensions;
@@ -52,13 +50,7 @@ namespace Quoridor.Core.Environment
                 throw new WallAlreadyPresentException($"{placement} wall from '{from}' already present");
         }
 
-        public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
-        {
-            yield return CreateAndValidateWall(from, placement);
-            yield return CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
-        }
-
-        private IWall CreateAndValidateWall(Vector2 from, Direction dir)
+        public IWall CreateAndValidateWall(Vector2 from, Direction dir)
         {
             var wall = _wallFactory.CreateWall(dir, from);
 
