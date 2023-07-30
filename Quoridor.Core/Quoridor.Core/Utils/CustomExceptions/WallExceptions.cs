@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Quoridor.Core.Utils.CustomExceptions
 {
     public class WallAlreadyPresentException : Exception
@@ -20,5 +21,12 @@ namespace Quoridor.Core.Utils.CustomExceptions
         public WallNotPresentException(string message) : base(message) { }
 
         public WallNotPresentException() : base() { }
+    }
+
+    public class NewWallBlocksPlayerException : Exception
+    {
+        public NewWallBlocksPlayerException(string message) : base(message) { }
+
+        public NewWallBlocksPlayerException() : base() { }
     }
 }

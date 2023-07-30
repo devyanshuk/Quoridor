@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Quoridor.Core.Utils;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Utils.CustomExceptions;
+using Quoridor.Core.Entities;
 
 namespace Quoridor.Core.Environment
 {
@@ -11,10 +12,46 @@ namespace Quoridor.Core.Environment
     {
         private readonly IBoard _board;
 
+        public int Turn { get; private set; }
+        public List<IPlayer> Players { get; } = new List<IPlayer>();
+        public HashSet<IWall> Walls { get; private set; } = new HashSet<IWall>();
+
         public GameEnvironment(
             IBoard board)
         {
             _board = board;
+        }
+
+        public void Initialize()
+        {
+            Turn = 0;
+            _board.Initialize();
+        }
+
+        public void AddPlayer(IPlayer player)
+        {
+            Players.Add(player);
+        }
+
+        public void ChangeTurn()
+        {
+            Turn = (Turn + 1) % Players.Count;
+        }
+
+        public void MovePlayer(Direction dir)
+        {
+            var player = Players[Turn];
+            var newPos = player.CurrentPos.GetPosFor(dir);
+
+            if (!_board.WithinBounds(newPos))
+                throw new InvalidAgentMoveException($"player '{Turn}' cannot move to '{newPos}'. Invalid move position");
+
+            var neighbors = _board.Neighbors(_board.GetCell(player.CurrentPos));
+            if (neighbors.Any(n => n.Position.Equals(newPos)))
+            {
+                player.Move(newPos);
+            }
+            else throw new NewMoveBlockedByWallException($"player '{Turn}' cannot move to '{newPos}' since it's blocked by a wall");
         }
 
         public void AddWall(Vector2 from, Direction placement)
@@ -29,9 +66,11 @@ namespace Quoridor.Core.Environment
                 {
                     _board.GetCell(wall.From).AddWall(wall);
                 }
-                //TODO: check if player is blocked and if so, throw
+                var playerPos = Players[Turn].CurrentPos;
             }
             else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
+
+            Walls.Add(walls.First());
         }
 
         public void RemoveWall(Vector2 from, Direction placement)
@@ -48,6 +87,8 @@ namespace Quoridor.Core.Environment
                 }
             }
             else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
+
+            Walls.Remove(walls.First());
         }
         
         public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)

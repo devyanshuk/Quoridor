@@ -10,10 +10,12 @@ namespace Quoridor.Core.Game
         private readonly IGameEnvironment _gameEnvironment;
 
         public GameLogic(
-            IGameEnvironment gameEnvironment)
+            IGameEnvironment gameEnvironment
+            )
         {
             _gameEnvironment = gameEnvironment;
         }
+
 
         
 

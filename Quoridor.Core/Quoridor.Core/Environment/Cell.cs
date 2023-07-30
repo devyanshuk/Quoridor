@@ -1,8 +1,10 @@
-﻿using Quoridor.Core.Utils;
+﻿using System;
+
+using Quoridor.Core.Utils;
 
 namespace Quoridor.Core.Environment
 {
-    public class Cell
+    public class Cell : IEquatable<Cell>
     {
         public Vector2 Position { get; private set; }
 
@@ -37,6 +39,12 @@ namespace Quoridor.Core.Environment
 
             Walls[(int)wall.Placement] = null;
             return true;
+        }
+
+        public bool Equals(Cell other)
+        {
+            if (other == null) return false;
+            return Position.Equals(other.Position) && Walls.Equals(other.Walls);
         }
     }
 }

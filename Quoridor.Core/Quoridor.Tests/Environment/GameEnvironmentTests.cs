@@ -4,6 +4,7 @@ using NUnit.Framework;
 using FluentAssertions;
 
 using Quoridor.Core.Utils;
+using Quoridor.Core.Entities;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.Core.Utils.CustomExceptions;
@@ -241,11 +242,87 @@ namespace Quoridor.Tests.Environment
 
         #endregion
 
-        private Tuple<IBoard, GameEnvironment> CreateGameEnvironment()
+
+        #region MovePlayer
+
+        [TestCase(0, 0, North)]
+        [TestCase(8, 8, South)]
+        [TestCase(8, 0, East)]
+        [TestCase(0, 8, West)]
+        public void Should_Throw_If_Player_Moved_Out_Of_Board(
+            int f_x, int f_y, Direction dir)
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var player = token.Item3;
+            player.CurrentPos = new Vector2(f_x, f_y);
+
+            //Act
+            Action a = () => gameEnv.MovePlayer(dir);
+
+            //Assert
+            a.Should().Throw<InvalidAgentMoveException>();
+        }
+
+        [TestCase(5, 5, North, 5, 4)]
+        [TestCase(2, 3, East, 3, 3)]
+        [TestCase(8, 8, West, 7, 8)]
+        [TestCase(0, 0, South, 0, 1)]
+        [TestCase(0, 8, East, 1, 8)]
+        public void Should_Correctly_Move_Player_If_Valid_Direction_Is_Provided(
+            int f_x, int f_y, Direction dir, int t_x, int t_y)
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var player = token.Item3;
+            player.CurrentPos = new Vector2(f_x, f_y);
+            var expectedNewPos = new Vector2(t_x, t_y);
+
+            //Act
+            gameEnv.MovePlayer(dir);
+
+            //Assert
+            player.CurrentPos.Should().Be(expectedNewPos);
+        }
+
+        [TestCase(5, 5, North)]
+        [TestCase(4, 3, South)]
+        [TestCase(2, 2, South)]
+        [TestCase(1, 0, East)]
+        [TestCase(1, 0, West)]
+        public void Should_Throw_If_Player_Tried_To_Move_Past_Wall(
+            int f_x, int f_y, Direction dir)
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var player = token.Item3;
+            var pos = new Vector2(f_x, f_y);
+            player.CurrentPos = pos;
+
+            //Act
+            gameEnv.AddWall(pos, dir);
+            gameEnv.AddWall(pos, dir.Opposite());
+            Action a = () => gameEnv.MovePlayer(dir);
+            Action b = () => gameEnv.MovePlayer(dir.Opposite());
+
+            //Assert
+            a.Should().Throw<NewMoveBlockedByWallException>();
+            b.Should().Throw<NewMoveBlockedByWallException>();
+        }
+
+        #endregion
+
+        private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()
         {
             var board = new Board();
             board.SetDimension(9);
-            return Tuple.Create<IBoard, GameEnvironment>(board, new GameEnvironment(board));
+            var gameEnv = new GameEnvironment(board);
+            var player = new Player(8, new Vector2(4, 0));
+            gameEnv.AddPlayer(player);
+            return Tuple.Create<IBoard, GameEnvironment, IPlayer>(board, gameEnv, player);
         }
     }
 }

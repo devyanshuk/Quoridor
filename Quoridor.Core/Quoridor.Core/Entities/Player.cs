@@ -1,18 +1,24 @@
-﻿using System;
-using Quoridor.Core.Environment;
+﻿using Quoridor.Core.Utils;
 
 namespace Quoridor.Core.Entities
 {
-    public class Player
+    public class Player : IPlayer
     {
         public int NumWalls { get; set; }
 
-        public Cell Cell { get; private set; }
-        
+        public Vector2 StartPos { get; }
+        public Vector2 CurrentPos { get; set; }
 
-        public Player(int numWalls)
+        public Player(int numWalls, Vector2 startPos)
         {
             NumWalls = numWalls;
+            StartPos = startPos;
+            CurrentPos = startPos;
+        }
+
+        public void Move(Vector2 newPos)
+        {
+            CurrentPos = newPos;
         }
     }
 }

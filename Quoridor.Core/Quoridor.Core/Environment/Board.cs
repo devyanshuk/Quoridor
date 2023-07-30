@@ -25,13 +25,8 @@ namespace Quoridor.Core.Environment
 
         public Cell GetCellAt(Vector2 from, Direction dir)
         {
-            switch(dir)
-            {
-                case Direction.South: return Cells[from.X, from.Y + 1];
-                case Direction.North: return Cells[from.X, from.Y - 1];
-                case Direction.East : return Cells[from.X + 1, from.Y];
-                default             : return Cells[from.X - 1, from.Y];
-            }
+            var newPos = from.GetPosFor(dir);
+            return GetCell(newPos);
         }
 
         public bool WithinBounds(Vector2 pos)
