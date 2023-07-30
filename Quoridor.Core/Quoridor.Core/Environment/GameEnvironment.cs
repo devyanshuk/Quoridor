@@ -1,9 +1,9 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Utils.CustomExceptions;
-using System.Collections.Generic;
 
 namespace Quoridor.Core.Environment
 {
@@ -29,6 +29,7 @@ namespace Quoridor.Core.Environment
                 {
                     _board.GetCell(wall.From).AddWall(wall);
                 }
+                //TODO: check if player is blocked and if so, throw
             }
             else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
         }
