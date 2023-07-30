@@ -28,5 +28,15 @@ namespace Quoridor.Core.Environment
         {
             return HashCode.Combine(Placement, From);
         }
+
+        public bool IsHorizontal()
+        {
+            return Placement.Equals(Direction.North) || Placement.Equals(Direction.South);
+        }
+
+        public bool IsVertical()
+        {
+            return Placement.Equals(Direction.East) || Placement.Equals(Direction.West);
+        }
     }
 }

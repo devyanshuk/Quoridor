@@ -6,5 +6,8 @@ namespace Quoridor.Core.Environment
     {
         Direction Placement { get; }
         Vector2 From { get; }
+
+        bool IsHorizontal();
+        bool IsVertical();
     }
 }

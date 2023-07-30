@@ -1,69 +1,62 @@
-﻿using System;
+﻿using System.Linq;
 
 using Quoridor.Core.Utils;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Utils.CustomExceptions;
+using System.Collections.Generic;
 
 namespace Quoridor.Core.Environment
 {
     public class GameEnvironment : IGameEnvironment
     {
         private readonly IBoard _board;
-        private readonly IWallFactory _wallFactory;
 
         public GameEnvironment(
-            IBoard board,
-            IWallFactory wallFactory)
+            IBoard board)
         {
             _board = board;
-            _wallFactory = wallFactory;
         }
-
 
         public void AddWall(Vector2 from, Direction placement)
         {
             if (from.X >= _board.Dimension || from.X < 0 || from.Y >= _board.Dimension || from.Y < 0)
                 throw new InvalidWallException($"{placement}ern wall from '{from}' not possible. Invalid dimension.");
 
-            IWall wall1;
-            IWall wall2;
-
-            try
+            var walls = GetWallsForAffectedCells(from, placement);
+            if (walls.All(w => _board.GetCell(w.From).IsAccessible(w.Placement)))
             {
-                wall1 = CreateAndValidateWall(from, placement);
-                wall2 = CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
+                foreach(var wall in walls)
+                {
+                    _board.GetCell(wall.From).AddWall(wall);
+                }
             }
-            catch
-            {
-                throw new InvalidWallException($"{placement}ern wall from '{from} not possible.'");
-            }
+            else throw new WallAlreadyPresentException($"{placement} wall from '{from}' already present");
+        }
+        
+        public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
+        {
+            yield return CreateAndValidateWall(from, placement);
+            yield return CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
 
-            var cell1 = _board.GetCell(from);
-            var cell2 = _board.GetCell(wall2.From);
-
-            if (cell1.IsAccessible(placement) && cell2.IsAccessible(wall2.Placement))
-            {
-                cell1.AddWall(wall1);
-                cell2.AddWall(wall2);
-            }
-            else
-                throw new WallAlreadyPresentException($"{placement} wall from '{from}' already present");
+            var newPos = from.PositionAt(placement);
+            yield return CreateAndValidateWall(newPos, placement);
+            yield return CreateAndValidateWall(_board.GetCellAt(newPos, placement).Position, placement.Opposite());
         }
 
         public IWall CreateAndValidateWall(Vector2 from, Direction dir)
         {
-            var wall = _wallFactory.CreateWall(dir, from);
+            var wall = new Wall(dir, from);
 
             if ((wall.From.X == 0 && wall.Placement.Equals(Direction.West))
                 || (wall.From.Y == 0 && wall.Placement.Equals(Direction.North))
                 || (wall.From.X == _board.Dimension - 1 && wall.Placement.Equals(Direction.East))
-                || (wall.From.Y == _board.Dimension - 1 && wall.Placement.Equals(Direction.South))) {
-                throw new Exception();
+                || (wall.From.Y == _board.Dimension - 1 && wall.Placement.Equals(Direction.South))
+                || (wall.From.X >= _board.Dimension - 1 && wall.IsHorizontal())
+                || (wall.From.Y >= _board.Dimension - 1 && wall.IsVertical()))
+            {
+                throw new InvalidWallException($"{dir}ern wall from '{from} not possible.'");
             }
-
             return wall;
         }
-
-
     }
 }
