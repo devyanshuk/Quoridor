@@ -19,8 +19,8 @@ namespace Quoridor.Core.Environment
 
         public void AddWall(Vector2 from, Direction placement)
         {
-            if (from.X >= _board.Dimension || from.X < 0 || from.Y >= _board.Dimension || from.Y < 0)
-                throw new InvalidWallException($"{placement}ern wall from '{from}' not possible. Invalid dimension.");
+            if (!_board.WithinBounds(from))
+                throw new InvalidWallException($"{placement}ern wall from '{from}' could not be added. Invalid dimension.");
 
             var walls = GetWallsForAffectedCells(from, placement);
             if (walls.All(w => _board.GetCell(w.From).IsAccessible(w.Placement)))
@@ -30,7 +30,23 @@ namespace Quoridor.Core.Environment
                     _board.GetCell(wall.From).AddWall(wall);
                 }
             }
-            else throw new WallAlreadyPresentException($"{placement} wall from '{from}' already present");
+            else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
+        }
+
+        public void RemoveWall(Vector2 from, Direction placement)
+        {
+            if (!_board.WithinBounds(from))
+                throw new InvalidWallException($"{placement}ern wall from '{from}' could not be removed. Invalid dimension");
+
+            var walls = GetWallsForAffectedCells(from, placement);
+            if (walls.All(w => !_board.GetCell(w.From).IsAccessible(w.Placement)))
+            {
+                foreach(var wall in walls)
+                {
+                    _board.GetCell(wall.From).RemoveWall(wall);
+                }
+            }
+            else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
         }
         
         public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)

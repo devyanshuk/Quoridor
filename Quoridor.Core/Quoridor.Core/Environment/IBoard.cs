@@ -11,6 +11,7 @@ namespace Quoridor.Core.Environment
 
         void Initialize();
         void SetDimension(int dimension);
+        bool WithinBounds(Vector2 pos);
 
         Cell GetCell(Vector2 vec);
         Cell GetCellAt(Vector2 from, Direction dir);

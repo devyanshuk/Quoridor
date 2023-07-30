@@ -5,5 +5,6 @@ namespace Quoridor.Core.Environment
     public interface IGameEnvironment
     {
         void AddWall(Vector2 from, Direction placement);
+        void RemoveWall(Vector2 from, Direction placement);
     }
 }

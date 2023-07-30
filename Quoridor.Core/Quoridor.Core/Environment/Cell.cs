@@ -29,5 +29,14 @@ namespace Quoridor.Core.Environment
             Walls[(int)wall.Placement] = wall;
             return true;
         }
+
+        public bool RemoveWall(IWall wall)
+        {
+            if (IsAccessible(wall.Placement))
+                return false;
+
+            Walls[(int)wall.Placement] = null;
+            return true;
+        }
     }
 }

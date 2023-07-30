@@ -34,6 +34,11 @@ namespace Quoridor.Core.Environment
             }
         }
 
+        public bool WithinBounds(Vector2 pos)
+        {
+            return pos.X < Dimension && pos.X >= 0 && pos.Y < Dimension && pos.Y >= 0;
+        }
+
         public void Initialize()
         {
             Cells = new Cell[Dimension, Dimension];

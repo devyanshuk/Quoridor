@@ -4,6 +4,7 @@ using NUnit.Framework;
 using FluentAssertions;
 
 using Quoridor.Core.Utils;
+using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.Core.Utils.CustomExceptions;
 using static Quoridor.Core.Utils.Direction;
@@ -13,6 +14,9 @@ namespace Quoridor.Tests.Environment
     [TestFixture]
     public class GameEnvironmentTests
     {
+
+        #region AddWall
+
         [TestCase(South, -1, 0)]
         [TestCase(North, 100, 100)]
         [TestCase(East, 0, 9)]
@@ -133,6 +137,75 @@ namespace Quoridor.Tests.Environment
             board.Neighbors(board.GetCell(pos3)).Count().Should().Be(3);
         }
 
+        #endregion
+
+
+        #region RemoveWall
+
+        [TestCase(5, 5, North)]
+        [TestCase(8, 6, West)]
+        [TestCase(0, 0, South)]
+        [TestCase(0, 6, East)]
+        public void Should_Throw_If_Wall_To_Be_Removed_Is_Not_Present(
+            int f_x, int f_y, Direction dir)
+        {
+            //Arrange
+            var gameEnv = CreateGameEnvironment().Item2;
+            var pos = new Vector2(f_x, f_y);
+
+            //Act
+            Action a = () => gameEnv.RemoveWall(pos, dir);
+
+            //Assert
+            a.Should().Throw<WallNotPresentException>();
+        }
+
+        [TestCase(-1, 0, North)]
+        [TestCase(999, 999, South)]
+        public void Should_Throw_If_Wall_To_Be_Removed_Is_Outside_Of_Bounds(
+            int f_x, int f_y, Direction dir)
+        {
+            //Arrange
+            var gameEnv = CreateGameEnvironment().Item2;
+            var pos = new Vector2(f_x, f_y);
+
+            //Act
+            Action a = () => gameEnv.RemoveWall(pos, dir);
+
+            //Assert
+            a.Should().Throw<InvalidWallException>();
+        }
+
+        [TestCase(5, 5, South, 5, 6)]
+        [TestCase(0, 0, East, 1, 0)]
+        [TestCase(5, 6, North, 5, 5)]
+        public void Should_Correctly_Remove_Walls_If_Present(
+            int f_x, int f_y, Direction dir, int t_x, int t_y)
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var board = token.Item1;
+            var pos = new Vector2(f_x, f_y);
+            var pos2 = new Vector2(t_x, t_y);
+
+            //Act
+            gameEnv.AddWall(pos, dir);
+            Action a = () => gameEnv.RemoveWall(pos, dir);
+
+            //Assert
+            board.GetCell(pos2).IsAccessible(dir.Opposite()).Should().Be(false);
+            board.GetCell(pos).IsAccessible(dir).Should().Be(false);
+            a.Should().NotThrow();
+            board.GetCell(pos).IsAccessible(dir).Should().Be(true);
+            board.GetCell(pos2).IsAccessible(dir.Opposite()).Should().Be(true);
+        }
+
+        #endregion
+
+
+        #region CreateAndValidateWall
+
         [TestCase(5, 5, North)]
         [TestCase(7, 5, South)]
         public void Should_Create_And_Validate_Walls(
@@ -167,6 +240,8 @@ namespace Quoridor.Tests.Environment
             //Assert
             a.Should().Throw<Exception>();
         }
+
+        #endregion
 
         private Tuple<IBoard, GameEnvironment> CreateGameEnvironment()
         {

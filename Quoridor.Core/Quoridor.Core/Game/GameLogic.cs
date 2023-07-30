@@ -15,5 +15,7 @@ namespace Quoridor.Core.Game
             _gameEnvironment = gameEnvironment;
         }
 
+        
+
     }
 }

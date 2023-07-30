@@ -66,5 +66,22 @@ namespace Quoridor.Tests.Environment
             //Assert
             neighbors.Count().Should().Be(expectedCount);
         }
+
+        [TestCase(-1, 0, false)]
+        [TestCase(5, 5, true)]
+        [TestCase(8, 8, true)]
+        [TestCase(9, 7, false)]
+        public void Should_Correctly_Decide_If_Pos_Is_Within_Board_Bounds(
+            int f_x, int f_y, bool expected)
+        {
+            //Arrange
+            var board = new Board();
+            board.SetDimension(9);
+            var pos = new Vector2(f_x, f_y);
+
+            //Act
+            //Assert
+            board.WithinBounds(pos).Should().Be(expected);
+        }
     }
 }
