@@ -116,6 +116,8 @@ namespace Quoridor.Tests.Environment
             board.GetCell(pos).IsAccessible(West).Should().Be(false);
             board.Neighbors(board.GetCell(pos)).Count().Should().Be(1);
 
+            var a = board.GetCell(pos2);
+
             //(5,6) is blocked on the northern and the western sides
             board.GetCell(pos2).IsAccessible(North).Should().Be(false);
             board.GetCell(pos2).IsAccessible(West).Should().Be(false);

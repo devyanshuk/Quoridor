@@ -35,10 +35,14 @@ namespace Quoridor.Core.Environment
         
         public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
         {
-            yield return CreateAndValidateWall(from, placement);
+            var wall = CreateAndValidateWall(from, placement);
+            yield return wall;
             yield return CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
 
-            var newPos = from.PositionAt(placement);
+            var newPos = from.Copy();
+            if (wall.IsHorizontal()) newPos.X++;
+            else newPos.Y++;
+
             yield return CreateAndValidateWall(newPos, placement);
             yield return CreateAndValidateWall(_board.GetCellAt(newPos, placement).Position, placement.Opposite());
         }

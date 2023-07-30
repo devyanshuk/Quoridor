@@ -18,9 +18,11 @@
     <None Remove="Environment\" />
     <None Remove="NSubstitute" />
     <None Remove="FluentAssertions" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Environment\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />

@@ -18,21 +18,6 @@ namespace Quoridor.Core.Utils
             return new Vector2(X, Y);
         }
 
-        public Vector2 PositionAt(Direction dir)
-        {
-            var copy = Copy();
-            switch (dir)
-            {
-                case Direction.North:
-                case Direction.South:
-                    { copy.X++; break; }
-                case Direction.East:
-                default:
-                    { copy.Y++; break; }
-            }
-            return copy;
-        }
-
         public static bool operator==(Vector2 first, Vector2 second)
         {
             return first.X == second.X && first.Y == second.Y;
