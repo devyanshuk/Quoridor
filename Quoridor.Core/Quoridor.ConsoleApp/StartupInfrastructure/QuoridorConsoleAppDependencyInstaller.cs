@@ -6,7 +6,7 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Quoridor.Core.DependencyRegistry;
 
 
-namespace Quoridor.ConsoleApp.DependencyInstaller
+namespace Quoridor.ConsoleApp.StartupInfrastructure
 {
     public class QuoridorConsoleAppDependencyInstaller : IWindsorInstaller
     {
@@ -14,6 +14,7 @@ namespace Quoridor.ConsoleApp.DependencyInstaller
         {
             container.AddFacility<TypedFactoryFacility>();
             container.Register(QuoridorCoreDependencyRegistry.GetRegistrations());
+            container.Register(QuoridorConsoleAppDependencyRegistry.GetRegistrations());
         }
     }
 }

@@ -19,10 +19,12 @@
     <None Remove="NSubstitute" />
     <None Remove="FluentAssertions" />
     <None Remove="Extensions\" />
+    <None Remove="Game\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Environment\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Game\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />

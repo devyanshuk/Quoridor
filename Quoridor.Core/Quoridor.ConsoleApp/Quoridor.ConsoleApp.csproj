@@ -15,6 +15,7 @@
     <None Remove="DependencyInstaller\" />
     <None Remove="CLAP" />
     <None Remove="Utils\" />
+    <None Remove="GameManager\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
@@ -23,8 +24,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="DependencyInstaller\" />
+    <Folder Include="StartupInfrastructure\" />
     <Folder Include="Utils\" />
+    <Folder Include="GameManager\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

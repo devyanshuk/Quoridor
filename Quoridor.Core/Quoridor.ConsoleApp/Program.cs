@@ -3,7 +3,7 @@ using System;
 using Castle.Windsor;
 
 using Quoridor.Common.Logging;
-using Quoridor.ConsoleApp.DependencyInstaller;
+using Quoridor.ConsoleApp.StartupInfrastructure;
 
 namespace Quoridor.ConsoleApp
 {
@@ -15,18 +15,13 @@ namespace Quoridor.ConsoleApp
         public static void Main(string[] args)
         {
             var container = new WindsorContainer().Install(new QuoridorConsoleAppDependencyInstaller());
-            try
-            {
-                _log.Info($"Successfully installed DI container. Starting {nameof(ConsoleApp)}...");
+            _log.Info($"Successfully installed DI container. Starting {nameof(ConsoleApp)}...");
 
-                var p = new Parser<Runner>();
-                p.Run(args, new Runner(container, Console.Out, Console.Error));
-            } catch(Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            Console.WriteLine("HERE");
-            //Console.ReadKey();
+            var p = new Parser<Runner>();
+            p.Run(args, new Runner(container, Console.Out, Console.Error));
+
+            _log.Info($"Game finished.");
+            Console.ReadKey();
         }
     }
 }

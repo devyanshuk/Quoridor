@@ -14,7 +14,6 @@ namespace Quoridor.Core.DependencyRegistry
             {
                 //LifestyleSingleton
                 Component.For<IBoard>().ImplementedBy<Board>().LifestyleSingleton(),
-                Component.For<IGameLogic>().ImplementedBy<GameLogic>().LifestyleSingleton(),
                 Component.For<IGameEnvironment>().ImplementedBy<GameEnvironment>().LifestyleSingleton(),
 
                 //LifestyleTransient

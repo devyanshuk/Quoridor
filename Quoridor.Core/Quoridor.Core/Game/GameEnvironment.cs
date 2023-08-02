@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
-using Quoridor.Core.Extensions;
-using Quoridor.Core.Utils.CustomExceptions;
 using Quoridor.Core.Entities;
+using Quoridor.Core.Extensions;
+using Quoridor.Core.Environment;
+using Quoridor.Core.Utils.CustomExceptions;
 
-namespace Quoridor.Core.Environment
+namespace Quoridor.Core.Game
 {
     public class GameEnvironment : IGameEnvironment
     {

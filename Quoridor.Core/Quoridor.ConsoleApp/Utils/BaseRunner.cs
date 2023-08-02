@@ -1,13 +1,13 @@
-﻿using System;
+﻿using CLAP;
+using System;
 using System.IO;
-using CLAP;
 
 namespace Quoridor.ConsoleApp.Utils
 {
     public class BaseRunner
     {
-        private readonly TextWriter _stdOut;
-        private readonly TextWriter _stdErr;
+        public readonly TextWriter _stdOut;
+        public readonly TextWriter _stdErr;
 
         public BaseRunner(TextWriter stdOut, TextWriter stdErr)
         {

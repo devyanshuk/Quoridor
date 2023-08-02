@@ -3,7 +3,7 @@
 using Quoridor.Core.Utils;
 using Quoridor.Core.Entities;
 
-namespace Quoridor.Core.Environment
+namespace Quoridor.Core.Game
 {
     public interface IGameEnvironment
     {

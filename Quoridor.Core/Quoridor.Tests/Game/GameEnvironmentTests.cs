@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
 
+using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
 using Quoridor.Core.Entities;
 using Quoridor.Core.Extensions;
@@ -10,7 +11,7 @@ using Quoridor.Core.Environment;
 using Quoridor.Core.Utils.CustomExceptions;
 using static Quoridor.Core.Utils.Direction;
 
-namespace Quoridor.Tests.Environment
+namespace Quoridor.Tests.Game
 {
     [TestFixture]
     public class GameEnvironmentTests

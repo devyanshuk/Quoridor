@@ -1,12 +1,11 @@
 ﻿using CLAP;
-using System;
 using System.IO;
 using Castle.Windsor;
 
 using Quoridor.Core.Environment;
-using Quoridor.Core.Game;
-using Quoridor.ConsoleApp.Utils;
 using Quoridor.Common.Logging;
+using Quoridor.ConsoleApp.Utils;
+using Quoridor.ConsoleApp.GameManager;
 
 namespace Quoridor.ConsoleApp
 {
@@ -24,17 +23,38 @@ namespace Quoridor.ConsoleApp
             _container = container;
         }
 
-        [Verb]
+        [Verb(IsDefault=true)]
         public void Play(
 
-            [Description("Game Board Dimension"), DefaultValue(9)]
+            [Description("Game Board Dimension")]
+            [DefaultValue(9)]
             [Aliases("d")]
-            int Dimension
+            int Dimension,
+
+            [Description("Player 1 Identifier")]
+            [DefaultValue('A')]
+            [Aliases("f")]
+            char PlayerOneId,
+
+            [Description("Player 2 Identifier")]
+            [DefaultValue('B')]
+            [Aliases("s")]
+            char PlayerTwoId,
+
+            [Description("Number of walls a player has at the beginning")]
+            [DefaultValue(8)]
+            [Aliases("w")]
+            int NumWalls
         )
         {
+            _log.Info($@"{nameof(Play)} method called. Params: {nameof(Dimension)}: {Dimension},
+            {nameof(PlayerOneId)} : '{PlayerOneId}', {nameof(PlayerTwoId)}: '{PlayerTwoId}', {nameof(NumWalls)}: {NumWalls}");
+
             _container.Resolve<IBoard>().SetDimension(Dimension);
 
-            var game = _container.Resolve<IGameLogic>();
+            var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
+            var gameManager = gameManagerFactory.CreateManager(PlayerOneId, PlayerTwoId, NumWalls, _stdOut);
+            gameManager.Start();
         }
     }
 }
