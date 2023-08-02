@@ -1,7 +1,7 @@
 ﻿using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
-
 using Quoridor.ConsoleApp.GameManager;
+using Quoridor.ConsoleApp.Configuration;
 
 namespace Quoridor.ConsoleApp.StartupInfrastructure
 {
@@ -13,6 +13,7 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
             {
                 //LifestyleSingleton
                 Component.For<IConsoleGameManager>().ImplementedBy<ConsoleGameManager>().LifestyleSingleton(),
+                Component.For<IConfigProvider>().ImplementedBy<ConfigProvider>().LifestyleSingleton(),
 
                 //Factory
                 Component.For<IConsoleGameManagerFactory>().AsFactory().LifestyleSingleton(),

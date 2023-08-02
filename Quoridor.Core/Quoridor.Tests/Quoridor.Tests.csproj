@@ -20,13 +20,25 @@
     <None Remove="FluentAssertions" />
     <None Remove="Extensions\" />
     <None Remove="Game\" />
+    <None Remove="Configuration\" />
+    <None Remove="ConfigTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Environment\" />
     <Folder Include="Extensions\" />
     <Folder Include="Game\" />
+    <Folder Include="Configuration\" />
+    <Folder Include="ConfigTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
+    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
+    <ProjectReference Include="..\Quoridor.ConsoleApp\Quoridor.ConsoleApp.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Quoridor.ConsoleApp\ConfigTemplates\BoardCharacters.xml">
+      <Link>ConfigTemplates\BoardCharacters.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

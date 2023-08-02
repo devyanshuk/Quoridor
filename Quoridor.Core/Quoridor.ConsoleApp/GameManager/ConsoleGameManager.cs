@@ -6,6 +6,8 @@ using Quoridor.Common.Logging;
 using Quoridor.Core.Environment;
 using Quoridor.Core.Entities;
 using Quoridor.Core.Utils;
+using System.Text;
+using Quoridor.ConsoleApp.Configuration;
 
 namespace Quoridor.ConsoleApp.GameManager
 {
@@ -13,6 +15,7 @@ namespace Quoridor.ConsoleApp.GameManager
     {
         private readonly IBoard _board;
         private readonly IGameEnvironment _gameEnvironment;
+        private readonly IConfigProvider _configProvider;
 
         private readonly ILogger _log = Logger.InstanceFor<ConsoleGameManager>();
 
@@ -27,7 +30,8 @@ namespace Quoridor.ConsoleApp.GameManager
             int numWalls,
             TextWriter stdOut,
             IBoard board,
-            IGameEnvironment gameEnvironment
+            IGameEnvironment gameEnvironment,
+            IConfigProvider configProvider
         )
         {
             _playerALabel = playerALabel;
@@ -36,6 +40,7 @@ namespace Quoridor.ConsoleApp.GameManager
             _stdOut = stdOut;
             _board = board;
             _gameEnvironment = gameEnvironment;
+            _configProvider = configProvider;
         }
 
         public void Start()
@@ -55,6 +60,11 @@ namespace Quoridor.ConsoleApp.GameManager
             {
 
             }
+        }
+
+        public void DrawBoard()
+        {
+            var sb = new StringBuilder();
         }
 
     }

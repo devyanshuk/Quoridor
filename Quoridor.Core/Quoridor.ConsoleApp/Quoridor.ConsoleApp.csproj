@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <DefineConstants>_WINDOWS</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
@@ -16,6 +19,8 @@
     <None Remove="CLAP" />
     <None Remove="Utils\" />
     <None Remove="GameManager\" />
+    <None Remove="ConfigTemplates\" />
+    <None Remove="Configuration\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
@@ -27,6 +32,8 @@
     <Folder Include="StartupInfrastructure\" />
     <Folder Include="Utils\" />
     <Folder Include="GameManager\" />
+    <Folder Include="ConfigTemplates\" />
+    <Folder Include="Configuration\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
