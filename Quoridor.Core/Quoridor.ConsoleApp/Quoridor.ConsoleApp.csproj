@@ -8,15 +8,27 @@
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
     <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
+    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Castle.Windsor" />
     <None Remove="DependencyInstaller\" />
+    <None Remove="CLAP" />
+    <None Remove="Utils\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
+    <PackageReference Include="CLAP" Version="4.6.0">
+        <NoWarn>NU1701</NoWarn>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DependencyInstaller\" />
+    <Folder Include="Utils\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

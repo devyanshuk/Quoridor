@@ -1,20 +1,32 @@
-﻿using System;
+﻿using CLAP;
+using System;
 using Castle.Windsor;
+
+using Quoridor.Common.Logging;
 using Quoridor.ConsoleApp.DependencyInstaller;
-using Quoridor.Core.Environment;
-using Quoridor.Core.Game;
 
 namespace Quoridor.ConsoleApp
 {
-    class Program
+    
+    public class Program
     {
-        static void Main(string[] args)
+        private static readonly ILogger _log = Logger.InstanceFor<Program>();
+
+        public static void Main(string[] args)
         {
             var container = new WindsorContainer().Install(new QuoridorConsoleAppDependencyInstaller());
-            container.Resolve<IBoard>().SetDimension(9);
+            try
+            {
+                _log.Info($"Successfully installed DI container. Starting {nameof(ConsoleApp)}...");
 
-            var game = container.Resolve<IGameLogic>();
-            Console.WriteLine("Success");
+                var p = new Parser<Runner>();
+                p.Run(args, new Runner(container, Console.Out, Console.Error));
+            } catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            Console.WriteLine("HERE");
+            //Console.ReadKey();
         }
     }
 }
