@@ -53,7 +53,9 @@ namespace Quoridor.ConsoleApp
             _container.Resolve<IBoard>().SetDimension(Dimension);
 
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
-            var gameManager = gameManagerFactory.CreateManager(PlayerOneId, PlayerTwoId, NumWalls, _stdOut);
+            var boardVisualizerFactory = _container.Resolve<IBoardVisualizerFactory>();
+            var boardVisualizer = boardVisualizerFactory.CreateVisualizer(PlayerOneId, PlayerTwoId, _stdOut);
+            var gameManager = gameManagerFactory.CreateManager(NumWalls, boardVisualizer);
             gameManager.Start();
         }
     }

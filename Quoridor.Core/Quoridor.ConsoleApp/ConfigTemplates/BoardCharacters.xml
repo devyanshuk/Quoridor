@@ -1,12 +1,11 @@
 ﻿<BoardChars>
     <BorderSeparators>
-        <HorizontalSeparator> - </HorizontalSeparator>
-        <VerticalSeparator> | </VerticalSeparator>
-        <IntersectionSeparator> + </IntersectionSeparator>
+        <HorizontalSeparator>-</HorizontalSeparator>
+        <VerticalSeparator>|</VerticalSeparator>
+        <IntersectionSeparator>+</IntersectionSeparator>
     </BorderSeparators>
     <WallSeparators>
-        <HorizontalWallSeparator> = </HorizontalWallSeparator>
-        <VerticalWallSeparator> || </VerticalWallSeparator>
+        <HorizontalWallSeparator>=</HorizontalWallSeparator>
+        <VerticalWallSeparator>||</VerticalWallSeparator>
     </WallSeparators>
-
 </BoardChars>

@@ -1,46 +1,35 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 using Quoridor.Core.Game;
+using Quoridor.Core.Utils;
+using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Environment;
-using Quoridor.Core.Entities;
-using Quoridor.Core.Utils;
-using System.Text;
-using Quoridor.ConsoleApp.Configuration;
 
 namespace Quoridor.ConsoleApp.GameManager
 {
     public class ConsoleGameManager : IConsoleGameManager
     {
+        private readonly int _numWalls;
         private readonly IBoard _board;
+        private readonly IBoardVisualizer _boardVisualizer;
         private readonly IGameEnvironment _gameEnvironment;
-        private readonly IConfigProvider _configProvider;
 
         private readonly ILogger _log = Logger.InstanceFor<ConsoleGameManager>();
 
-        private readonly char _playerALabel;
-        private readonly char _playerBLabel;
-        private readonly int _numWalls;
-        private readonly TextWriter _stdOut;
-
         public ConsoleGameManager(
-            char playerALabel,
-            char playerBLabel,
             int numWalls,
-            TextWriter stdOut,
             IBoard board,
-            IGameEnvironment gameEnvironment,
-            IConfigProvider configProvider
+            IBoardVisualizer boardVisualizer,
+            IGameEnvironment gameEnvironment
         )
         {
-            _playerALabel = playerALabel;
-            _playerBLabel = playerBLabel;
             _numWalls = numWalls;
-            _stdOut = stdOut;
             _board = board;
+            _boardVisualizer = boardVisualizer;
             _gameEnvironment = gameEnvironment;
-            _configProvider = configProvider;
         }
 
         public void Start()
@@ -58,14 +47,8 @@ namespace Quoridor.ConsoleApp.GameManager
             _log.Info($"Starting console game application...");
             while(true)
             {
-
+                _boardVisualizer.DrawBoard();
             }
         }
-
-        public void DrawBoard()
-        {
-            var sb = new StringBuilder();
-        }
-
     }
 }
