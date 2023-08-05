@@ -14,6 +14,7 @@ namespace Quoridor.Core.Environment
         bool WithinBounds(Vector2 pos);
 
         Cell GetCell(Vector2 vec);
+        Cell GetCell(int x, int y);
         Cell GetCellAt(Vector2 from, Direction dir);
 
         IEnumerable<Cell> Neighbors(Cell refCell);

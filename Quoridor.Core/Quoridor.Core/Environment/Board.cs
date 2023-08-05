@@ -21,7 +21,9 @@ namespace Quoridor.Core.Environment
             Initialize();
         }
 
-        public Cell GetCell(Vector2 vec) => Cells[vec.X, vec.Y];
+        public Cell GetCell(Vector2 vec) => GetCell(vec.X, vec.Y);
+
+        public Cell GetCell(int x, int y) => Cells[x, y];
 
         public Cell GetCellAt(Vector2 from, Direction dir)
         {

@@ -67,7 +67,7 @@ namespace Quoridor.Core.Game
                 {
                     _board.GetCell(wall.From).AddWall(wall);
                 }
-                var playerPos = Players[Turn].CurrentPos;
+                //var playerPos = Players[Turn].CurrentPos;
             }
             else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
 

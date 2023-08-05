@@ -48,8 +48,8 @@ namespace Quoridor.ConsoleApp.GameManager
         private void InitAndAddPlayers(char playerAId, char playerBId)
         {
             var playerStartX = _board.Dimension / 2;
-            var playerOne = new Player(playerAId, _numWalls, new Vector2(0, playerStartX));
-            var playerTwo = new Player(playerBId, _numWalls, new Vector2(_board.Dimension - 1, playerStartX));
+            var playerOne = new Player(playerAId, _numWalls, new Vector2(playerStartX, 0));
+            var playerTwo = new Player(playerBId, _numWalls, new Vector2(playerStartX, _board.Dimension - 1));
 
             _log.Info($"{nameof(playerOne)} '{playerAId}' start pos: '{playerOne.StartPos}'");
             _log.Info($"{nameof(playerTwo)} '{playerBId}' start pos: '{playerTwo.StartPos}'");
