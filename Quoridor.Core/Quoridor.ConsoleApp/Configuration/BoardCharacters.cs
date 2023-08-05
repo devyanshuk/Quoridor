@@ -11,7 +11,30 @@ namespace Quoridor.ConsoleApp.Configuration
 
         [XmlElement(nameof(WallSeparators))]
         public WallSeparators WallSeparator { get; set; }
-        
+
+        [XmlElement(nameof(CellProperties))]
+        public CellProperties CellProperty { get; set; }
+    }
+
+    [Serializable]
+    public class CellProperties
+    {
+        [XmlElement(nameof(CellWidth))]
+        public int _cellWidth { get; set; }
+
+        [XmlIgnore]
+        public int CellWidth
+        {
+            get
+            {
+                if (_cellWidth % 2 == 0)
+                    throw new Exception($"Cell width must be an odd integer");
+                return _cellWidth;
+            }
+        }
+
+        [XmlIgnore]
+        public int HalfCellWidth => CellWidth / 2;
     }
 
     [Serializable]

@@ -51,11 +51,10 @@ namespace Quoridor.ConsoleApp
             {nameof(PlayerOneId)} : '{PlayerOneId}', {nameof(PlayerTwoId)}: '{PlayerTwoId}', {nameof(NumWalls)}: {NumWalls}");
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
-
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
             var boardVisualizerFactory = _container.Resolve<IBoardVisualizerFactory>();
-            var boardVisualizer = boardVisualizerFactory.CreateVisualizer(PlayerOneId, PlayerTwoId, _stdOut);
-            var gameManager = gameManagerFactory.CreateManager(NumWalls, boardVisualizer);
+            var boardVisualizer = boardVisualizerFactory.CreateVisualizer(_stdOut);
+            var gameManager = gameManagerFactory.CreateManager(PlayerOneId, PlayerTwoId, NumWalls, boardVisualizer);
             gameManager.Start();
         }
     }

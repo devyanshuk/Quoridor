@@ -15,7 +15,9 @@ namespace Quoridor.Common.Helpers
             try
             {
                 var serializer = new XmlSerializer(typeof(T));
-                return (T)serializer.Deserialize(sr);
+                var deserialized = (T)serializer.Deserialize(sr);
+                _log.Info($"Successfully deserialized config at path '{path}' to '{typeof(T).Name}'");
+                return deserialized;
             }
             catch(Exception ex)
             {

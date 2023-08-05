@@ -4,13 +4,14 @@ namespace Quoridor.Core.Entities
 {
     public class Player : IPlayer
     {
-        public int NumWalls { get; set; }
-
+        public int NumWalls { get; }
+        public char Id { get; }
         public Vector2 StartPos { get; }
         public Vector2 CurrentPos { get; set; }
 
-        public Player(int numWalls, Vector2 startPos)
+        public Player(char id, int numWalls, Vector2 startPos)
         {
+            Id = id;
             NumWalls = numWalls;
             StartPos = startPos;
             CurrentPos = startPos;

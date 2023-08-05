@@ -1,11 +1,14 @@
 ﻿<BoardChars>
+    <CellProperties>
+        <CellWidth>5</CellWidth>
+    </CellProperties>
     <BorderSeparators>
-        <HorizontalSeparator>-</HorizontalSeparator>
+        <HorizontalSeparator>=</HorizontalSeparator>
         <VerticalSeparator>|</VerticalSeparator>
         <IntersectionSeparator>+</IntersectionSeparator>
     </BorderSeparators>
     <WallSeparators>
-        <HorizontalWallSeparator>=</HorizontalWallSeparator>
-        <VerticalWallSeparator>||</VerticalWallSeparator>
+        <HorizontalWallSeparator>■</HorizontalWallSeparator>
+        <VerticalWallSeparator>█</VerticalWallSeparator>
     </WallSeparators>
 </BoardChars>

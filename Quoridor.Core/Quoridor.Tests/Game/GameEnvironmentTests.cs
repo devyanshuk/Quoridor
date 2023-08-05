@@ -321,7 +321,7 @@ namespace Quoridor.Tests.Game
             var board = new Board();
             board.SetDimension(9);
             var gameEnv = new GameEnvironment(board);
-            var player = new Player(8, new Vector2(4, 0));
+            var player = new Player('A', 8, new Vector2(4, 0));
             gameEnv.AddPlayer(player);
             return Tuple.Create<IBoard, GameEnvironment, IPlayer>(board, gameEnv, player);
         }

@@ -20,6 +20,8 @@ namespace Quoridor.ConsoleApp.GameManager
         private readonly ILogger _log = Logger.InstanceFor<ConsoleGameManager>();
 
         public ConsoleGameManager(
+            char playerAId,
+            char playerBId,
             int numWalls,
             IBoard board,
             IBoardVisualizer boardVisualizer,
@@ -30,25 +32,30 @@ namespace Quoridor.ConsoleApp.GameManager
             _board = board;
             _boardVisualizer = boardVisualizer;
             _gameEnvironment = gameEnvironment;
+            InitAndAddPlayers(playerAId, playerBId);
         }
 
         public void Start()
         {
-            var playerStartX = _board.Dimension / 2;
-            var playerOne = new Player(_numWalls, new Vector2(playerStartX, 0));
-            var playerTwo = new Player(_numWalls, new Vector2(playerStartX, _board.Dimension - 1));
-
-            _log.Info($"{nameof(playerOne)} start pos: '{playerOne.StartPos}'");
-            _log.Info($"{nameof(playerTwo)} start pos: '{playerTwo.StartPos}'");
-
-            _gameEnvironment.AddPlayer(playerOne);
-            _gameEnvironment.AddPlayer(playerTwo);
-
             _log.Info($"Starting console game application...");
             while(true)
             {
                 _boardVisualizer.DrawBoard();
+                Console.ReadKey();
             }
+        }
+
+        private void InitAndAddPlayers(char playerAId, char playerBId)
+        {
+            var playerStartX = _board.Dimension / 2;
+            var playerOne = new Player(playerAId, _numWalls, new Vector2(0, playerStartX));
+            var playerTwo = new Player(playerBId, _numWalls, new Vector2(_board.Dimension - 1, playerStartX));
+
+            _log.Info($"{nameof(playerOne)} '{playerAId}' start pos: '{playerOne.StartPos}'");
+            _log.Info($"{nameof(playerTwo)} '{playerBId}' start pos: '{playerTwo.StartPos}'");
+
+            _gameEnvironment.AddPlayer(playerOne);
+            _gameEnvironment.AddPlayer(playerTwo);
         }
     }
 }
