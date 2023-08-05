@@ -4,18 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Quoridor.Common.Logging;
-using Quoridor.ConsoleApp.Configuration;
-using Quoridor.Core.Environment;
 using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
+using Quoridor.Core.Environment;
+using Quoridor.ConsoleApp.Configuration;
 
 namespace Quoridor.ConsoleApp.GameManager
 {
     public class BoardVisualizer : IBoardVisualizer
     {
-        private readonly ILogger _log = Logger.InstanceFor<BoardVisualizer>();
-
         private readonly TextWriter _stdOut;
         private readonly IBoard _board;
         private readonly IConfigProvider _configProvider;
@@ -34,11 +31,13 @@ namespace Quoridor.ConsoleApp.GameManager
             _board = board;
             _configProvider = configProvider;
             _gameEnvironment = gameEnvironment;
-
             _verticalWalls = new int[_board.Dimension];
 
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.South);
+            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.West);
             _gameEnvironment.AddWall(new Vector2(5, 5), Direction.East);
+            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.South);
+            _gameEnvironment.AddWall(new Vector2(3, 5), Direction.South);
+            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.North);
         }
 
         public void DrawBoard()
@@ -67,7 +66,7 @@ namespace Quoridor.ConsoleApp.GameManager
 
             for (var k = 0; k < _board.Dimension; k++)
             {
-                if (row < _board.Dimension - 1 && !_board.GetCell(k, row).IsAccessible(Direction.South))
+                if (row > 0 && row < _board.Dimension && !_board.GetCell(k, row).IsAccessible(Direction.North))
                 {
                     sb.Append(PadStrWithChar(_configProvider.BoardChars.WallSeparator.Horizontal));
                     wallCount++;
@@ -75,7 +74,9 @@ namespace Quoridor.ConsoleApp.GameManager
                 else
                     sb.Append(PadStrWithChar(_configProvider.BoardChars.BorderSeparator.Horizontal));
 
-                if (_verticalWalls[k] % 2 == 1 || wallCount % 2 == 1)
+                if (_verticalWalls[k] % 2 == 1)
+                    sb.Append(_configProvider.BoardChars.WallSeparator.Vertical);
+                else if (wallCount % 2 == 1)
                     sb.Append(_configProvider.BoardChars.WallSeparator.Horizontal);
                 else
                     sb.Append(_configProvider.BoardChars.BorderSeparator.Intersection);
@@ -112,7 +113,6 @@ namespace Quoridor.ConsoleApp.GameManager
                     if (player != null)
                         cellId = player.Id.ToString();
                 }
-
                 sb.Append(PadStr(cellId));
 
                 if (j < _board.Dimension - 1 && !cell.IsAccessible(Direction.East))
