@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -33,11 +31,10 @@ namespace Quoridor.ConsoleApp.GameManager
             _gameEnvironment = gameEnvironment;
             _verticalWalls = new int[_board.Dimension];
 
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.West);
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.East);
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.South);
-            _gameEnvironment.AddWall(new Vector2(3, 5), Direction.South);
             _gameEnvironment.AddWall(new Vector2(5, 5), Direction.North);
+            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.South);
+            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.West);
+        
         }
 
         public void DrawBoard()
@@ -130,11 +127,9 @@ namespace Quoridor.ConsoleApp.GameManager
         private string PadStr<T>(T item)
         {
             var padLen = _configProvider.BoardChars.CellProperty.HalfCellWidth;
-
             var itemStr = item.ToString();
-            var right = itemStr.PadRight(padLen + itemStr.Length);
-            var left = right.PadLeft(padLen * 2 + itemStr.Length);
-            return left;
+            return itemStr.PadRight(padLen + itemStr.Length)
+                .PadLeft(padLen * 2 + itemStr.Length);
         }
 
         private string PadStrWithChar<T>(T item)
@@ -143,9 +138,8 @@ namespace Quoridor.ConsoleApp.GameManager
 
             var itemStr = item.ToString();
             var padChar = itemStr[0];
-            var right = itemStr.PadRight(padLen + itemStr.Length, padChar);
-            var left = right.PadLeft(padLen * 2 + itemStr.Length, padChar);
-            return left;
+            return itemStr.PadRight(padLen + itemStr.Length, padChar)
+                .PadLeft(padLen * 2 + itemStr.Length, padChar);
         }
     }
 }

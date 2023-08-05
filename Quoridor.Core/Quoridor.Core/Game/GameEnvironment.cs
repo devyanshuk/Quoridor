@@ -95,15 +95,23 @@ namespace Quoridor.Core.Game
         public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
         {
             var wall = CreateAndValidateWall(from, placement);
-            yield return wall;
-            yield return CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
+            var wall2 = CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
 
             var newPos = from.Copy();
             if (wall.IsHorizontal()) newPos.X++;
             else newPos.Y++;
 
-            yield return CreateAndValidateWall(newPos, placement);
-            yield return CreateAndValidateWall(_board.GetCellAt(newPos, placement).Position, placement.Opposite());
+            var wall3 = CreateAndValidateWall(newPos, placement);
+            var wall4 = CreateAndValidateWall(_board.GetCellAt(newPos, placement).Position, placement.Opposite());
+
+            var dir1 = wall.From.GetDirFor(wall3.From);
+            var dir2 = wall2.From.GetDirFor(wall4.From);
+
+            if (!_board.GetCell(wall.From).IsAccessible(dir1) && !_board.GetCell(wall2.From).IsAccessible(dir2))
+                throw new WallIntersectsException($"wall '{from}' : '{placement}' intersects with '{wall3.From}' : '{dir1}'");
+
+
+            return new List<IWall> { wall, wall2, wall3, wall4 };
         }
 
         public IWall CreateAndValidateWall(Vector2 from, Direction dir)

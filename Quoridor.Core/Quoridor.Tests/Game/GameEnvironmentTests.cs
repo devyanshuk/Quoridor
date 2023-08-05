@@ -79,6 +79,22 @@ namespace Quoridor.Tests.Game
             b.Should().Throw<WallAlreadyPresentException>();
         }
 
+        [Test]
+        public void Should_Throw_If_Wall_Added_Intersects_With_Another_Wall()
+        {
+            //Arrange
+            var gameEnv = CreateGameEnvironment().Item2;
+            var pos = new Vector2(5, 5);
+
+            //Act
+            gameEnv.AddWall(pos, North);
+            gameEnv.AddWall(pos, South);
+            Action a = () => gameEnv.AddWall(pos, East);
+
+            //Assert
+            a.Should().Throw<WallIntersectsException>();
+        }
+
         [TestCase(5, 5, North)]
         [TestCase(5, 5, South)]
         [TestCase(3, 4, East)]

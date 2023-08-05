@@ -33,6 +33,17 @@ namespace Quoridor.Core.Utils
             return copy;
         }
 
+        public Direction GetDirFor(Vector2 vec)
+        {
+            if (vec == this || (vec.X != X && vec.Y != Y))
+                throw new ArgumentException($"{vec} : cannot determine direction WRT {this}");
+            if (vec.Y == Y)
+            {
+                return vec.X < X ? Direction.West : Direction.East;
+            }
+            return vec.Y < Y ? Direction.North : Direction.South;
+        }
+
         public static bool operator==(Vector2 first, Vector2 second)
         {
             return first.X == second.X && first.Y == second.Y;

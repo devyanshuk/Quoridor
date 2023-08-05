@@ -16,6 +16,13 @@ namespace Quoridor.Core.Utils.CustomExceptions
         public InvalidWallException() : base() { }
     }
 
+    public class WallIntersectsException : Exception
+    {
+        public WallIntersectsException(string message) : base(message) { }
+
+        public WallIntersectsException() : base() { }
+    }
+
     public class WallNotPresentException : Exception
     {
         public WallNotPresentException(string message) : base(message) { }
