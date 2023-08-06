@@ -18,7 +18,7 @@ namespace Quoridor.ConsoleApp
             _log.Info($"Successfully installed DI container. Starting {nameof(ConsoleApp)}...");
 
             var p = new Parser<Runner>();
-            p.Run(args, new Runner(container, Console.Out, Console.Error));
+            p.Run(args, new Runner(container, Console.In, Console.Out, Console.Error));
 
             _log.Info($"Game finished.");
             Console.ReadKey();

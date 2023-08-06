@@ -16,6 +16,8 @@ namespace Quoridor.Core.Game
         void MovePlayer(Direction dir);
         void ChangeTurn();
 
+        IPlayer CurrentPlayer { get; }
+
         void AddWall(Vector2 from, Direction placement);
         void RemoveWall(Vector2 from, Direction placement);
     }

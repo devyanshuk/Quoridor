@@ -2,9 +2,9 @@
 using System.IO;
 using Castle.Windsor;
 
-using Quoridor.Core.Environment;
 using Quoridor.Common.Logging;
 using Quoridor.ConsoleApp.Utils;
+using Quoridor.Core.Environment;
 using Quoridor.ConsoleApp.GameManager;
 
 namespace Quoridor.ConsoleApp
@@ -14,12 +14,16 @@ namespace Quoridor.ConsoleApp
         private readonly IWindsorContainer _container;
         private readonly ILogger _log = Logger.InstanceFor<Runner>();
 
+        private readonly TextReader _stdIn;
+
         public Runner(
             IWindsorContainer container,
+            TextReader stdIn,
             TextWriter stdOut,
             TextWriter stdErr)
             : base(stdOut, stdErr)
         {
+            _stdIn = stdIn;
             _container = container;
         }
 
@@ -53,8 +57,11 @@ namespace Quoridor.ConsoleApp
             _container.Resolve<IBoard>().SetDimension(Dimension);
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
             var boardVisualizerFactory = _container.Resolve<IBoardVisualizerFactory>();
+            var commandParserFactory = _container.Resolve<ICommandParserFactory>();
+
             var boardVisualizer = boardVisualizerFactory.CreateVisualizer(_stdOut);
-            var gameManager = gameManagerFactory.CreateManager(PlayerOneId, PlayerTwoId, NumWalls, boardVisualizer);
+            var commandParser = commandParserFactory.CreateParser(_stdIn, _stdOut);
+            var gameManager = gameManagerFactory.CreateManager(PlayerOneId, PlayerTwoId, NumWalls, boardVisualizer, commandParser);
             gameManager.Start();
         }
     }

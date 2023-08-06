@@ -16,6 +16,7 @@ namespace Quoridor.ConsoleApp.GameManager
         private readonly IBoard _board;
         private readonly IBoardVisualizer _boardVisualizer;
         private readonly IGameEnvironment _gameEnvironment;
+        private readonly ICommandParser _commandParser;
 
         private readonly ILogger _log = Logger.InstanceFor<ConsoleGameManager>();
 
@@ -25,13 +26,16 @@ namespace Quoridor.ConsoleApp.GameManager
             int numWalls,
             IBoard board,
             IBoardVisualizer boardVisualizer,
-            IGameEnvironment gameEnvironment
+            IGameEnvironment gameEnvironment,
+            ICommandParser commandParser
         )
         {
             _numWalls = numWalls;
             _board = board;
             _boardVisualizer = boardVisualizer;
             _gameEnvironment = gameEnvironment;
+            _commandParser = commandParser;
+
             InitAndAddPlayers(playerAId, playerBId);
         }
 
@@ -41,7 +45,7 @@ namespace Quoridor.ConsoleApp.GameManager
             while(true)
             {
                 _boardVisualizer.DrawBoard();
-                Console.ReadKey();
+                _commandParser.ParseAndProcess();
             }
         }
 

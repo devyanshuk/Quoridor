@@ -30,11 +30,6 @@ namespace Quoridor.ConsoleApp.GameManager
             _configProvider = configProvider;
             _gameEnvironment = gameEnvironment;
             _verticalWalls = new int[_board.Dimension];
-
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.North);
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.South);
-            _gameEnvironment.AddWall(new Vector2(5, 5), Direction.West);
-        
         }
 
         public void DrawBoard()

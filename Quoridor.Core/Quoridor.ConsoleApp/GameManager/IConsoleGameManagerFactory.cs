@@ -3,6 +3,10 @@
     public interface IConsoleGameManagerFactory
     {
         IConsoleGameManager CreateManager(
-            char playerAId, char playerBId, int numWalls, IBoardVisualizer boardVisualizer);
+            char playerAId,
+            char playerBId,
+            int numWalls,
+            IBoardVisualizer boardVisualizer,
+            ICommandParser commandParser);
     }
 }

@@ -39,20 +39,33 @@ namespace Quoridor.Core.Game
             Turn = (Turn + 1) % Players.Count;
         }
 
+        public IPlayer CurrentPlayer
+        {
+            get
+            {
+                return Players[Turn];
+            }
+        }
+
         public void MovePlayer(Direction dir)
         {
             var player = Players[Turn];
             var newPos = player.CurrentPos.GetPosFor(dir);
 
+            var playerInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos));
+
+            if (playerInNewPos != null)
+                throw new InvalidAgentMoveException($"Player '{player.Id}' cannot move to '{newPos}'. Player '{playerInNewPos.Id}' already present");
+
             if (!_board.WithinBounds(newPos))
-                throw new InvalidAgentMoveException($"player '{Turn}' cannot move to '{newPos}'. Invalid move position");
+                throw new InvalidAgentMoveException($"player '{player.Id}' cannot move to '{newPos}'. Invalid move position");
 
             var neighbors = _board.Neighbors(_board.GetCell(player.CurrentPos));
             if (neighbors.Any(n => n.Position.Equals(newPos)))
             {
                 player.Move(newPos);
             }
-            else throw new NewMoveBlockedByWallException($"player '{Turn}' cannot move to '{newPos}' since it's blocked by a wall");
+            else throw new NewMoveBlockedByWallException($"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall");
         }
 
         public void AddWall(Vector2 from, Direction placement)
@@ -67,11 +80,11 @@ namespace Quoridor.Core.Game
                 {
                     _board.GetCell(wall.From).AddWall(wall);
                 }
-                //var playerPos = Players[Turn].CurrentPos;
             }
             else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
 
             Walls.Add(walls.First());
+            Players[Turn].NumWalls--;
         }
 
         public void RemoveWall(Vector2 from, Direction placement)
@@ -108,8 +121,7 @@ namespace Quoridor.Core.Game
             var dir2 = wall2.From.GetDirFor(wall4.From);
 
             if (!_board.GetCell(wall.From).IsAccessible(dir1) && !_board.GetCell(wall2.From).IsAccessible(dir2))
-                throw new WallIntersectsException($"wall '{from}' : '{placement}' intersects with '{wall3.From}' : '{dir1}'");
-
+                throw new WallIntersectsException($"wall '{from}' : '{placement}' intersects with a previously added wall");
 
             return new List<IWall> { wall, wall2, wall3, wall4 };
         }

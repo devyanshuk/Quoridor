@@ -4,7 +4,7 @@ namespace Quoridor.Core.Entities
 {
     public class Player : IPlayer
     {
-        public int NumWalls { get; }
+        public int NumWalls { get; set; }
         public char Id { get; }
         public Vector2 StartPos { get; }
         public Vector2 CurrentPos { get; set; }

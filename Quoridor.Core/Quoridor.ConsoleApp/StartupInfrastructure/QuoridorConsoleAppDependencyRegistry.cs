@@ -15,10 +15,12 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
                 Component.For<IConsoleGameManager>().ImplementedBy<ConsoleGameManager>().LifestyleSingleton(),
                 Component.For<IConfigProvider>().ImplementedBy<ConfigProvider>().LifestyleSingleton(),
                 Component.For<IBoardVisualizer>().ImplementedBy<BoardVisualizer>().LifestyleSingleton(),
+                Component.For<ICommandParser>().ImplementedBy<CommandParser>().LifestyleSingleton(),
 
                 //Factory
                 Component.For<IConsoleGameManagerFactory>().AsFactory().LifestyleSingleton(),
                 Component.For<IBoardVisualizerFactory>().AsFactory().LifestyleSingleton(),
+                Component.For<ICommandParserFactory>().AsFactory().LifestyleSingleton(),
             };
         }
     }
