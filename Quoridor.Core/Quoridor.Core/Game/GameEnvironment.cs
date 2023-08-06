@@ -14,7 +14,7 @@ namespace Quoridor.Core.Game
         private readonly IBoard _board;
 
         public int Turn { get; private set; }
-        public List<IPlayer> Players { get; } = new List<IPlayer>();
+        public List<IPlayer> Players { get; private set; }
         public HashSet<IWall> Walls { get; private set; } = new HashSet<IWall>();
 
         public GameEnvironment(
@@ -31,6 +31,10 @@ namespace Quoridor.Core.Game
 
         public void AddPlayer(IPlayer player)
         {
+            if (Players == null)
+            {
+                Players = new List<IPlayer>();
+            }
             Players.Add(player);
         }
 
@@ -50,32 +54,10 @@ namespace Quoridor.Core.Game
         public void MovePlayer(Direction dir)
         {
             var player = Players[Turn];
-            var newPos = player.CurrentPos.GetPosFor(dir);
-
-            var jump = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos)) != null;
-
-            if (!_board.WithinBounds(newPos))
-                throw new InvalidAgentMoveException($"player '{player.Id}' cannot move to '{newPos}'. Invalid move position");
-
-            if (!NewMoveBlockedByWall(player.CurrentPos, newPos))
-            {
-                var canMove = true;
-                if (jump)
-                {
-                    var jumpPos = newPos.GetPosFor(dir);
-                    if (NewMoveBlockedByWall(newPos, jumpPos))
-                        canMove = false;
-                    else
-                        newPos = jumpPos;
-                }
-                if (canMove)
-                {
-                    player.Move(newPos);
-                    return;
-                }
-            }
-            throw new NewMoveBlockedByWallException($"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall");
+            var newPos = TryMove(player.CurrentPos, dir);
+            player.CurrentPos = newPos;
         }
+
 
         public void AddWall(Vector2 from, Direction placement)
         {
@@ -93,7 +75,8 @@ namespace Quoridor.Core.Game
             else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
 
             Walls.Add(walls.First());
-            Players[Turn].NumWalls--;
+
+            Players?[Turn]?.DecreaseWallCount();
         }
 
         public void RemoveWall(Vector2 from, Direction placement)
@@ -155,6 +138,22 @@ namespace Quoridor.Core.Game
                 throw new InvalidWallException($"{dir}ern wall from '{from} not possible.'");
             }
             return wall;
+        }
+
+        private Vector2 TryMove(Vector2 currentPos, Direction dir)
+        {
+            var newPos = currentPos.GetPosFor(dir);
+            var player = Players[Turn];
+
+            if (!_board.WithinBounds(newPos))
+                throw new InvalidAgentMoveException($"player '{player.Id}' cannot move to '{newPos}'. Invalid move position");
+
+            if (NewMoveBlockedByWall(currentPos, newPos))
+                throw new NewMoveBlockedByWallException($"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall");
+
+            var anotherPlayerExistsInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos)) != null;
+
+            return anotherPlayerExistsInNewPos ? TryMove(newPos, dir) : newPos;
         }
     }
 }

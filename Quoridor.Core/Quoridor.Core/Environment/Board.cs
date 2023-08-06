@@ -58,7 +58,7 @@ namespace Quoridor.Core.Environment
             if (x + 1 < Dimension && refCell.IsAccessible(Direction.East))
                 yield return Cells[x + 1, y];
 
-            if (x - 1 > 0 && refCell.IsAccessible(Direction.West))
+            if (x - 1 >= 0 && refCell.IsAccessible(Direction.West))
                 yield return Cells[x - 1, y];
         }
     }

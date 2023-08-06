@@ -50,6 +50,10 @@ namespace Quoridor.Tests.Environment
         [TestCase(0, 0, 1, South)]
         [TestCase(5, 5, 2, North, South)]
         [TestCase(0, 0, 0, South, East)]
+        [TestCase(0, 0, 2)]
+        [TestCase(5, 5, 4)]
+        [TestCase(8, 8, 2)]
+        [TestCase(4, 8, 3)]
         public void Should_Return_Correct_Movable_Space_From_A_Cell(
             int x, int y, int expectedCount, params Direction[] directions)
         {

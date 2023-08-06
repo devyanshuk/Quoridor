@@ -10,5 +10,6 @@ namespace Quoridor.Core.Entities
         public Vector2 CurrentPos { get; set; }
 
         void Move(Vector2 newPos);
+        void DecreaseWallCount();
     }
 }

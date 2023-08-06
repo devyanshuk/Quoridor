@@ -21,5 +21,10 @@ namespace Quoridor.Core.Entities
         {
             CurrentPos = newPos;
         }
+
+        public void DecreaseWallCount()
+        {
+            NumWalls--;
+        }
     }
 }

@@ -272,7 +272,8 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
-            var player = token.Item3;
+            var player = new Player('A', 8, new Vector2(4, 0));
+            gameEnv.AddPlayer(player);
             player.CurrentPos = new Vector2(f_x, f_y);
 
             //Act
@@ -293,7 +294,8 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
-            var player = token.Item3;
+            var player = new Player('A', 8, new Vector2(4, 0));
+            gameEnv.AddPlayer(player);
             player.CurrentPos = new Vector2(f_x, f_y);
             var expectedNewPos = new Vector2(t_x, t_y);
 
@@ -302,6 +304,50 @@ namespace Quoridor.Tests.Game
 
             //Assert
             player.CurrentPos.Should().Be(expectedNewPos);
+        }
+
+        [TestCase(0, 7, 0, 8, South)]
+        [TestCase(1, 0, 0, 0, West)]
+        [TestCase(7, 0, 8, 0, East)]
+        [TestCase(2, 1, 2, 0, North)]
+        public void Should_Throw_If_Player_Tried_Jumping_Outside_Board_Bounds(
+            int f_x, int f_y, int t_x, int t_y, Direction dir)
+        {
+            //Arrange
+            var gameEnv = CreateGameEnvironment().Item2;
+            var p1 = new Player('A', 8, new Vector2(f_x, f_y));
+            var p2 = new Player('B', 8, new Vector2(t_x, t_y));
+            gameEnv.AddPlayer(p1);
+            gameEnv.AddPlayer(p2);
+
+            //Act
+            Action a = () => gameEnv.MovePlayer(dir);
+
+            //Assert
+            a.Should().Throw<InvalidAgentMoveException>();
+        }
+
+
+        [TestCase(5, 5, 5, 4, North, 5, 3)]
+        [TestCase(1, 3, 2, 3, East, 3, 3)]
+        [TestCase(8, 8, 7, 8, West, 6, 8)]
+        public void Player_Should_Jump_If_Another_Player_Is_On_Its_Path(
+            int f_x, int f_y, int t_x, int t_y, Direction dir, int d_x, int d_y
+            )
+        {
+            //Arrange
+            var gameEnv = CreateGameEnvironment().Item2;
+            var p1 = new Player('A', 8, new Vector2(f_x, f_y));
+            var p2 = new Player('B', 8, new Vector2(t_x, t_y));
+            gameEnv.AddPlayer(p1);
+            gameEnv.AddPlayer(p2);
+
+            //Act
+            gameEnv.MovePlayer(dir);
+
+            //Assert
+            p1.CurrentPos.X.Should().Be(d_x);
+            p1.CurrentPos.Y.Should().Be(d_y);
         }
 
         [TestCase(5, 5, North)]
@@ -315,7 +361,8 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
-            var player = token.Item3;
+            var player = new Player('A', 8, new Vector2(4, 0));
+            gameEnv.AddPlayer(player);
             var pos = new Vector2(f_x, f_y);
             player.CurrentPos = pos;
 
@@ -332,14 +379,13 @@ namespace Quoridor.Tests.Game
 
         #endregion
 
-        private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()
+        private Tuple<IBoard, GameEnvironment> CreateGameEnvironment()
         {
             var board = new Board();
             board.SetDimension(9);
             var gameEnv = new GameEnvironment(board);
-            var player = new Player('A', 8, new Vector2(4, 0));
-            gameEnv.AddPlayer(player);
-            return Tuple.Create<IBoard, GameEnvironment, IPlayer>(board, gameEnv, player);
+   
+            return Tuple.Create<IBoard, GameEnvironment>(board, gameEnv);
         }
     }
 }
