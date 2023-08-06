@@ -27,4 +27,7 @@
     <Folder Include="Utils\CustomExceptions\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
+  </ItemGroup>
 </Project>
