@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
 using Quoridor.Common.Logging;
+using System.Globalization;
 
 namespace Quoridor.ConsoleApp.GameManager
 {
@@ -17,7 +18,7 @@ namespace Quoridor.ConsoleApp.GameManager
         private readonly ILogger _log = Logger.InstanceFor<CommandParser>();
 
         private readonly Regex commandPattern = new Regex(
-            $"^\\s*(?<{nameof(Type)}>Move|Wall\\s*\\(?\\s*(?<X>\\d)\\s*,?\\s*(?<Y>\\d))\\s*\\)?\\s*(?<{nameof(Direction)}>North|South|East|West)");
+            $"^\\s*(?<{nameof(Type)}>[Mm]ove|[Ww]all\\s*\\(?\\s*(?<X>\\d)\\s*,?\\s*(?<Y>\\d))\\s*\\)?\\s*(?<{nameof(Direction)}>[Nn]orth|[Ss]outh|[Ee]ast|[Ww]est)");
 
         public CommandParser(
             TextReader stdIn,
@@ -64,10 +65,11 @@ namespace Quoridor.ConsoleApp.GameManager
                 return false;
             }
             var groups = commandPattern.Match(line).Groups;
-            var type = groups[nameof(Type)].Value;
-            var dir = ParseEnum<Direction>(groups[nameof(Direction)].Value);
+            var type = groups[nameof(Type)].Value.ToLower();
+            var directionStr = groups[nameof(Direction)].Value;
+            var dir = ParseEnum<Direction>(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(directionStr));
 
-            if (type == "Move")
+            if (type == "move")
             {
                 _log.Info($"Move command entered. Moving player '{_gameEnvironment.Turn}'");
                 _gameEnvironment.MovePlayer(dir);

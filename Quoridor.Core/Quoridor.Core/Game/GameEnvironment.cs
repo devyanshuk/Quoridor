@@ -52,24 +52,29 @@ namespace Quoridor.Core.Game
             var player = Players[Turn];
             var newPos = player.CurrentPos.GetPosFor(dir);
 
-            var playerInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos));
-            var jump = false;
-
-            if (playerInNewPos != null)
-            {
-                newPos = newPos.GetPosFor(dir);
-                jump = true;
-            }
+            var jump = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos)) != null;
 
             if (!_board.WithinBounds(newPos))
                 throw new InvalidAgentMoveException($"player '{player.Id}' cannot move to '{newPos}'. Invalid move position");
 
-            var neighbors = _board.Neighbors(_board.GetCell(jump ? playerInNewPos.CurrentPos : player.CurrentPos));
-            if (neighbors.Any(n => n.Position.Equals(newPos)))
+            if (!NewMoveBlockedByWall(player.CurrentPos, newPos))
             {
-                player.Move(newPos);
+                var canMove = true;
+                if (jump)
+                {
+                    var jumpPos = newPos.GetPosFor(dir);
+                    if (NewMoveBlockedByWall(newPos, jumpPos))
+                        canMove = false;
+                    else
+                        newPos = jumpPos;
+                }
+                if (canMove)
+                {
+                    player.Move(newPos);
+                    return;
+                }
             }
-            else throw new NewMoveBlockedByWallException($"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall");
+            throw new NewMoveBlockedByWallException($"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall");
         }
 
         public void AddWall(Vector2 from, Direction placement)
@@ -107,6 +112,12 @@ namespace Quoridor.Core.Game
             else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
 
             Walls.Remove(walls.First());
+        }
+
+        public bool NewMoveBlockedByWall(Vector2 currPos, Vector2 newPos)
+        {
+            var neighbors = _board.Neighbors(_board.GetCell(currPos));
+            return neighbors.All(n => !n.Position.Equals(newPos));
         }
         
         public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
