@@ -53,14 +53,18 @@ namespace Quoridor.Core.Game
             var newPos = player.CurrentPos.GetPosFor(dir);
 
             var playerInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos));
+            var jump = false;
 
             if (playerInNewPos != null)
-                throw new InvalidAgentMoveException($"Player '{player.Id}' cannot move to '{newPos}'. Player '{playerInNewPos.Id}' already present");
+            {
+                newPos = newPos.GetPosFor(dir);
+                jump = true;
+            }
 
             if (!_board.WithinBounds(newPos))
                 throw new InvalidAgentMoveException($"player '{player.Id}' cannot move to '{newPos}'. Invalid move position");
 
-            var neighbors = _board.Neighbors(_board.GetCell(player.CurrentPos));
+            var neighbors = _board.Neighbors(_board.GetCell(jump ? playerInNewPos.CurrentPos : player.CurrentPos));
             if (neighbors.Any(n => n.Position.Equals(newPos)))
             {
                 player.Move(newPos);
