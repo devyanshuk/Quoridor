@@ -26,5 +26,10 @@ namespace Quoridor.Core.Entities
         {
             NumWalls--;
         }
+
+        public void IncreaseWallCount()
+        {
+            NumWalls++;
+        }
     }
 }

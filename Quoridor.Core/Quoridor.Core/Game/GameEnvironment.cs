@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
@@ -52,20 +53,21 @@ namespace Quoridor.Core.Game
         {
             get
             {
-                return Players[Turn];
+                return Players?[Turn];
             }
         }
 
         public void MovePlayer(Direction dir)
         {
-            var player = Players[Turn];
+            if (Players == null)
+                throw new Exception($"No player registered. Call the {nameof(AddPlayer)} method to register");
 
-            _log.Info($"Moving player '{player.Id}' '{dir}'...");
+            _log.Info($"Moving player '{CurrentPlayer.Id}' '{dir}'...");
 
-            var newPos = TryMove(player.CurrentPos, dir);
-            player.CurrentPos = newPos;
+            var newPos = TryMove(CurrentPlayer.CurrentPos, dir);
+            CurrentPlayer.CurrentPos = newPos;
 
-            _log.Info($"Moved player '{player.Id}' to '{newPos}'");
+            _log.Info($"Moved player '{CurrentPlayer.Id}' to '{newPos}'");
         }
 
 
@@ -96,17 +98,24 @@ namespace Quoridor.Core.Game
 
             _log.Info($"Successfully added '{placement}ern' wall from '{from}'");
 
-            Players?[Turn]?.DecreaseWallCount();
+            CurrentPlayer?.DecreaseWallCount();
         }
 
         public void RemoveWall(Vector2 from, Direction placement)
         {
+            _log.Info($"Attempting to remove '{placement}ern' wall from '{from}'");
+
             if (!_board.WithinBounds(from))
-                throw new InvalidWallException($"{placement}ern wall from '{from}' could not be removed. Invalid dimension");
+            {
+                var errorMessage = $"{placement}ern wall from '{from}' could not be removed. Invalid dimension";
+                _log.Error(errorMessage);
+                throw new InvalidWallException(errorMessage);
+            }
 
             var walls = GetWallsForAffectedCells(from, placement);
             if (walls.All(w => !_board.GetCell(w.From).IsAccessible(w.Placement)))
             {
+                _log.Info($"'{placement}'ern wall from '{from}' exists. Removing it");
                 foreach(var wall in walls)
                 {
                     _board.GetCell(wall.From).RemoveWall(wall);
@@ -115,6 +124,10 @@ namespace Quoridor.Core.Game
             else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
 
             Walls.Remove(walls.First());
+
+            _log.Info($"Successfully removed '{placement}ern' wall from '{from}'");
+
+            CurrentPlayer?.IncreaseWallCount();
         }
 
         public bool NewMoveBlockedByWall(Vector2 currPos, Vector2 newPos)

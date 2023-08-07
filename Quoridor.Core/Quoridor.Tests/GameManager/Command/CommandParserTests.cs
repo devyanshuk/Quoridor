@@ -84,7 +84,13 @@ namespace Quoridor.Tests.GameManager.Command
             a.Should().Throw<ArgumentException>();
         }
 
-        public class RandomCommand : BaseCommand { }
+        public class RandomCommand : BaseCommand
+        {
+            public override void Handle(IGameEnvironment gameEnv)
+            {
+                throw new NotImplementedException();
+            }
+        }
 
         [Test]
         public void Should_Throw_If_Process_Command_Does_Not_Recognize_Command_Type()
@@ -97,7 +103,7 @@ namespace Quoridor.Tests.GameManager.Command
             Action a = () => commandParser.Process(randomCommand);
 
             //Assert
-            a.Should().Throw<ArgumentException>();
+            a.Should().Throw<NotImplementedException>();
         }
 
 

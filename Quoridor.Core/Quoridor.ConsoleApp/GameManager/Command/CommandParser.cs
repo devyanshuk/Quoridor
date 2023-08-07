@@ -97,17 +97,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
 
         public void Process<T>(T command) where T : BaseCommand
         {
-            if (command is MoveCommand moveCommand)
-            {
-                _log.Info($"Move command entered. Moving player '{_gameEnvironment.Turn}'");
-                _gameEnvironment.MovePlayer(moveCommand.Dir);
-            }
-            else if (command is WallCommand wallCommand)
-            {
-                _gameEnvironment.AddWall(wallCommand.Pos, wallCommand.Dir);
-                _log.Info($"Successfully added wall '{wallCommand.Pos}': '{wallCommand.Dir}'");
-            }
-            else throw new ArgumentException($"{typeof(T).Name} command type not recognized");
+            command.Handle(_gameEnvironment);
         }
 
         private T ParseEnum<T>(string val)
