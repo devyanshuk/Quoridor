@@ -18,6 +18,8 @@ namespace Quoridor.Tests.GameManager.Command
         [TestCase("pLACE         wall (5,    3) at north please", 5, 3, North)]
         [TestCase("wall 4, 2 easT", 4, 2, East)]
         [TestCase("could you please place a northern wall at coordinate (2,1)?", 2, 1, North)]
+        [TestCase("northern wall at (5,5)", 5, 5,  North)]
+        [TestCase("wall in the southern side at coordinate (5,5)", 5, 5, South)]
         public void Should_Correctly_Parse_Valid_Wall_Commands(
             string line, int w_x, int w_y, Direction dir)
         {
