@@ -11,8 +11,6 @@ using Quoridor.Core.Environment;
 using Quoridor.Core.Utils.CustomExceptions;
 using static Quoridor.Core.Utils.Direction;
 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
-
 namespace Quoridor.Tests.Game
 {
     [TestFixture]

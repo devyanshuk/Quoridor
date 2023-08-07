@@ -10,7 +10,6 @@ namespace Quoridor.Common.Logging
 
         public Logger(string loggerName)
         {
-            log4net.Config.XmlConfigurator.Configure();
             _log = LogManager.GetLogger(loggerName);
             _name = loggerName;
         }

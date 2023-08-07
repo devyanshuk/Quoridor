@@ -14,6 +14,8 @@ namespace Quoridor.ConsoleApp
 
         public static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure();
+
             var container = new WindsorContainer().Install(new QuoridorConsoleAppDependencyInstaller());
             _log.Info($"Successfully installed DI container. Starting {nameof(ConsoleApp)}...");
 
