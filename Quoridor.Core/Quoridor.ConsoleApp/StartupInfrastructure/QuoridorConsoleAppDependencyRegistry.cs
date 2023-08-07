@@ -21,8 +21,6 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
                 Component.For<IConsoleGameManager>().ImplementedBy<ConsoleGameManager>().LifestyleSingleton(),
 
                 //Factory
-                Component.For<ICommandParserFactory>().AsFactory().LifestyleSingleton(),
-                Component.For<IBoardVisualizerFactory>().AsFactory().LifestyleSingleton(),
                 Component.For<IConsoleGameManagerFactory>().AsFactory().LifestyleSingleton(),
             };
         }

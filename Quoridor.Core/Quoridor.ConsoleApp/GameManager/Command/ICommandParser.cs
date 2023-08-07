@@ -1,7 +1,9 @@
-﻿namespace Quoridor.ConsoleApp.GameManager.Command
+﻿using System.IO;
+
+namespace Quoridor.ConsoleApp.GameManager.Command
 {
     public interface ICommandParser
     {
-        void ParseAndProcess();
+        BaseCommand Parse(string line);
     }
 }

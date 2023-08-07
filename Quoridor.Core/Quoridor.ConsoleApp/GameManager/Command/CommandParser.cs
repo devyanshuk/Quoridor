@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.RegularExpressions;
 
-using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
 using System.Globalization;
 using Quoridor.Common.Logging;
@@ -11,10 +10,6 @@ namespace Quoridor.ConsoleApp.GameManager.Command
 {
     public class CommandParser : ICommandParser
     {
-        private readonly TextReader _stdIn;
-        private readonly TextWriter _stdOut;
-        private readonly IGameEnvironment _gameEnvironment;
-
         private readonly ILogger _log = Logger.InstanceFor<CommandParser>();
 
         private readonly Regex dirRegex = new Regex(
@@ -23,38 +18,8 @@ namespace Quoridor.ConsoleApp.GameManager.Command
         private readonly Regex wallRegex = new Regex($"(?<{nameof(MoveType)}>[Ww][Aa][Ll][Ll])");
         private readonly Regex coordinateRegex = new Regex("(?<X>\\d+)\\s*,?\\s*(?<Y>\\d+)");
 
-        public CommandParser(
-            TextReader stdIn,
-            TextWriter stdOut,
-            IGameEnvironment gameEnvironment
-            )
+        public CommandParser()
         {
-            _stdIn = stdIn;
-            _stdOut = stdOut;
-            _gameEnvironment = gameEnvironment;
-        }
-
-        public void ParseAndProcess()
-        {
-            var player = _gameEnvironment.CurrentPlayer;
-
-            _stdOut.WriteLine($"Player '{player.Id}''s Turn. {player.NumWalls} wall(s) left");
-
-            while (true)
-            {
-                var line = _stdIn.ReadLine();
-                try
-                {
-                    var command = Parse(line);
-                    Process(command);
-                    break;
-                }
-                catch(Exception ex)
-                {
-                    _stdOut.WriteLine(ex.Message);
-                }
-            }
-            _gameEnvironment.ChangeTurn();
         }
 
         public BaseCommand Parse(string line)
@@ -95,15 +60,9 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             return new WallCommand { Dir = dirEnum, Pos = pos };
         }
 
-        public void Process<T>(T command) where T : BaseCommand
-        {
-            command.Handle(_gameEnvironment);
-        }
-
         private T ParseEnum<T>(string val)
         {
             return (T)Enum.Parse(typeof(T), val);
         }
-
     }
 }

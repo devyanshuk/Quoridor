@@ -11,7 +11,6 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
 {
     public class BoardVisualizer : IBoardVisualizer
     {
-        private readonly TextWriter _stdOut;
         private readonly IBoard _board;
         private readonly IConfigProvider _configProvider;
         private readonly IGameEnvironment _gameEnvironment;
@@ -19,19 +18,17 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
         private int[] _verticalWalls;
 
         public BoardVisualizer(
-            TextWriter stdOut,
             IBoard board,
             IConfigProvider configProvider,
             IGameEnvironment gameEnvironment
         )
         {
-            _stdOut = stdOut;
             _board = board;
             _configProvider = configProvider;
             _gameEnvironment = gameEnvironment;
         }
 
-        public void DrawBoard()
+        public void DrawBoard(TextWriter dest)
         {
             _verticalWalls = new int[_board.Dimension];
             var sb = new StringBuilder();
@@ -46,7 +43,7 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
             }
             AppendWallRow(sb, _board.Dimension);
 
-            _stdOut.WriteLine(sb);
+            dest.WriteLine(sb);
         }
 
         private void AppendWallRow(StringBuilder sb, int row)

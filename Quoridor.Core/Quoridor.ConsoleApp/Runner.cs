@@ -1,13 +1,13 @@
 ﻿using CLAP;
 using System.IO;
+using System.Linq;
 using Castle.Windsor;
+using CLAP.Validation;
 
 using Quoridor.Common.Logging;
 using Quoridor.ConsoleApp.Utils;
 using Quoridor.Core.Environment;
 using Quoridor.ConsoleApp.GameManager;
-using Quoridor.ConsoleApp.GameManager.Command;
-using Quoridor.ConsoleApp.GameManager.Visualizer;
 
 namespace Quoridor.ConsoleApp
 {
@@ -37,15 +37,16 @@ namespace Quoridor.ConsoleApp
             [Aliases("d")]
             int Dimension,
 
-            [Description("Player 1 Identifier")]
-            [DefaultValue('A')]
-            [Aliases("f")]
-            char PlayerOneId,
+            [Description("Number of Players")]
+            [LessOrEqualTo(4), MoreOrEqualTo(0)]
+            [DefaultValue(2)]
+            [Aliases("n")]
+            int NumPlayers,
 
-            [Description("Player 2 Identifier")]
-            [DefaultValue('B')]
-            [Aliases("s")]
-            char PlayerTwoId,
+            [Description("Player Ids (comma separated chars)")]
+            [DefaultValue("A,B")]
+            [Aliases("i")]
+            string Ids,
 
             [Description("Number of walls a player has at the beginning")]
             [DefaultValue(8)]
@@ -54,16 +55,21 @@ namespace Quoridor.ConsoleApp
         )
         {
             _log.Info($@"{nameof(Play)} method called. Params: {nameof(Dimension)}: {Dimension},
-            {nameof(PlayerOneId)} : '{PlayerOneId}', {nameof(PlayerTwoId)}: '{PlayerTwoId}', {nameof(NumWalls)}: {NumWalls}");
+            {nameof(Ids)}: {Ids}, {nameof(NumWalls)}: {NumWalls}, {nameof(NumPlayers)}: {NumPlayers}");
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
-            var boardVisualizerFactory = _container.Resolve<IBoardVisualizerFactory>();
-            var commandParserFactory = _container.Resolve<ICommandParserFactory>();
 
-            var boardVisualizer = boardVisualizerFactory.CreateVisualizer(_stdOut);
-            var commandParser = commandParserFactory.CreateParser(_stdIn, _stdOut);
-            var gameManager = gameManagerFactory.CreateManager(PlayerOneId, PlayerTwoId, NumWalls, boardVisualizer, commandParser);
+            var settings = new ConsoleGameSettings
+            {
+                InputSrc = _stdIn,
+                OutputDest = _stdOut,
+                NumPlayers = NumPlayers,
+                PlayerIds = Ids.Split(",").Select(i => i.Trim()[0]).ToList(),
+                NumWalls = NumWalls
+            };
+
+            var gameManager = gameManagerFactory.CreateManager(settings);
             gameManager.Start();
         }
     }

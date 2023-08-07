@@ -1,7 +1,9 @@
-﻿namespace Quoridor.ConsoleApp.GameManager.Visualizer
+﻿using System.IO;
+
+namespace Quoridor.ConsoleApp.GameManager.Visualizer
 {
     public interface IBoardVisualizer
     {
-        void DrawBoard();
+        void DrawBoard(TextWriter dest);
     }
 }

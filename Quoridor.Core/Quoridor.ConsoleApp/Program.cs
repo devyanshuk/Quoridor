@@ -23,7 +23,6 @@ namespace Quoridor.ConsoleApp
             p.Run(args, new Runner(container, Console.In, Console.Out, Console.Error));
 
             _log.Info($"Game finished.");
-            Console.ReadKey();
         }
     }
 }
