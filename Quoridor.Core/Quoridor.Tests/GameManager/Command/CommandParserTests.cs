@@ -1,5 +1,4 @@
 ﻿using System;
-using NSubstitute;
 using NUnit.Framework;
 using FluentAssertions;
 
@@ -92,24 +91,9 @@ namespace Quoridor.Tests.GameManager.Command
             }
         }
 
-        [Test]
-        public void Should_Throw_If_Process_Command_Does_Not_Recognize_Command_Type()
-        {
-            //Arrange
-            var commandParser = GetCommandParser();
-            var randomCommand = new RandomCommand { Dir = South };
-
-            //Act
-            Action a = () => commandParser.Process(randomCommand);
-
-            //Assert
-            a.Should().Throw<NotImplementedException>();
-        }
-
-
         private CommandParser GetCommandParser()
         {
-            return new CommandParser(null, null, Substitute.For<IGameEnvironment>());
+            return new CommandParser();
         }
     }
 
