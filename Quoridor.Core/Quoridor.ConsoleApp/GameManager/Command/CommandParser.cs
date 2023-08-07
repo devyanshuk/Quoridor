@@ -37,16 +37,17 @@ namespace Quoridor.ConsoleApp.GameManager.Command
         public void ParseAndProcess()
         {
             var player = _gameEnvironment.CurrentPlayer;
+
             _stdOut.WriteLine($"Player '{player.Id}''s Turn. {player.NumWalls} wall(s) left");
 
-            var success = false;
-            while (!success)
+            while (true)
             {
                 var line = _stdIn.ReadLine();
                 try
                 {
                     var command = Parse(line);
-                    success = Process(command);
+                    Process(command);
+                    break;
                 }
                 catch(Exception ex)
                 {
@@ -94,7 +95,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             return new WallCommand { Dir = dirEnum, Pos = pos };
         }
 
-        public bool Process(BaseCommand command)
+        public void Process<T>(T command) where T : BaseCommand
         {
             if (command is MoveCommand moveCommand)
             {
@@ -106,9 +107,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
                 _gameEnvironment.AddWall(wallCommand.Pos, wallCommand.Dir);
                 _log.Info($"Successfully added wall '{wallCommand.Pos}': '{wallCommand.Dir}'");
             }
-            else throw new ArgumentException($"{typeof(BaseCommand).Name} command type not recognized");
-          
-            return true;
+            else throw new ArgumentException($"{typeof(T).Name} command type not recognized");
         }
 
         private T ParseEnum<T>(string val)
