@@ -1,5 +1,4 @@
-﻿using System;
-namespace Quoridor.ConsoleApp.GameManager
+﻿namespace Quoridor.ConsoleApp.GameManager.Visualizer
 {
     public interface IBoardVisualizer
     {

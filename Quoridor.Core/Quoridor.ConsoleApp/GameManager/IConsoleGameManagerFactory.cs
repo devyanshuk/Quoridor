@@ -1,4 +1,7 @@
-﻿namespace Quoridor.ConsoleApp.GameManager
+﻿using Quoridor.ConsoleApp.GameManager.Command;
+using Quoridor.ConsoleApp.GameManager.Visualizer;
+
+namespace Quoridor.ConsoleApp.GameManager
 {
     public interface IConsoleGameManagerFactory
     {

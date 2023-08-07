@@ -21,6 +21,8 @@
     <None Remove="GameManager\" />
     <None Remove="ConfigTemplates\" />
     <None Remove="Configuration\" />
+    <None Remove="GameManager\Command\" />
+    <None Remove="GameManager\Visualizer\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
@@ -34,6 +36,8 @@
     <Folder Include="GameManager\" />
     <Folder Include="ConfigTemplates\" />
     <Folder Include="Configuration\" />
+    <Folder Include="GameManager\Command\" />
+    <Folder Include="GameManager\Visualizer\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

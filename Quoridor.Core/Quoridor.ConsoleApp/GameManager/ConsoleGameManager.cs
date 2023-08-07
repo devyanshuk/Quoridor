@@ -1,12 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Text;
-
-using Quoridor.Core.Game;
+﻿using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Environment;
+using Quoridor.ConsoleApp.GameManager.Visualizer;
+using Quoridor.ConsoleApp.GameManager.Command;
 
 namespace Quoridor.ConsoleApp.GameManager
 {

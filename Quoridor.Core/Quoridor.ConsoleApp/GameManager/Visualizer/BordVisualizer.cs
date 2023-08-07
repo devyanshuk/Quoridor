@@ -7,7 +7,7 @@ using Quoridor.Core.Utils;
 using Quoridor.Core.Environment;
 using Quoridor.ConsoleApp.Configuration;
 
-namespace Quoridor.ConsoleApp.GameManager
+namespace Quoridor.ConsoleApp.GameManager.Visualizer
 {
     public class BoardVisualizer : IBoardVisualizer
     {
@@ -29,11 +29,11 @@ namespace Quoridor.ConsoleApp.GameManager
             _board = board;
             _configProvider = configProvider;
             _gameEnvironment = gameEnvironment;
-            _verticalWalls = new int[_board.Dimension];
         }
 
         public void DrawBoard()
         {
+            _verticalWalls = new int[_board.Dimension];
             var sb = new StringBuilder();
 
             AppendInitialRow(sb);
@@ -87,6 +87,12 @@ namespace Quoridor.ConsoleApp.GameManager
             sb.AppendLine(_configProvider.BoardChars.BorderSeparator.Vertical);
         }
 
+        /// <summary>
+        /// Append either empty spaces, or cell numbers, player Ids.
+        /// When displaying table, the user could configure cells to be bigger, so
+        /// we use the 'displayItems' switch to only display the cell number, player Id (if any)
+        /// in a row, and on the other, we append only empty spaces
+        /// </summary>
         private void AppendCellRow(StringBuilder sb, int rowNumber, bool displayItems)
         {
             sb.Append(PadStr(displayItems ? rowNumber.ToString() : " "));

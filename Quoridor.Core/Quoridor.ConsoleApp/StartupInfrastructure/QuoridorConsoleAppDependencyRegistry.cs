@@ -1,7 +1,10 @@
 ﻿using Castle.Facilities.TypedFactory;
 using Castle.MicroKernel.Registration;
+
 using Quoridor.ConsoleApp.GameManager;
 using Quoridor.ConsoleApp.Configuration;
+using Quoridor.ConsoleApp.GameManager.Command;
+using Quoridor.ConsoleApp.GameManager.Visualizer;
 
 namespace Quoridor.ConsoleApp.StartupInfrastructure
 {
@@ -12,15 +15,15 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
             return new IRegistration[]
             {
                 //LifestyleSingleton
-                Component.For<IConsoleGameManager>().ImplementedBy<ConsoleGameManager>().LifestyleSingleton(),
+                Component.For<ICommandParser>().ImplementedBy<CommandParser>().LifestyleSingleton(),
                 Component.For<IConfigProvider>().ImplementedBy<ConfigProvider>().LifestyleSingleton(),
                 Component.For<IBoardVisualizer>().ImplementedBy<BoardVisualizer>().LifestyleSingleton(),
-                Component.For<ICommandParser>().ImplementedBy<CommandParser>().LifestyleSingleton(),
+                Component.For<IConsoleGameManager>().ImplementedBy<ConsoleGameManager>().LifestyleSingleton(),
 
                 //Factory
-                Component.For<IConsoleGameManagerFactory>().AsFactory().LifestyleSingleton(),
-                Component.For<IBoardVisualizerFactory>().AsFactory().LifestyleSingleton(),
                 Component.For<ICommandParserFactory>().AsFactory().LifestyleSingleton(),
+                Component.For<IBoardVisualizerFactory>().AsFactory().LifestyleSingleton(),
+                Component.For<IConsoleGameManagerFactory>().AsFactory().LifestyleSingleton(),
             };
         }
     }

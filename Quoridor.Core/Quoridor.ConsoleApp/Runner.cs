@@ -6,6 +6,8 @@ using Quoridor.Common.Logging;
 using Quoridor.ConsoleApp.Utils;
 using Quoridor.Core.Environment;
 using Quoridor.ConsoleApp.GameManager;
+using Quoridor.ConsoleApp.GameManager.Command;
+using Quoridor.ConsoleApp.GameManager.Visualizer;
 
 namespace Quoridor.ConsoleApp
 {

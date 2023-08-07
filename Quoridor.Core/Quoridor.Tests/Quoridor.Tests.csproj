@@ -22,6 +22,8 @@
     <None Remove="Game\" />
     <None Remove="Configuration\" />
     <None Remove="ConfigTemplates\" />
+    <None Remove="GameManager\" />
+    <None Remove="GameManager\Command\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Environment\" />
@@ -29,6 +31,8 @@
     <Folder Include="Game\" />
     <Folder Include="Configuration\" />
     <Folder Include="ConfigTemplates\" />
+    <Folder Include="GameManager\" />
+    <Folder Include="GameManager\Command\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
