@@ -41,21 +41,14 @@ namespace Quoridor.ConsoleApp.GameManager
         {
             _log.Info($"Starting console game application...");
             while(true)
-            {
-                try
-                {
-                    _boardVisualizer.DrawBoard(_settings.OutputDest);
+            { 
+                _boardVisualizer.DrawBoard(_settings.OutputDest);
 
-                    var player = _gameEnvironment.CurrentPlayer;
-                    _settings.OutputDest.WriteLine($"Player '{player.Id}''s Turn. {player.NumWalls} wall(s) left");
+                var player = _gameEnvironment.CurrentPlayer;
+                _settings.OutputDest.WriteLine($"Player '{player.Id}''s Turn. {player.NumWalls} wall(s) left");
 
-                    ParseAndProcessCommand();
-                    _gameEnvironment.ChangeTurn();
-                }
-                catch (Exception ex)
-                {
-                    _settings.OutputDest.WriteLine(ex.Message);
-                }
+                ParseAndProcessCommand();
+                _gameEnvironment.ChangeTurn();
             }
         }
 
