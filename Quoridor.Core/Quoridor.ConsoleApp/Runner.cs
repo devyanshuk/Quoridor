@@ -48,7 +48,7 @@ namespace Quoridor.ConsoleApp
             [Aliases("i")]
             string Ids,
 
-            [Description("Number of walls a player has at the beginning")]
+            [Description("Number of walls each player has at the beginning")]
             [DefaultValue(8)]
             [Aliases("w")]
             int NumWalls
