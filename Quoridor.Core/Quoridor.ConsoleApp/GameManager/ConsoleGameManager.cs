@@ -2,9 +2,11 @@
 
 using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
+using Quoridor.Core.Movement;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Environment;
+using Quoridor.AI.AStarAlgorithm;
 using Quoridor.ConsoleApp.GameManager.Command;
 using Quoridor.ConsoleApp.GameManager.Visualizer;
 
@@ -70,25 +72,44 @@ namespace Quoridor.ConsoleApp.GameManager
             }
         }
 
-        public void Process<T>(T command) where T : BaseCommand
+        public void Process<T>(T command) where T : Move
         {
             _log.Info($"Received '{typeof(T).Name}' command");
-            command.Handle(_gameEnvironment);
+            _gameEnvironment.Move(command);
         }
 
         private void InitAndAddPlayers()
         {
             var startXs = new int[4] { _board.Dimension / 2, _board.Dimension / 2, 0, _board.Dimension - 1 };
             var startYs = new int[4] { 0, _board.Dimension - 1, _board.Dimension / 2, _board.Dimension / 2 };
+            var goalConditions = new IsGoal<Vector2>[] {
+                (pos) => pos.Y == _board.Dimension - 1,
+                (pos) => pos.Y == 0,
+                (pos) => pos.X == 0,
+                (pos) => pos.X == _board.Dimension - 1
+            };
+            var heuristics = new H_n<Vector2>[]
+            {
+                (pos) => Math.Abs(_board.Dimension - 1 - pos.Y),
+                (pos) => pos.Y,
+                (pos) => pos.X,
+                (pos) => Math.Abs(_board.Dimension - 1 - pos.Y)
+            };
+
+            var currIdAscii = 65;
 
             for (int i = 0; i < _settings.NumPlayers; i++)
             {
                 var startX = startXs[i];
                 var startY = startYs[i];
-                var playerId = _settings.PlayerIds[i];
+                var playerId = (char)currIdAscii++;
 
                 var startPos = new Vector2(startX, startY);
-                var player = new Player(playerId, _settings.NumWalls, startPos);
+                var player = new Player(playerId, _settings.NumWalls, startPos)
+                {
+                    ManhattanHeuristicFn = heuristics[i],
+                    IsGoalCell = goalConditions[i]
+                };
 
                 _gameEnvironment.AddPlayer(player);
 

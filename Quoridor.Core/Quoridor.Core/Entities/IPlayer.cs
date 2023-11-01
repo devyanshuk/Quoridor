@@ -1,13 +1,16 @@
-﻿using Quoridor.Core.Utils;
+﻿using System;
+using Quoridor.Core.Utils;
+using Quoridor.AI.AStarAlgorithm;
 
 namespace Quoridor.Core.Entities
 {
-    public interface IPlayer
+    public interface IPlayer : IAStarPlayer<Vector2>, IEquatable<IPlayer>
     {
-        public char Id { get; }
-        public int NumWalls { get; set; }
-        public Vector2 StartPos { get; }
-        public Vector2 CurrentPos { get; set; }
+        char Id { get; }
+        int NumWalls { get; set; }
+        Vector2 StartPos { get; }
+        int CurrX { get; }
+        int CurrY { get; }
 
         void Move(Vector2 newPos);
         void DecreaseWallCount();

@@ -2,8 +2,8 @@
 using NUnit.Framework;
 using FluentAssertions;
 
-using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
+using Quoridor.Core.Movement;
 using static Quoridor.Core.Utils.Direction;
 using Quoridor.ConsoleApp.GameManager.Command;
 
@@ -29,11 +29,11 @@ namespace Quoridor.Tests.GameManager.Command
             var wallCommand = commandParser.Parse(line);
 
             //Assert
-            wallCommand.Should().BeOfType<WallCommand>();
-            var wall = wallCommand as WallCommand;
+            wallCommand.Should().BeOfType<WallPlacement>();
+            var wall = wallCommand as WallPlacement;
             wall.Dir.Should().Be(dir);
-            wall.Pos.X.Should().Be(w_x);
-            wall.Pos.Y.Should().Be(w_y);
+            wall.From.X.Should().Be(w_x);
+            wall.From.Y.Should().Be(w_y);
         }
 
         [TestCase("Move North", North)]
@@ -53,8 +53,8 @@ namespace Quoridor.Tests.GameManager.Command
             var moveCommand = commandParser.Parse(line);
 
             //Assert
-            moveCommand.Should().BeOfType<MoveCommand>();
-            var move = moveCommand as MoveCommand;
+            moveCommand.Should().BeOfType<AgentMove>();
+            var move = moveCommand as AgentMove;
             move.Dir.Should().Be(dir);
         }
 
@@ -81,14 +81,6 @@ namespace Quoridor.Tests.GameManager.Command
 
             //Assert
             a.Should().Throw<ArgumentException>();
-        }
-
-        public class RandomCommand : BaseCommand
-        {
-            public override void Handle(IGameEnvironment gameEnv)
-            {
-                throw new NotImplementedException();
-            }
         }
 
         private CommandParser GetCommandParser()

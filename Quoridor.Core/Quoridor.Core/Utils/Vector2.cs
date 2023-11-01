@@ -1,11 +1,15 @@
 ﻿using System;
 
+using Quoridor.AI.Interfaces;
+
 namespace Quoridor.Core.Utils
 {
-    public class Vector2 : IEquatable<Vector2>
+    public class Vector2 : IVector2D, IEquatable<Vector2>
     {
         public int X { get; set; }
         public int Y { get; set; }
+
+        public Vector2() { }
 
         public Vector2(int x, int y)
         {
@@ -18,6 +22,9 @@ namespace Quoridor.Core.Utils
             return new Vector2(X, Y);
         }
 
+
+        // (5,4) input North
+        // return (5,3)
         public Vector2 GetPosFor(Direction dir)
         {
             var copy = Copy();

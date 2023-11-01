@@ -80,6 +80,33 @@ namespace Quoridor.Tests.Game
         }
 
         [Test]
+        public void GameEnv_Should_Throw_If_Player_Blocked_By_Wall()
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var board = token.Item1;
+            var gameEnv = token.Item2;
+            gameEnv.Players.Clear();
+            var pos = new Vector2(5, 5);
+            var player = new Player('A', 10, pos)
+            {
+                ManhattanHeuristicFn = (cell) => cell.Y,
+                IsGoalCell = (cell) => cell.Y == 0
+            };
+            gameEnv.AddPlayer(player);
+            gameEnv.AddWall(new Vector2(5, 5), North);
+            gameEnv.AddWall(new Vector2(5, 5), West);
+            gameEnv.AddWall(new Vector2(5, 6), South);
+
+
+            //Act
+            Action a = () => gameEnv.AddWall(new Vector2(6, 5), East);
+
+            //Assert
+            a.Should().Throw<NewWallBlocksPlayerException>();
+        }
+
+        [Test]
         public void Should_Throw_If_Wall_Added_Intersects_With_Another_Wall()
         {
             //Arrange
@@ -136,21 +163,21 @@ namespace Quoridor.Tests.Game
             board.GetCell(pos).IsAccessible(North).Should().Be(false);
             board.GetCell(pos).IsAccessible(South).Should().Be(false);
             board.GetCell(pos).IsAccessible(West).Should().Be(false);
-            board.Neighbors(board.GetCell(pos)).Count().Should().Be(1);
+            board.Neighbors(pos).Count().Should().Be(1);
 
             //(5,6) is blocked on the northern and the western sides
             board.GetCell(pos2).IsAccessible(North).Should().Be(false);
             board.GetCell(pos2).IsAccessible(West).Should().Be(false);
-            board.Neighbors(board.GetCell(pos2)).Count().Should().Be(2);
+            board.Neighbors(pos2).Count().Should().Be(2);
 
             //(6,5) is blocked on the northern and southen sides
             board.GetCell(pos4).IsAccessible(North).Should().Be(false);
             board.GetCell(pos4).IsAccessible(South).Should().Be(false);
-            board.Neighbors(board.GetCell(pos4)).Count().Should().Be(2);
+            board.Neighbors(pos4).Count().Should().Be(2);
 
             //(4,6) is blocked on the eastern side
             board.GetCell(pos3).IsAccessible(East).Should().Be(false);
-            board.Neighbors(board.GetCell(pos3)).Count().Should().Be(3);
+            board.Neighbors(pos3).Count().Should().Be(3);
         }
 
         #endregion
@@ -272,6 +299,7 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
+            gameEnv.Players.Clear();
             var player = new Player('A', 8, new Vector2(4, 0));
             gameEnv.AddPlayer(player);
             player.CurrentPos = new Vector2(f_x, f_y);
@@ -294,6 +322,7 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
+            gameEnv.Players.Clear();
             var player = new Player('A', 8, new Vector2(4, 0));
             gameEnv.AddPlayer(player);
             player.CurrentPos = new Vector2(f_x, f_y);
@@ -315,6 +344,7 @@ namespace Quoridor.Tests.Game
         {
             //Arrange
             var gameEnv = CreateGameEnvironment().Item2;
+            gameEnv.Players.Clear();
             var p1 = new Player('A', 8, new Vector2(f_x, f_y));
             var p2 = new Player('B', 8, new Vector2(t_x, t_y));
             gameEnv.AddPlayer(p1);
@@ -337,6 +367,7 @@ namespace Quoridor.Tests.Game
         {
             //Arrange
             var gameEnv = CreateGameEnvironment().Item2;
+            gameEnv.Players.Clear();
             var p1 = new Player('A', 8, new Vector2(f_x, f_y));
             var p2 = new Player('B', 8, new Vector2(t_x, t_y));
             gameEnv.AddPlayer(p1);
@@ -361,10 +392,9 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
-            var player = new Player('A', 8, new Vector2(4, 0));
-            gameEnv.AddPlayer(player);
+            
             var pos = new Vector2(f_x, f_y);
-            player.CurrentPos = pos;
+            gameEnv.CurrentPlayer.CurrentPos = pos;
 
             //Act
             gameEnv.AddWall(pos, dir);
@@ -377,6 +407,27 @@ namespace Quoridor.Tests.Game
             b.Should().Throw<NewMoveBlockedByWallException>();
         }
 
+        [TestCase(5, 5, North)]
+        [TestCase(4, 4, East)]
+        public void Walls_Hashmap_Should_Correctly_Identify_Different_POV_Wall(
+            int f_x, int f_y, Direction dir)
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var pos = new Vector2(f_x, f_y);
+
+            //Act
+            gameEnv.AddWall(pos, dir);
+
+            //Assert
+            gameEnv.Walls.Contains(new Wall(dir, pos)).Should().BeTrue();
+            var oppPos = pos.GetPosFor(dir);
+            var oppDir = dir.Opposite();
+            var h = gameEnv.Walls.First().GetHashCode();
+            gameEnv.Walls.Contains(new Wall(oppDir, oppPos)).Should().BeTrue();
+        }
+
         #endregion
 
         private Tuple<IBoard, GameEnvironment> CreateGameEnvironment()
@@ -384,7 +435,13 @@ namespace Quoridor.Tests.Game
             var board = new Board();
             board.SetDimension(9);
             var gameEnv = new GameEnvironment(board);
-   
+            var player = new Player('A', 8, new Vector2(4, 0))
+            {
+                ManhattanHeuristicFn = (cell) => Math.Abs(8 - cell.Y),
+                IsGoalCell = (cell) => cell.Y == 8
+            };
+            gameEnv.AddPlayer(player);
+
             return Tuple.Create<IBoard, GameEnvironment>(board, gameEnv);
         }
     }

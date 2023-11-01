@@ -6,7 +6,6 @@ namespace Quoridor.ConsoleApp.GameManager
     public class ConsoleGameSettings
     {
         public int NumWalls { get; set; }
-        public List<char> PlayerIds { get; set; }
         public int NumPlayers { get; set; }
 
         public TextReader InputSrc { get; set; }

@@ -1,4 +1,5 @@
-﻿namespace Quoridor.Core.Utils
+﻿using System;
+namespace Quoridor.Core.Utils
 {
     public enum MoveType
     {

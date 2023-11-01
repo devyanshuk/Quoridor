@@ -3,10 +3,12 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
+using Quoridor.Core.Movement;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
+using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;
 
 namespace Quoridor.Core.Game
@@ -49,13 +51,9 @@ namespace Quoridor.Core.Game
             Turn = (Turn + 1) % Players.Count;
         }
 
-        public IPlayer CurrentPlayer
-        {
-            get
-            {
-                return Players?[Turn];
-            }
-        }
+        public IPlayer CurrentPlayer => Players?[Turn];
+
+        public bool IsTerminal => Players?.Any(p => p.IsGoalCell(p.CurrentPos)) ?? false;
 
         public void MovePlayer(Direction dir)
         {
@@ -85,20 +83,34 @@ namespace Quoridor.Core.Game
             var walls = GetWallsForAffectedCells(from, placement);
             if (walls.All(w => _board.GetCell(w.From).IsAccessible(w.Placement)))
             {
-                _log.Info($"Wall validity check complete. Adding wall '{from}': '{placement}' to the board");
-                foreach(var wall in walls)
-                {
+                _log.Info(@$"Wall validity check complete. Adding wall '{from}': '{
+                    placement}' to the board and checking if it's accessible for all players.");
+                foreach (var wall in walls)
                     _board.GetCell(wall.From).AddWall(wall);
-                    _log.Info($"Cell {wall.From} is now inaccessible on the '{wall.Placement}ern' side");
-                }
+                CheckForBlockedPath(walls);
             }
-            else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' already present");
+            else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
 
             Walls.Add(walls.First());
 
             _log.Info($"Successfully added '{placement}ern' wall from '{from}'");
 
             CurrentPlayer?.DecreaseWallCount();
+        }
+
+        private void CheckForBlockedPath(IEnumerable<IWall> walls)
+        {
+            foreach(var player in Players)
+            {
+                var bestNextPath = new AStar<Vector2, IBoard, IPlayer>().BestMove(_board, player);
+                if (bestNextPath is null)
+                {
+                    //undo the walls first
+                    foreach (var wall in walls)
+                        _board.GetCell(wall.From).RemoveWall(wall);
+                    throw new NewWallBlocksPlayerException($"{walls.First()} wall blocks player '{player}'");
+                }
+            }
         }
 
         public void RemoveWall(Vector2 from, Direction placement)
@@ -132,8 +144,8 @@ namespace Quoridor.Core.Game
 
         public bool NewMoveBlockedByWall(Vector2 currPos, Vector2 newPos)
         {
-            var neighbors = _board.Neighbors(_board.GetCell(currPos));
-            return neighbors.All(n => !n.Position.Equals(newPos));
+            var neighbors = _board.Neighbors(currPos);
+            return neighbors.All(n => !n.Equals(newPos));
         }
 
         public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
@@ -145,8 +157,8 @@ namespace Quoridor.Core.Game
             if (wall.IsHorizontal()) newPos.X++;
             else newPos.Y++;
 
-            var wall3 = CreateAndValidateWall(newPos, placement);
-            var wall4 = CreateAndValidateWall(_board.GetCellAt(newPos, placement).Position, placement.Opposite());
+            var wall3 = new Wall(placement, newPos);
+            var wall4 = new Wall(placement.Opposite(), _board.GetCellAt(newPos, placement).Position);
 
             var dir1 = wall.From.GetDirFor(wall3.From);
             var dir2 = wall2.From.GetDirFor(wall4.From);
@@ -209,6 +221,74 @@ namespace Quoridor.Core.Game
             }
             _log.Info($"No player found in '{newPos}'. Moving player '{player.Id}' from '{player.CurrentPos}' to '{newPos}'");
             return newPos;
+        }
+
+        public void Move(Move move)
+        {
+            if (move == null)
+                throw new Exception("no move type provided.");
+
+            if (move is AgentMove)
+                MovePlayer(move.Dir);
+
+            if (move is WallPlacement wallMove)
+                AddWall(wallMove.From, wallMove.Dir);
+        }
+
+        public void UndoMove(Move move)
+        {
+            if (move == null)
+                throw new Exception("no move type provided");
+
+            if (move is AgentMove)
+                MovePlayer(move.Dir.Opposite());
+
+            if (move is WallPlacement wallMove)
+                RemoveWall(wallMove.From, wallMove.Dir);
+        }
+
+        public IEnumerable<Move> GetValidMovesFor(IPlayer player)
+        {
+            var validMoves = new List<Move>();
+
+            //movable player positions (at most 4)
+            var validPlayerMoves = _board
+                .NeighborDirs(player.CurrentPos)
+                .Select(d => new AgentMove(d));
+
+            validMoves.AddRange(validPlayerMoves);
+
+            //all wall pieces that can be placed on the board
+            //horizontal walls
+            for (int i = 1; i < _board.Dimension - 1; i++)
+                for (int j = 0; j < _board.Dimension - 3; j++)
+                {
+                    var from = new Vector2(i, j);
+                    if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
+                        validMoves.Add(new WallPlacement(Direction.North, from));
+                }
+
+            //vertical walls
+            for (int i = 0; i < _board.Dimension - 3; i++)
+                for (int j = 1; j < _board.Dimension - 1; j++)
+                {
+                    var from = new Vector2(i, j);
+                    if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
+                        validMoves.Add(new WallPlacement(Direction.West, from));
+                }
+
+
+            return validMoves;
+        }
+
+        public double Evaluate(IPlayer agent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Vector2> Neighbors(Vector2 pos)
+        {
+            return _board.Neighbors(pos);
         }
     }
 }

@@ -8,10 +8,12 @@
     <None Remove="MCTS\" />
     <None Remove="Minimax\" />
     <None Remove="Interfaces\" />
+    <None Remove="AStar\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MCTS\" />
-    <Folder Include="Minimax\" />
+    <Folder Include="MinimaxAlgorith,\" />
     <Folder Include="Interfaces\" />
+    <Folder Include="AStarAlgorithm\" />
   </ItemGroup>
 </Project>

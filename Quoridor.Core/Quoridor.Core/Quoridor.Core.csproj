@@ -29,5 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
+    <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
   </ItemGroup>
 </Project>

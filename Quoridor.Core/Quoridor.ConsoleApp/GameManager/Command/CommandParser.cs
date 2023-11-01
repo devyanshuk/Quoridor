@@ -1,9 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Text.RegularExpressions;
 
 using Quoridor.Core.Utils;
 using System.Globalization;
+using Quoridor.Core.Movement;
 using Quoridor.Common.Logging;
 
 namespace Quoridor.ConsoleApp.GameManager.Command
@@ -22,7 +22,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
         {
         }
 
-        public BaseCommand Parse(string line)
+        public Move Parse(string line)
         {
             _log.Info($"Processing line : '{line}'...");
 
@@ -50,14 +50,14 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             _log.Info($"Parsed direction '{dirEnum}' from '{line}'");
 
             if (dir.Success && move.Success)
-                return new MoveCommand { Dir = dirEnum };
+                return new AgentMove(dirEnum);
 
             var x = int.Parse(coordinate.Groups["X"].Value);
             var y = int.Parse(coordinate.Groups["Y"].Value);
             var pos = new Vector2(x, y);
             _log.Info($"Parsed coordinate '{pos}' from '{line}'");
 
-            return new WallCommand { Dir = dirEnum, Pos = pos };
+            return new WallPlacement(dirEnum, pos);
         }
 
         private T ParseEnum<T>(string val)

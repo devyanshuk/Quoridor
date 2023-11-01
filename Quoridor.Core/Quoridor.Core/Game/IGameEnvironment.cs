@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 
+using Quoridor.AI.Interfaces;
+
 using Quoridor.Core.Utils;
 using Quoridor.Core.Entities;
+using Quoridor.Core.Movement;
 
 namespace Quoridor.Core.Game
 {
-    public interface IGameEnvironment
+    public interface IGameEnvironment :
+        IGame<IPlayer, Move>,
+        INeighbors<Vector2>
     {
-        int Turn { get; }
         List<IPlayer> Players { get; }
 
         void Initialize();
@@ -15,8 +19,6 @@ namespace Quoridor.Core.Game
         void AddPlayer(IPlayer player);
         void MovePlayer(Direction dir);
         void ChangeTurn();
-
-        IPlayer CurrentPlayer { get; }
 
         void AddWall(Vector2 from, Direction placement);
         void RemoveWall(Vector2 from, Direction placement);

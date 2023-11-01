@@ -15,7 +15,7 @@ namespace Quoridor.ConsoleApp.Utils
             _stdErr = stdErr;
         }
 
-        [Help]
+        [Empty, Help]
         public void HelpMessage(string message)
         {
             _stdOut.WriteLine(message);

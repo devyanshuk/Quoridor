@@ -29,7 +29,7 @@ namespace Quoridor.ConsoleApp
             _container = container;
         }
 
-        [Verb(IsDefault=true)]
+        [Verb]
         public void Play(
 
             [Description("Game Board Dimension")]
@@ -43,11 +43,6 @@ namespace Quoridor.ConsoleApp
             [Aliases("n")]
             int NumPlayers,
 
-            [Description("Player Ids (comma separated chars)")]
-            [DefaultValue("A,B")]
-            [Aliases("i")]
-            string Ids,
-
             [Description("Number of walls each player has at the beginning")]
             [DefaultValue(8)]
             [Aliases("w")]
@@ -55,7 +50,7 @@ namespace Quoridor.ConsoleApp
         )
         {
             _log.Info($@"{nameof(Play)} method called. Params: {nameof(Dimension)}: {Dimension},
-            {nameof(Ids)}: {Ids}, {nameof(NumWalls)}: {NumWalls}, {nameof(NumPlayers)}: {NumPlayers}");
+            {nameof(NumWalls)}: {NumWalls}, {nameof(NumPlayers)}: {NumPlayers}");
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
@@ -65,7 +60,6 @@ namespace Quoridor.ConsoleApp
                 InputSrc = _stdIn,
                 OutputDest = _stdOut,
                 NumPlayers = NumPlayers,
-                PlayerIds = Ids.Split(",").Select(i => i.Trim()[0]).ToList(),
                 NumWalls = NumWalls
             };
 

@@ -24,6 +24,8 @@
     <None Remove="ConfigTemplates\" />
     <None Remove="GameManager\" />
     <None Remove="GameManager\Command\" />
+    <None Remove="Utils\" />
+    <None Remove="AStarAlgorithm\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Environment\" />
@@ -33,11 +35,14 @@
     <Folder Include="ConfigTemplates\" />
     <Folder Include="GameManager\" />
     <Folder Include="GameManager\Command\" />
+    <Folder Include="Utils\" />
+    <Folder Include="AStarAlgorithm\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
     <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
     <ProjectReference Include="..\Quoridor.ConsoleApp\Quoridor.ConsoleApp.csproj" />
+    <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Quoridor.ConsoleApp\ConfigTemplates\BoardCharacters.xml">

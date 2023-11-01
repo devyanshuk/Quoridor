@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
@@ -60,6 +61,36 @@ namespace Quoridor.Core.Environment
 
             if (x - 1 >= 0 && refCell.IsAccessible(Direction.West))
                 yield return Cells[x - 1, y];
+        }
+
+        public IEnumerable<Direction> NeighborDirs(Cell refCell)
+        {
+            var x = refCell.Position.X;
+            var y = refCell.Position.Y;
+
+            if (y + 1 < Dimension && refCell.IsAccessible(Direction.South))
+                yield return Direction.South;
+
+            if (y - 1 >= 0 && refCell.IsAccessible(Direction.North))
+                yield return Direction.North;
+
+            if (x + 1 < Dimension && refCell.IsAccessible(Direction.East))
+                yield return Direction.East;
+
+            if (x - 1 >= 0 && refCell.IsAccessible(Direction.West))
+                yield return Direction.West;
+        }
+
+        public IEnumerable<Direction> NeighborDirs(Vector2 pos)
+        {
+            var cellForPos = GetCell(pos);
+            return NeighborDirs(cellForPos);
+        }
+
+        public IEnumerable<Vector2> Neighbors(Vector2 pos)
+        {
+            var cellForPos = GetCell(pos);
+            return Neighbors(cellForPos).Select(cell => cell.Position);
         }
     }
 }
