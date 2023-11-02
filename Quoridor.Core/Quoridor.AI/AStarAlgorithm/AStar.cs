@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+
 using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.AStarAlgorithm
 {
-    public class AStar<TVector2D, TMaze, TPlayer> : AIAgent<TVector2D, TMaze, TPlayer>
-        where TPlayer : class, IAStarPlayer<TVector2D>, IEquatable<TPlayer>
-        where TVector2D : class, IVector2D
-        where TMaze : class, INeighbors<TVector2D>
+    public class AStar<TMove, TMaze, TPlayer> : AIAgent<TMove, TMaze, TPlayer>
+        where TPlayer : IAStarPlayer<TMove>
+        where TMove : Movement
+        where TMaze : INeighbors<TMove>
     {
         public override string Name => nameof(AStarAlgorithm);
 
-        public override TVector2D BestMove(TMaze maze, TPlayer player)
+        public override TMove BestMove(TMaze maze, TPlayer player)
         {
             ValidateParams(maze, player);
 
-            var start = new Node<TVector2D> { CurrPos = player.CurrentPos };
-            var openSet = new HashSet<Node<TVector2D>>() { start  };
-            var closedSet = new HashSet<Node<TVector2D>>();
+            var start = new Node<TMove> { CurrMove = player.GetCurrentMove() };
+            var openSet = new HashSet<Node<TMove>>() { start  };
+            var closedSet = new HashSet<Node<TMove>>();
 
             //set the initial node as the current node
             var currNode = start;
@@ -34,12 +35,12 @@ namespace Quoridor.AI.AStarAlgorithm
                 openSet.Remove(nodeWithLowestFscore);
 
                 //if the closed set contains a goal node, we're done
-                if (closedSet.Any(node => player.IsGoalCell(node.CurrPos)))
+                if (closedSet.Any(node => player.IsGoal(node.CurrMove)))
                     return ConstructPath(currNode);
 
-                foreach (var neighbor in maze.Neighbors(currNode.CurrPos))
+                foreach (var neighbor in maze.Neighbors(currNode.CurrMove))
                 {
-                    var neighborNode = new Node<TVector2D> { CurrPos = neighbor };
+                    var neighborNode = new Node<TMove> { CurrMove = neighbor };
                     //if it's in the closed list, skip it
                     if (closedSet.Contains(neighborNode))
                         continue;
@@ -52,7 +53,7 @@ namespace Quoridor.AI.AStarAlgorithm
                     if (!openSet.Contains(neighborNode) || neighborNode.GValue < gScore)
                     {
                         neighborNode.GValue = gScore;
-                        neighborNode.HValue = player.ManhattanHeuristicFn(neighbor);
+                        neighborNode.HValue = player.CalculateHeuristic(neighbor);
                         neighborNode.FValue = gScore + neighborNode.HValue;
                         neighborNode.Parent = currNode;
                         //if neighbor was already present, it won't re-add.
@@ -63,13 +64,13 @@ namespace Quoridor.AI.AStarAlgorithm
             return null;
         }
 
-        private static TVector2D ConstructPath(Node<TVector2D> currNode)
+        private static TMove ConstructPath(Node<TMove> currNode)
         {
             //we only need the next position so we skip the rest
             while (currNode.Parent.Parent != null)
                 currNode = currNode.Parent;
 
-            return currNode.CurrPos;
+            return currNode.CurrMove;
         }
 
         private static void ValidateParams(

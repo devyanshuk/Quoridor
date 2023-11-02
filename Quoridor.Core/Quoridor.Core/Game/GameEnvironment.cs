@@ -3,13 +3,14 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
-using Quoridor.Core.Movement;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;
+using Quoridor.AI.Interfaces;
+using Quoridor.Core.Move;
 
 namespace Quoridor.Core.Game
 {
@@ -53,7 +54,7 @@ namespace Quoridor.Core.Game
 
         public IPlayer CurrentPlayer => Players?[Turn];
 
-        public bool IsTerminal => Players?.Any(p => p.IsGoalCell(p.CurrentPos)) ?? false;
+        public bool IsTerminal => Players?.Any(p => p.IsGoalMove(p.CurrentPos)) ?? false;
 
         public void MovePlayer(Direction dir)
         {
@@ -223,33 +224,33 @@ namespace Quoridor.Core.Game
             return newPos;
         }
 
-        public void Move(Move move)
+        public void Move(Movement move)
         {
             if (move == null)
                 throw new Exception("no move type provided.");
 
-            if (move is AgentMove)
-                MovePlayer(move.Dir);
+            if (move is AgentMove agentMove)
+                MovePlayer(agentMove.Dir);
 
             if (move is WallPlacement wallMove)
                 AddWall(wallMove.From, wallMove.Dir);
         }
 
-        public void UndoMove(Move move)
+        public void UndoMove(Movement move)
         {
             if (move == null)
                 throw new Exception("no move type provided");
 
-            if (move is AgentMove)
-                MovePlayer(move.Dir.Opposite());
+            if (move is AgentMove agentMove)
+                MovePlayer(agentMove.Dir.Opposite());
 
             if (move is WallPlacement wallMove)
                 RemoveWall(wallMove.From, wallMove.Dir);
         }
 
-        public IEnumerable<Move> GetValidMovesFor(IPlayer player)
+        public IEnumerable<Movement> GetValidMovesFor(IPlayer player)
         {
-            var validMoves = new List<Move>();
+            var validMoves = new List<Movement>();
 
             //movable player positions (at most 4)
             var validPlayerMoves = _board
@@ -289,6 +290,12 @@ namespace Quoridor.Core.Game
         public IEnumerable<Vector2> Neighbors(Vector2 pos)
         {
             return _board.Neighbors(pos);
+        }
+
+        public IEnumerable<Movement> Neighbors(Movement pos)
+        {
+            var posVec = pos as Vector2;
+            return Neighbors(posVec);
         }
     }
 }

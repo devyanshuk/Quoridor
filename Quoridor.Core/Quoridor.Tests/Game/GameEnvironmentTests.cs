@@ -91,7 +91,7 @@ namespace Quoridor.Tests.Game
             var player = new Player('A', 10, pos)
             {
                 ManhattanHeuristicFn = (cell) => cell.Y,
-                IsGoalCell = (cell) => cell.Y == 0
+                IsGoalMove = (cell) => cell.Y == 0
             };
             gameEnv.AddPlayer(player);
             gameEnv.AddWall(new Vector2(5, 5), North);
@@ -438,7 +438,7 @@ namespace Quoridor.Tests.Game
             var player = new Player('A', 8, new Vector2(4, 0))
             {
                 ManhattanHeuristicFn = (cell) => Math.Abs(8 - cell.Y),
-                IsGoalCell = (cell) => cell.Y == 8
+                IsGoalMove = (cell) => cell.Y == 8
             };
             gameEnv.AddPlayer(player);
 

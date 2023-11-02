@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Quoridor.AI.Interfaces
+﻿namespace Quoridor.AI.Interfaces
 {
     public interface IGame<TPlayer, TMove> :
             ICurrentPlayer<TPlayer>,
@@ -9,9 +6,7 @@ namespace Quoridor.AI.Interfaces
             IMove<TMove>,
             IStaticEvaluation<TPlayer>,
             ITerminal
-
-        where TPlayer : class, IEquatable<TPlayer>
-        where TMove : class
+        where TMove : Movement
     {
     }
 }

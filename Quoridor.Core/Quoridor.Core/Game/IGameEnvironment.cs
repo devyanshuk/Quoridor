@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 
-using Quoridor.AI.Interfaces;
-
 using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
-using Quoridor.Core.Movement;
 
 namespace Quoridor.Core.Game
 {
     public interface IGameEnvironment :
-        IGame<IPlayer, Move>,
-        INeighbors<Vector2>
+        IGame<IPlayer, Movement>,
+        INeighbors<Vector2>,
+        INeighbors<Movement>
     {
         List<IPlayer> Players { get; }
 

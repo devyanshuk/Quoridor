@@ -3,9 +3,9 @@ using NUnit.Framework;
 using FluentAssertions;
 
 using Quoridor.Core.Utils;
-using Quoridor.Core.Movement;
 using static Quoridor.Core.Utils.Direction;
 using Quoridor.ConsoleApp.GameManager.Command;
+using Quoridor.Core.Move;
 
 namespace Quoridor.Tests.GameManager.Command
 {

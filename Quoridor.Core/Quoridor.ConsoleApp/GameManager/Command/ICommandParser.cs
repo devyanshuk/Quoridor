@@ -1,9 +1,9 @@
-﻿using Quoridor.Core.Movement;
+﻿using Quoridor.AI.Interfaces;
 
 namespace Quoridor.ConsoleApp.GameManager.Command
 {
     public interface ICommandParser
     {
-        Move Parse(string line);
+        Movement Parse(string line);
     }
 }

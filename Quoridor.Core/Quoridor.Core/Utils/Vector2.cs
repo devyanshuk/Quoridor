@@ -4,7 +4,7 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.Core.Utils
 {
-    public class Vector2 : IVector2D, IEquatable<Vector2>
+    public class Vector2 : Movement, IVector2D, IEquatable<Vector2>
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -63,12 +63,14 @@ namespace Quoridor.Core.Utils
 
         public bool Equals(Vector2 other)
         {
-            return this == other;
+            return X == other.X && Y == other.Y;
         }
 
         public override bool Equals(object obj)
         {
-            return obj != null && obj is Vector2 && Equals((Vector2)obj);
+            if (obj is null) return false;
+            var pos = obj as Vector2;
+            return pos.X == X && pos.Y == Y;
         }
 
         public override string ToString()

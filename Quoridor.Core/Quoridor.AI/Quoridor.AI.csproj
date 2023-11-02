@@ -12,7 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MCTS\" />
-    <Folder Include="MinimaxAlgorith,\" />
+    <Folder Include="MinimaxAlgorithm\" />
     <Folder Include="Interfaces\" />
     <Folder Include="AStarAlgorithm\" />
   </ItemGroup>

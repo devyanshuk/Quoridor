@@ -1,4 +1,5 @@
 ﻿using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
 using Quoridor.AI.AStarAlgorithm;
 
 namespace Quoridor.Core.Entities
@@ -12,7 +13,7 @@ namespace Quoridor.Core.Entities
 
         //each player's 'is-goal' criteria will be different based on their
         //starting position, so this delegate is necessary.
-        public IsGoal<Vector2> IsGoalCell { get; set; }
+        public IsGoal<Vector2> IsGoalMove { get; set; }
 
         //each player's heuristic function also differs based on their starting and
         //goal cells, so this delegate is also necessary. eg: if a player starts at
@@ -35,7 +36,7 @@ namespace Quoridor.Core.Entities
 
         public int CurrX => CurrentPos.X;
         public int CurrY => CurrentPos.Y;
-        
+
         public void DecreaseWallCount()
         {
             NumWalls--;
@@ -55,5 +56,17 @@ namespace Quoridor.Core.Entities
         {
             return Id.ToString();
         }
+
+        public Vector2 GetCurrentMove() => CurrentPos;
+
+        Movement IAStarPlayer<Movement>.GetCurrentMove() => CurrentPos;
+
+        public bool IsGoal(Movement move) => IsGoalMove((Vector2)move);
+
+        public double CalculateHeuristic(Movement move) => ManhattanHeuristicFn((Vector2)move);
+
+        public bool IsGoal(Vector2 move) => IsGoalMove(move);
+
+        public double CalculateHeuristic(Vector2 move) => ManhattanHeuristicFn(move);
     }
 }

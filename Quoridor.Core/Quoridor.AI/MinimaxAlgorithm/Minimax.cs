@@ -4,10 +4,8 @@ using Quoridor.AI.Interfaces;
 namespace Quoridor.AI.MinimaxAlgorithm
 {
     public class Minimax<TPlayer, TMove, TGame> : AIAgent<TMove, TGame, TPlayer>
-        where TPlayer : class, IEquatable<TPlayer>
-        where TMove : class
-        where TGame : class, IGame<TPlayer, TMove>
-            
+        where TMove : Movement
+        where TGame : IGame<TPlayer, TMove>
     {
         private readonly int _depth;
 

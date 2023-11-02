@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 namespace Quoridor.Core.Environment
 {
-    public interface IBoard : INeighbors<Vector2>
+    public interface IBoard :
+        INeighbors<Vector2>,
+        INeighbors<Movement>
     {
         // Dimension of the game board.
         int Dimension { get; }

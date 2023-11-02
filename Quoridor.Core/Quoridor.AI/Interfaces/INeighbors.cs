@@ -2,9 +2,8 @@
 
 namespace Quoridor.AI.Interfaces
 {
-    public interface INeighbors<TVector2D>
-        where TVector2D : class, IVector2D
+    public interface INeighbors<TMove>
     {
-        IEnumerable<TVector2D> Neighbors(TVector2D pos);
+        IEnumerable<TMove> Neighbors(TMove pos);
     }
 }

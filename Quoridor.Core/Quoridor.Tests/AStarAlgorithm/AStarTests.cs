@@ -29,7 +29,7 @@ namespace Quoridor.Tests.AStarAlgorithm
             var player = new Player('A', 10, pos)
             {
                 ManhattanHeuristicFn = (cell) => Math.Abs(h_n_offset - cell.Y),
-                IsGoalCell = (cell) => cell.Y == goalY
+                IsGoalMove = (cell) => cell.Y == goalY
             };
 
             var goal = new Vector2(goal_x, goal_y);
@@ -59,7 +59,7 @@ namespace Quoridor.Tests.AStarAlgorithm
             var player = new Player('A', 10, pos)
             {
                 ManhattanHeuristicFn = (cell) => cell.Y,
-                IsGoalCell = (cell) => cell.Y == 0
+                IsGoalMove = (cell) => cell.Y == 0
             };
 
             var goal = new Vector2(goal_x, goal_y);

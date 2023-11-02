@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
 
 namespace Quoridor.Core.Environment
 {
@@ -91,6 +92,12 @@ namespace Quoridor.Core.Environment
         {
             var cellForPos = GetCell(pos);
             return Neighbors(cellForPos).Select(cell => cell.Position);
+        }
+
+        public IEnumerable<Movement> Neighbors(Movement pos)
+        {
+            var posVec = pos as Vector2;
+            return Neighbors(posVec);
         }
     }
 }

@@ -2,12 +2,11 @@
 
 using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
-using Quoridor.Core.Movement;
 using Quoridor.Core.Entities;
+using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
-using Quoridor.ConsoleApp.GameManager.Command;
 using Quoridor.ConsoleApp.GameManager.Visualizer;
 
 namespace Quoridor.ConsoleApp.GameManager
@@ -18,7 +17,7 @@ namespace Quoridor.ConsoleApp.GameManager
         private readonly IBoard _board;
         private readonly IBoardVisualizer _boardVisualizer;
         private readonly IGameEnvironment _gameEnvironment;
-        private readonly ICommandParser _commandParser;
+        private int StrategyTurn = 0;
 
         private readonly ILogger _log = Logger.InstanceFor<ConsoleGameManager>();
 
@@ -26,15 +25,13 @@ namespace Quoridor.ConsoleApp.GameManager
             ConsoleGameSettings settings,
             IBoard board,
             IBoardVisualizer boardVisualizer,
-            IGameEnvironment gameEnvironment,
-            ICommandParser commandParser
+            IGameEnvironment gameEnvironment
         )
         {
             _settings = settings;
             _board = board;
             _boardVisualizer = boardVisualizer;
             _gameEnvironment = gameEnvironment;
-            _commandParser = commandParser;
 
             InitAndAddPlayers();
         }
@@ -47,32 +44,21 @@ namespace Quoridor.ConsoleApp.GameManager
                 _boardVisualizer.DrawBoard(_settings.OutputDest);
 
                 var player = _gameEnvironment.CurrentPlayer;
-                _settings.OutputDest.WriteLine($"Player '{player.Id}''s Turn. {player.NumWalls} wall(s) left");
+                var strategy = _settings.Strategies[StrategyTurn];
 
-                ParseAndProcessCommand();
+                _settings.OutputDest.WriteLine(@$"Player '{player.Id}''s Turn. {
+                    player.NumWalls} wall(s) left. Using {strategy.Name} strategy");
+
+                var bestMove = strategy.BestMove(_gameEnvironment, player);
+                Process(bestMove);
+
                 _gameEnvironment.ChangeTurn();
+                StrategyTurn = (StrategyTurn + 1) % _settings.NumPlayers;
             }
         }
 
-        public void ParseAndProcessCommand()
-        {
-            while (true)
-            {
-                var line = _settings.InputSrc.ReadLine();
-                try
-                {
-                    var command = _commandParser.Parse(line);
-                    Process(command);
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    _settings.OutputDest.WriteLine(ex.Message);
-                }
-            }
-        }
 
-        public void Process<T>(T command) where T : Move
+        public void Process<T>(T command) where T : Movement
         {
             _log.Info($"Received '{typeof(T).Name}' command");
             _gameEnvironment.Move(command);
@@ -108,7 +94,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 var player = new Player(playerId, _settings.NumWalls, startPos)
                 {
                     ManhattanHeuristicFn = heuristics[i],
-                    IsGoalCell = goalConditions[i]
+                    IsGoalMove = goalConditions[i]
                 };
 
                 _gameEnvironment.AddPlayer(player);

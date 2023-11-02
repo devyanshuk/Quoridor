@@ -2,10 +2,11 @@
 
 namespace Quoridor.AI.AStarAlgorithm
 {
-    public interface IAStarPlayer<TVector2D> : IPosition<TVector2D>
-        where TVector2D : class, IVector2D
+    public interface IAStarPlayer<TMove>
+        where TMove : Movement
     {
-        IsGoal<TVector2D> IsGoalCell { get; set; }
-        H_n<TVector2D> ManhattanHeuristicFn { get; set; }
+        TMove GetCurrentMove();
+        bool IsGoal(TMove move);
+        double CalculateHeuristic(TMove move);
     }
 }

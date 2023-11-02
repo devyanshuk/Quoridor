@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
+using Quoridor.Core.Move;
 using Quoridor.Core.Utils;
-using System.Globalization;
-using Quoridor.Core.Movement;
+using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 
 namespace Quoridor.ConsoleApp.GameManager.Command
@@ -22,7 +23,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
         {
         }
 
-        public Move Parse(string line)
+        public Movement Parse(string line)
         {
             _log.Info($"Processing line : '{line}'...");
 
