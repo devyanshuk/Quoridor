@@ -39,10 +39,10 @@ namespace Quoridor.ConsoleApp.GameManager
         public void Start()
         {
             _log.Info($"Starting console game application...");
+            _boardVisualizer.DrawBoard(_settings.OutputDest);
+
             while(true)
             { 
-                _boardVisualizer.DrawBoard(_settings.OutputDest);
-
                 var player = _gameEnvironment.CurrentPlayer;
                 var strategy = _settings.Strategies[StrategyTurn];
 
@@ -51,9 +51,16 @@ namespace Quoridor.ConsoleApp.GameManager
 
                 GetAndDoMove(strategy, player);
 
+                _boardVisualizer.DrawBoard(_settings.OutputDest);
+
+                if (_gameEnvironment.IsTerminal)
+                    break;
+
                 _gameEnvironment.ChangeTurn();
                 StrategyTurn = (StrategyTurn + 1) % _settings.NumPlayers;
             }
+            _settings.OutputDest.WriteLine(@$"Game over. Player {_gameEnvironment.CurrentPlayer} : {
+                _settings.Strategies[StrategyTurn].Name} won.");
         }
 
         public void GetAndDoMove(AIAgent<Movement, IGameEnvironment, IPlayer> strategy, IPlayer player)
