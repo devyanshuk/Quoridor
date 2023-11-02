@@ -234,6 +234,12 @@ namespace Quoridor.Core.Game
 
             if (move is WallPlacement wallMove)
                 AddWall(wallMove.From, wallMove.Dir);
+
+            if (move is Vector2 vecMove)
+            {
+                var dir = CurrentPlayer.CurrentPos.GetDirFor(vecMove);
+                MovePlayer(dir);
+            }
         }
 
         public void UndoMove(Movement move)
