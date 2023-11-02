@@ -26,10 +26,12 @@ namespace Quoridor.Tests.Game
             Direction dir, int f_x, int f_y)
         {
             //Arrange
-            var gameEnv = CreateGameEnvironment().Item2;
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var player = token.Item3;
 
             //Act
-            Action a = () => gameEnv.AddWall(new Vector2(f_x, f_y), dir);
+            Action a = () => gameEnv.AddWall(player, new Vector2(f_x, f_y), dir);
 
             //Assert
             a.Should().Throw<InvalidWallException>();
@@ -47,10 +49,12 @@ namespace Quoridor.Tests.Game
             int f_x, int f_y, Direction placement)
         {
             //Arrange
-            var gameEnv = CreateGameEnvironment().Item2;
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var player = token.Item3;
 
             //Act
-            Action a = () => gameEnv.AddWall(new Vector2(f_x, f_y), placement);
+            Action a = () => gameEnv.AddWall(player, new Vector2(f_x, f_y), placement);
 
             //Assert
             a.Should().Throw<InvalidWallException>();
@@ -65,14 +69,16 @@ namespace Quoridor.Tests.Game
             int f_x, int f_y, Direction dir, int t_x, int t_y)
         {
             //Arrange
-            var gameEnv = CreateGameEnvironment().Item2;
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
             var pos = new Vector2(f_x, f_y);
             var pos2 = new Vector2(t_x, t_y);
+            var player = token.Item3;
 
             //Act
-            gameEnv.AddWall(pos, dir);
-            Action a = () => gameEnv.AddWall(pos2, dir);
-            Action b = () => gameEnv.AddWall(pos, dir);
+            gameEnv.AddWall(player, pos, dir);
+            Action a = () => gameEnv.AddWall(player, pos2, dir);
+            Action b = () => gameEnv.AddWall(player, pos, dir);
 
             //Assert
             a.Should().Throw<WallAlreadyPresentException>();
@@ -91,16 +97,17 @@ namespace Quoridor.Tests.Game
             var player = new Player('A', 10, pos)
             {
                 ManhattanHeuristicFn = (cell) => cell.Y,
-                IsGoalMove = (cell) => cell.Y == 0
+                IsGoalMove = (cell) => cell.Y == 0,
+                NumWalls = 10
             };
             gameEnv.AddPlayer(player);
-            gameEnv.AddWall(new Vector2(5, 5), North);
-            gameEnv.AddWall(new Vector2(5, 5), West);
-            gameEnv.AddWall(new Vector2(5, 6), South);
+            gameEnv.AddWall(player, new Vector2(5, 5), North);
+            gameEnv.AddWall(player, new Vector2(5, 5), West);
+            gameEnv.AddWall(player, new Vector2(5, 6), South);
 
 
             //Act
-            Action a = () => gameEnv.AddWall(new Vector2(6, 5), East);
+            Action a = () => gameEnv.AddWall(player, new Vector2(6, 5), East);
 
             //Assert
             a.Should().Throw<NewWallBlocksPlayerException>();
@@ -110,13 +117,15 @@ namespace Quoridor.Tests.Game
         public void Should_Throw_If_Wall_Added_Intersects_With_Another_Wall()
         {
             //Arrange
-            var gameEnv = CreateGameEnvironment().Item2;
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var player = token.Item3;
             var pos = new Vector2(5, 5);
 
             //Act
-            gameEnv.AddWall(pos, North);
-            gameEnv.AddWall(pos, South);
-            Action a = () => gameEnv.AddWall(pos, East);
+            gameEnv.AddWall(player, pos, North);
+            gameEnv.AddWall(player, pos, South);
+            Action a = () => gameEnv.AddWall(player, pos, East);
 
             //Assert
             a.Should().Throw<WallIntersectsException>();
@@ -133,9 +142,10 @@ namespace Quoridor.Tests.Game
             var gameEnv = token.Item2;
             var board = token.Item1;
             var pos = new Vector2(f_x, f_y);
+            var player = token.Item3;
 
             //Act
-            gameEnv.AddWall(pos, dir);
+            gameEnv.AddWall(player, pos, dir);
 
             //Assert
             board.GetCell(pos).IsAccessible(dir).Should().Be(false);
@@ -145,18 +155,19 @@ namespace Quoridor.Tests.Game
         public void Should_Correctly_Set_Multiple_Walls_Arround_A_Cell()
         {
             //Arrange
-            var items = CreateGameEnvironment();
-            var board = items.Item1;
-            var gameEnv = items.Item2;
+            var token = CreateGameEnvironment();
+            var board = token.Item1;
+            var gameEnv = token.Item2;
             var pos = new Vector2(5, 5);
             var pos2 = new Vector2(5, 6);
             var pos3 = new Vector2(4, 6);
             var pos4 = new Vector2(6, 5);
+            var player = token.Item3;
 
             //Act
-            gameEnv.AddWall(pos, North);
-            gameEnv.AddWall(pos, South);
-            gameEnv.AddWall(pos, West);
+            gameEnv.AddWall(player, pos, North);
+            gameEnv.AddWall(player, pos, South);
+            gameEnv.AddWall(player, pos, West);
 
             //Assert
             //(5,5) is blocked on the northern, southern and western sides
@@ -193,11 +204,13 @@ namespace Quoridor.Tests.Game
             int f_x, int f_y, Direction dir)
         {
             //Arrange
-            var gameEnv = CreateGameEnvironment().Item2;
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
             var pos = new Vector2(f_x, f_y);
+            var player = token.Item3;
 
             //Act
-            Action a = () => gameEnv.RemoveWall(pos, dir);
+            Action a = () => gameEnv.RemoveWall(player, pos, dir);
 
             //Assert
             a.Should().Throw<WallNotPresentException>();
@@ -209,11 +222,13 @@ namespace Quoridor.Tests.Game
             int f_x, int f_y, Direction dir)
         {
             //Arrange
-            var gameEnv = CreateGameEnvironment().Item2;
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
             var pos = new Vector2(f_x, f_y);
+            var player = token.Item3;
 
             //Act
-            Action a = () => gameEnv.RemoveWall(pos, dir);
+            Action a = () => gameEnv.RemoveWall(player, pos, dir);
 
             //Assert
             a.Should().Throw<InvalidWallException>();
@@ -231,10 +246,11 @@ namespace Quoridor.Tests.Game
             var board = token.Item1;
             var pos = new Vector2(f_x, f_y);
             var pos2 = new Vector2(t_x, t_y);
+            var player = token.Item3;
 
             //Act
-            gameEnv.AddWall(pos, dir);
-            Action a = () => gameEnv.RemoveWall(pos, dir);
+            gameEnv.AddWall(player, pos, dir);
+            Action a = () => gameEnv.RemoveWall(player, pos, dir);
 
             //Assert
             board.GetCell(pos2).IsAccessible(dir.Opposite()).Should().Be(false);
@@ -305,7 +321,7 @@ namespace Quoridor.Tests.Game
             player.CurrentPos = new Vector2(f_x, f_y);
 
             //Act
-            Action a = () => gameEnv.MovePlayer(dir);
+            Action a = () => gameEnv.MovePlayer(player, dir);
 
             //Assert
             a.Should().Throw<InvalidAgentMoveException>();
@@ -329,7 +345,7 @@ namespace Quoridor.Tests.Game
             var expectedNewPos = new Vector2(t_x, t_y);
 
             //Act
-            gameEnv.MovePlayer(dir);
+            gameEnv.MovePlayer(player, dir);
 
             //Assert
             player.CurrentPos.Should().Be(expectedNewPos);
@@ -345,13 +361,14 @@ namespace Quoridor.Tests.Game
             //Arrange
             var gameEnv = CreateGameEnvironment().Item2;
             gameEnv.Players.Clear();
+
             var p1 = new Player('A', 8, new Vector2(f_x, f_y));
             var p2 = new Player('B', 8, new Vector2(t_x, t_y));
             gameEnv.AddPlayer(p1);
             gameEnv.AddPlayer(p2);
 
             //Act
-            Action a = () => gameEnv.MovePlayer(dir);
+            Action a = () => gameEnv.MovePlayer(p1, dir);
 
             //Assert
             a.Should().Throw<InvalidAgentMoveException>();
@@ -368,13 +385,14 @@ namespace Quoridor.Tests.Game
             //Arrange
             var gameEnv = CreateGameEnvironment().Item2;
             gameEnv.Players.Clear();
+
             var p1 = new Player('A', 8, new Vector2(f_x, f_y));
             var p2 = new Player('B', 8, new Vector2(t_x, t_y));
             gameEnv.AddPlayer(p1);
             gameEnv.AddPlayer(p2);
 
             //Act
-            gameEnv.MovePlayer(dir);
+            gameEnv.MovePlayer(p1, dir);
 
             //Assert
             p1.CurrentPos.X.Should().Be(d_x);
@@ -392,15 +410,16 @@ namespace Quoridor.Tests.Game
             //Arrange
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
+            var player = token.Item3;
             
             var pos = new Vector2(f_x, f_y);
             gameEnv.CurrentPlayer.CurrentPos = pos;
 
             //Act
-            gameEnv.AddWall(pos, dir);
-            gameEnv.AddWall(pos, dir.Opposite());
-            Action a = () => gameEnv.MovePlayer(dir);
-            Action b = () => gameEnv.MovePlayer(dir.Opposite());
+            gameEnv.AddWall(player, pos, dir);
+            gameEnv.AddWall(player, pos, dir.Opposite());
+            Action a = () => gameEnv.MovePlayer(player, dir);
+            Action b = () => gameEnv.MovePlayer(player, dir.Opposite());
 
             //Assert
             a.Should().Throw<NewMoveBlockedByWallException>();
@@ -416,9 +435,10 @@ namespace Quoridor.Tests.Game
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
             var pos = new Vector2(f_x, f_y);
+            var player = token.Item3;
 
             //Act
-            gameEnv.AddWall(pos, dir);
+            gameEnv.AddWall(player, pos, dir);
 
             //Assert
             gameEnv.Walls.Contains(new Wall(dir, pos)).Should().BeTrue();
@@ -430,7 +450,7 @@ namespace Quoridor.Tests.Game
 
         #endregion
 
-        private Tuple<IBoard, GameEnvironment> CreateGameEnvironment()
+        private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()
         {
             var board = new Board();
             board.SetDimension(9);
@@ -438,11 +458,12 @@ namespace Quoridor.Tests.Game
             var player = new Player('A', 8, new Vector2(4, 0))
             {
                 ManhattanHeuristicFn = (cell) => Math.Abs(8 - cell.Y),
-                IsGoalMove = (cell) => cell.Y == 8
+                IsGoalMove = (cell) => cell.Y == 8,
+                NumWalls = 10
             };
             gameEnv.AddPlayer(player);
 
-            return Tuple.Create<IBoard, GameEnvironment>(board, gameEnv);
+            return Tuple.Create<IBoard, GameEnvironment, IPlayer>(board, gameEnv, player);
         }
     }
 }

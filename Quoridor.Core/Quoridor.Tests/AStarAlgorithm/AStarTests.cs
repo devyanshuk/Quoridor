@@ -37,19 +37,19 @@ namespace Quoridor.Tests.AStarAlgorithm
             gameEnv.AddPlayer(player);
 
             //Act
-            var nextBestPos = new AStar<Vector2, IBoard, IPlayer>().BestMove(board, player);
+            var nextBestPos = new AStar<Vector2, IBoard, IPlayer>().BestMove(board, player).BestMove;
 
             //Assert
             nextBestPos.Should().Be(goal);
         }
 
-        [TestCase(5, 5, 5, 5, North, 4, 5)]
-        [TestCase(5, 5, 5, 5, South, 5, 4)]
-        [TestCase(5, 5, 5, 5, West, 5, 4)]
-        [TestCase(5, 5, 5, 5, East, 5, 4)]
-        [TestCase(5, 5, 5, 4, North, 5, 4)]
+        [TestCase(5, 5, 5, 5, North, 4, 5, 6)]
+        [TestCase(5, 5, 5, 5, South, 5, 4, 5)]
+        [TestCase(5, 5, 5, 5, West, 5, 4, 5)]
+        [TestCase(5, 5, 5, 5, East, 5, 4, 5)]
+        [TestCase(5, 5, 5, 4, North, 5, 4, 6)]
         public void Should_Compute_Correct_Path_If_Walls_Are_Present_On_Its_Way(
-            int f_x, int f_y, int w_x, int w_y, Direction wallDir, int goal_x, int goal_y)
+            int f_x, int f_y, int w_x, int w_y, Direction wallDir, int goal_x, int goal_y, int expectedDistToGoal)
         {
             //Arrange
             var token = CreateGameEnvironment();
@@ -65,13 +65,14 @@ namespace Quoridor.Tests.AStarAlgorithm
             var goal = new Vector2(goal_x, goal_y);
 
             gameEnv.AddPlayer(player);
-            gameEnv.AddWall(new Vector2(w_x, w_y), wallDir);
+            gameEnv.AddWall(player, new Vector2(w_x, w_y), wallDir);
 
             //Act
             var shortestPath = new AStar<Vector2, IBoard, IPlayer>().BestMove(board, player);
 
             //Assert
-            shortestPath.Should().Be(goal);
+            shortestPath.BestMove.Should().Be(goal);
+            shortestPath.Value.Should().Be(expectedDistToGoal);
         }
 
         private Tuple<IBoard, GameEnvironment> CreateGameEnvironment()

@@ -1,5 +1,4 @@
-﻿using System;
-using Quoridor.Core.Utils;
+﻿using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.AI.AStarAlgorithm;
 
@@ -7,8 +6,7 @@ namespace Quoridor.Core.Entities
 {
     public interface IPlayer :
         IAStarPlayer<Movement>,
-        IAStarPlayer<Vector2>,
-        IEquatable<IPlayer>
+        IAStarPlayer<Vector2>
     {
         char Id { get; }
         int NumWalls { get; set; }

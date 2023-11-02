@@ -1,8 +1,7 @@
-﻿using System;
-namespace Quoridor.AI.Interfaces
+﻿namespace Quoridor.AI.Interfaces
 {
-    public interface IStaticEvaluation<TAgent>
+    public interface IStaticEvaluation<TPlayer>
     {
-        public double Evaluate(TAgent agent);
+        public double Evaluate(TPlayer player);
     }
 }

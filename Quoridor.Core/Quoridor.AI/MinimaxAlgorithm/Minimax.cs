@@ -3,7 +3,7 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.MinimaxAlgorithm
 {
-    public class Minimax<TPlayer, TMove, TGame> : AIAgent<TMove, TGame, TPlayer>
+    public class Minimax<TPlayer, TMove, TGame> : AIStrategy<TMove, TGame, TPlayer>
         where TMove : Movement
         where TGame : IGame<TPlayer, TMove>
     {
@@ -19,7 +19,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
 
         public override string Name => nameof(MinimaxAlgorithm);
 
-        public override TMove BestMove(TGame game, TPlayer player)
+        public override AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
             if (game.IsTerminal)
                 throw new Exception($"Game already over. Cannot perform minimax");
@@ -27,27 +27,30 @@ namespace Quoridor.AI.MinimaxAlgorithm
                 throw new Exception($"No agent to get scores from");
 
             var bestMove = MinimaxStep(game, player, _depth);
-            return bestMove.Item1;
+            return bestMove;
         }
 
-        private Tuple<TMove, double> MinimaxStep(TGame game, TPlayer player, int depth)
+        private AIStrategyResult<TMove> MinimaxStep(TGame game, TPlayer player, int depth)
         {
             if (depth <= 0 || game.IsTerminal)
-                return Tuple.Create(default(TMove), game.Evaluate(player));
+                return new AIStrategyResult<TMove> { Value = game.Evaluate(player) };
 
             var maximizingPlayer = player.Equals(game.CurrentPlayer);
             var bestScore = maximizingPlayer ? double.MinValue : double.MaxValue;
-            var bestMove = Tuple.Create(default(TMove), bestScore);
+
+            var bestMove = new AIStrategyResult<TMove> { Value = bestScore };
 
             foreach(var move in game.GetValidMovesFor(player))
             {
-                game.Move(move);
+                game.Move(player, move);
 
-                var currScore = MinimaxStep(game, player, depth - 1);
-                if ((maximizingPlayer && currScore.Item2 > bestScore) || (!maximizingPlayer && currScore.Item2 < bestScore))
-                    bestMove = Tuple.Create(move, currScore.Item2);
+                var result = MinimaxStep(game, player, depth - 1);
+                if ((maximizingPlayer && result.Value > bestScore) || (!maximizingPlayer && result.Value < bestScore)) {
+                    bestMove.BestMove = move;
+                    bestMove.Value = result.Value;
+                }
 
-                game.UndoMove(move);
+                game.UndoMove(player, move);
             }
 
             return bestMove;

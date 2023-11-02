@@ -36,4 +36,10 @@ namespace Quoridor.Core.Utils.CustomExceptions
 
         public NewWallBlocksPlayerException() : base() { }
     }
+
+    public class NoWallRemainingException : Exception
+    {
+        public NoWallRemainingException(string message) : base(message) { }
+        public NoWallRemainingException() : base() { }
+    }
 }

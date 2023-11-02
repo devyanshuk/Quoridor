@@ -7,7 +7,7 @@ using Quoridor.ConsoleApp.GameManager.Command;
 
 namespace Quoridor.ConsoleApp.GameManager
 {
-    public class HumanAgentConsole : AIAgent<Movement, IGameEnvironment, IPlayer>
+    public class HumanAgentConsole : AIStrategy<Movement, IGameEnvironment, IPlayer>
     {
         private readonly TextReader _inputSrc;
         private readonly ICommandParser _commandParser;
@@ -22,11 +22,11 @@ namespace Quoridor.ConsoleApp.GameManager
 
         public override string Name => nameof(HumanAgentConsole);
 
-        public override Movement BestMove(IGameEnvironment gameView, IPlayer player)
+        public override AIStrategyResult<Movement> BestMove(IGameEnvironment gameView, IPlayer player)
         {
             var line = _inputSrc.ReadLine();
             var move = _commandParser.Parse(line);
-            return move;
+            return new AIStrategyResult<Movement> { BestMove = move };
         }
     }
 }

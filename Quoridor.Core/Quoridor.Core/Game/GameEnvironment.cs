@@ -20,7 +20,12 @@ namespace Quoridor.Core.Game
 
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
-        public HashSet<IWall> Walls { get; private set; } = new HashSet<IWall>();
+        public HashSet<IWall> Walls { get; private set; }
+
+        int COUNT = 0;
+        Wall WALL = new Wall(Direction.North, new Vector2(0, 1));
+
+        private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
 
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
 
@@ -28,20 +33,20 @@ namespace Quoridor.Core.Game
             IBoard board)
         {
             _board = board;
+            _aStar = new AStar<Vector2, IBoard, IPlayer>();
+            Players = new List<IPlayer>();
+            Walls = new HashSet<IWall>();
         }
 
         public void Initialize()
         {
             Turn = 0;
             _board.Initialize();
+            Walls.Clear();
         }
 
         public void AddPlayer(IPlayer player)
         {
-            if (Players == null)
-            {
-                Players = new List<IPlayer>();
-            }
             Players.Add(player);
             _log.Info($@"Adding player '{player.Id}'. Available players: '{
                 string.Join(", ", Players.Select(p => p.Id))}'");
@@ -56,23 +61,27 @@ namespace Quoridor.Core.Game
 
         public bool IsTerminal => Players?.Any(p => p.IsGoalMove(p.CurrentPos)) ?? false;
 
-        public void MovePlayer(Direction dir)
+        public void MovePlayer(IPlayer player, Direction dir)
         {
             if (Players == null)
-                throw new Exception($"No player registered. Call the {nameof(AddPlayer)} method to register");
+                throw new Exception(@$"player '{player}' not registered. Call the {
+                    nameof(AddPlayer)} method to register");
 
-            _log.Info($"Moving player '{CurrentPlayer.Id}' '{dir}'...");
+            _log.Info($"Moving player '{player}' '{dir}'...");
 
-            var newPos = TryMove(CurrentPlayer.CurrentPos, dir);
-            CurrentPlayer.CurrentPos = newPos;
+            var newPos = TryMove(player, player.CurrentPos, dir);
+            player.CurrentPos = newPos;
 
-            _log.Info($"Moved player '{CurrentPlayer.Id}' to '{newPos}'");
+            _log.Info($"Moved player '{player}' to '{newPos}'");
         }
 
 
-        public void AddWall(Vector2 from, Direction placement)
+        public void AddWall(IPlayer player, Vector2 from, Direction placement)
         {
-            _log.Info($"Attempting to add '{placement}ern' wall from '{from}'");
+            _log.Info($"Attempting to add '{placement}ern' wall from '{from}' for player '{player}'");
+
+            if (player.NumWalls <= 0)
+                throw new NoWallRemainingException($"player {player} has no walls left");
 
             if (!_board.WithinBounds(from))
             {
@@ -90,20 +99,32 @@ namespace Quoridor.Core.Game
                     _board.GetCell(wall.From).AddWall(wall);
                 CheckForBlockedPath(walls);
             }
-            else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
+            else
+            {
+                Console.WriteLine("Walls");
+                foreach(var wall in Walls)
+                    Console.WriteLine(wall);
+                throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
+            }
 
             Walls.Add(walls.First());
 
+            if (Walls.Contains(WALL))
+            {
+                COUNT++;
+                Console.WriteLine($"WALL COUNT (ADD) = {COUNT}");
+            }
+
             _log.Info($"Successfully added '{placement}ern' wall from '{from}'");
 
-            CurrentPlayer?.DecreaseWallCount();
+            player.DecreaseWallCount();
         }
 
         private void CheckForBlockedPath(IEnumerable<IWall> walls)
         {
             foreach(var player in Players)
             {
-                var bestNextPath = new AStar<Vector2, IBoard, IPlayer>().BestMove(_board, player);
+                var bestNextPath = _aStar.BestMove(_board, player);
                 if (bestNextPath is null)
                 {
                     //undo the walls first
@@ -114,9 +135,15 @@ namespace Quoridor.Core.Game
             }
         }
 
-        public void RemoveWall(Vector2 from, Direction placement)
+        public void RemoveWall(IPlayer player, Vector2 from, Direction placement)
         {
             _log.Info($"Attempting to remove '{placement}ern' wall from '{from}'");
+
+            if (from.X == 0 && from.Y == 1) {
+                Console.WriteLine($"Removing {placement} wall from {from}");
+                Console.WriteLine("----------");
+            }
+            
 
             if (!_board.WithinBounds(from))
             {
@@ -136,11 +163,39 @@ namespace Quoridor.Core.Game
             }
             else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
 
+            if (from.X == 0 && from.Y == 1)
+            {
+                Console.WriteLine($"Almost removing {placement}ern wall from {from}");
+                foreach (var wall in Walls)
+                    Console.WriteLine(wall);
+            }
+
+            if (Walls.Contains(WALL))
+            {
+                COUNT--;
+                Console.WriteLine($"WALL COUNT (REMOVE)= {COUNT}");
+            }
             Walls.Remove(walls.First());
+
+            if (from.X == 0 && from.Y == 1)
+            {
+                Console.WriteLine($"REMOVED {placement}ern wall from {from}");
+                foreach (var wall in Walls)
+                    Console.WriteLine(wall);
+            }
 
             _log.Info($"Successfully removed '{placement}ern' wall from '{from}'");
 
-            CurrentPlayer?.IncreaseWallCount();
+            if (Walls.Count > 0)
+            {
+                Console.WriteLine($"Removed {placement}ern wall from {from}");
+                Console.WriteLine();
+                foreach (var wall in Walls)
+                    Console.WriteLine(wall);
+                Console.WriteLine();
+            }
+
+            player.IncreaseWallCount();
         }
 
         public bool NewMoveBlockedByWall(Vector2 currPos, Vector2 newPos)
@@ -191,10 +246,9 @@ namespace Quoridor.Core.Game
             return wall;
         }
 
-        private Vector2 TryMove(Vector2 currentPos, Direction dir)
+        private Vector2 TryMove(IPlayer player, Vector2 currentPos, Direction dir)
         {
             var newPos = currentPos.GetPosFor(dir);
-            var player = Players[Turn];
 
             _log.Info($@"Trying to check if it's possible to move player '{player.Id}' currently at '{
                 player.CurrentPos}' '{dir}' to '{newPos}' from '{currentPos}'");
@@ -218,40 +272,41 @@ namespace Quoridor.Core.Game
             if (playerInNewPos != null)
             {
                 _log.Info($"Player '{playerInNewPos.Id}' already is in '{newPos}'. Trying to jump '{dir}' from '{newPos}'");
-                return TryMove(newPos, dir);
+                return TryMove(player, newPos, dir);
             }
             _log.Info($"No player found in '{newPos}'. Moving player '{player.Id}' from '{player.CurrentPos}' to '{newPos}'");
             return newPos;
         }
 
-        public void Move(Movement move)
+        public void Move(IPlayer player, Movement move)
         {
-            if (move == null)
-                throw new Exception("no move type provided.");
+            ValidateNotNull(player, nameof(player));
+            ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
-                MovePlayer(agentMove.Dir);
+                MovePlayer(player, agentMove.Dir);
 
-            if (move is WallPlacement wallMove)
-                AddWall(wallMove.From, wallMove.Dir);
+            else if (move is WallPlacement wallMove)
+                AddWall(player, wallMove.From, wallMove.Dir);
 
-            if (move is Vector2 vecMove)
+            else if (move is Vector2 vecMove)
             {
                 var dir = CurrentPlayer.CurrentPos.GetDirFor(vecMove);
-                MovePlayer(dir);
+                MovePlayer(player, dir);
             }
+            else throw new Exception($"move type {typeof(Movement).Name} not supported");
         }
 
-        public void UndoMove(Movement move)
+        public void UndoMove(IPlayer player, Movement move)
         {
-            if (move == null)
-                throw new Exception("no move type provided");
+            ValidateNotNull(player, nameof(player));
+            ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
-                MovePlayer(agentMove.Dir.Opposite());
+                MovePlayer(player, agentMove.Dir.Opposite());
 
-            if (move is WallPlacement wallMove)
-                RemoveWall(wallMove.From, wallMove.Dir);
+            else if (move is WallPlacement wallMove)
+                RemoveWall(player, wallMove.From, wallMove.Dir);
         }
 
         public IEnumerable<Movement> GetValidMovesFor(IPlayer player)
@@ -265,10 +320,14 @@ namespace Quoridor.Core.Game
 
             validMoves.AddRange(validPlayerMoves);
 
+            //if player has no wall remaining, we don't need to add in wall moves.
+            if (player.NumWalls <= 0)
+                return validMoves;
+
             //all wall pieces that can be placed on the board
             //horizontal walls
-            for (int i = 1; i < _board.Dimension - 1; i++)
-                for (int j = 0; j < _board.Dimension - 3; j++)
+            for (int i = 0; i <= _board.Dimension - 3; i++)
+                for (int j = 1; j < _board.Dimension - 1; j++)
                 {
                     var from = new Vector2(i, j);
                     if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
@@ -276,8 +335,8 @@ namespace Quoridor.Core.Game
                 }
 
             //vertical walls
-            for (int i = 0; i < _board.Dimension - 3; i++)
-                for (int j = 1; j < _board.Dimension - 1; j++)
+            for (int i = 1; i < _board.Dimension - 1; i++)
+                for (int j = 0; j <= _board.Dimension - 3; j++)
                 {
                     var from = new Vector2(i, j);
                     if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
@@ -290,7 +349,17 @@ namespace Quoridor.Core.Game
 
         public double Evaluate(IPlayer agent)
         {
-            throw new NotImplementedException();
+            var result = _aStar.BestMove(_board, agent);
+            var goalDistance = result.Value;
+            var wallsLeft = agent.NumWalls;
+
+            var otherAgent = Players.First(p => !p.Equals(agent));
+            var result2 = _aStar.BestMove(_board, otherAgent);
+            var goalDistance2 = result2.Value;
+            var wallsLeft2 = otherAgent.NumWalls;
+
+            var score = goalDistance - goalDistance2 + wallsLeft - wallsLeft2;
+            return score;
         }
 
         public IEnumerable<Vector2> Neighbors(Vector2 pos)
@@ -302,6 +371,12 @@ namespace Quoridor.Core.Game
         {
             var posVec = pos as Vector2;
             return Neighbors(posVec);
+        }
+
+        private void ValidateNotNull<T>(T param, string paramName)
+        {
+            if (param is null)
+                throw new ArgumentNullException(paramName);
         }
     }
 }

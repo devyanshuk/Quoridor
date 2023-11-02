@@ -1,10 +1,12 @@
-﻿using Quoridor.Core.Utils;
+﻿using System;
+
+using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.AI.AStarAlgorithm;
 
 namespace Quoridor.Core.Entities
 {
-    public class Player : IPlayer
+    public class Player : IPlayer, IEquatable<Player>
     {
         public int NumWalls { get; set; }
         public char Id { get; }
@@ -47,9 +49,9 @@ namespace Quoridor.Core.Entities
             NumWalls++;
         }
 
-        public bool Equals(IPlayer other)
+        public bool Equals(Player other)
         {
-            return Id == other.Id && StartPos == other.StartPos;
+            return Id == other.Id && StartPos.Equals(other.StartPos);
         }
 
         public override string ToString()

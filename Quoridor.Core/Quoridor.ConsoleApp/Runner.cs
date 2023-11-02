@@ -72,7 +72,7 @@ namespace Quoridor.ConsoleApp
                 NumWalls = NumWalls,
                 OutputDest = _stdOut,
             };
-            settings.Strategies = new List<AIAgent<Movement, IGameEnvironment, IPlayer>>();
+            settings.Strategies = new List<AIStrategy<Movement, IGameEnvironment, IPlayer>>();
             for (int i = 0; i < NumPlayers; i++)
                 settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
 
@@ -103,6 +103,9 @@ namespace Quoridor.ConsoleApp
             int Depth
             )
         {
+            // for large tree, logs might be very big, so we disable it.
+            Logger.Disable = true;
+
             _container.Resolve<IBoard>().SetDimension(Dimension);
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
             var commandParser = _container.Resolve<ICommandParser>();
@@ -112,7 +115,7 @@ namespace Quoridor.ConsoleApp
                 NumPlayers = 2,
                 NumWalls = NumWalls,
                 OutputDest = _stdOut,
-                Strategies = new List<AIAgent<Movement, IGameEnvironment, IPlayer>>()
+                Strategies = new List<AIStrategy<Movement, IGameEnvironment, IPlayer>>()
             };
 
             //add selected ai
@@ -132,7 +135,7 @@ namespace Quoridor.ConsoleApp
             return (T)Enum.Parse(enumType: typeof(T), value: value, ignoreCase: true);
         }
 
-        private AIAgent<Movement, IGameEnvironment, IPlayer> GetStrategy(AITypes aiType, int depth)
+        private AIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy(AITypes aiType, int depth)
         {
             switch (aiType)
             {

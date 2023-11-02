@@ -63,14 +63,14 @@ namespace Quoridor.ConsoleApp.GameManager
                 _settings.Strategies[StrategyTurn].Name} won.");
         }
 
-        public void GetAndDoMove(AIAgent<Movement, IGameEnvironment, IPlayer> strategy, IPlayer player)
+        public void GetAndDoMove(AIStrategy<Movement, IGameEnvironment, IPlayer> strategy, IPlayer player)
         {
             while (true)
             {
                 try
                 {
-                    var bestMove = strategy.BestMove(_gameEnvironment, player);
-                    Process(bestMove);
+                    var result = strategy.BestMove(_gameEnvironment, player);
+                    Process(result.BestMove, player);
                     break;
                 }
                 catch(Exception ex)
@@ -81,10 +81,10 @@ namespace Quoridor.ConsoleApp.GameManager
         }
 
 
-        public void Process<T>(T command) where T : Movement
+        public void Process<T>(T command, IPlayer player) where T : Movement
         {
             _log.Info($"Received '{typeof(T).Name}' command");
-            _gameEnvironment.Move(command);
+            _gameEnvironment.Move(player, command);
         }
 
         private void InitAndAddPlayers()

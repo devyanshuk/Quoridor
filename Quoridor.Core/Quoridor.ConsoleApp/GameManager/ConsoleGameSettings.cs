@@ -12,6 +12,6 @@ namespace Quoridor.ConsoleApp.GameManager
         public int NumPlayers { get; set; }
         public int NumWalls { get; set; }
         public TextWriter OutputDest { get; set; }
-        public List<AIAgent<Movement, IGameEnvironment, IPlayer>> Strategies { get; set; }
+        public List<AIStrategy<Movement, IGameEnvironment, IPlayer>> Strategies { get; set; }
     }
 }

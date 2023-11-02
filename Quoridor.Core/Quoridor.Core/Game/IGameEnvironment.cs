@@ -3,6 +3,7 @@
 using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
+using Quoridor.Core.Environment;
 
 namespace Quoridor.Core.Game
 {
@@ -12,14 +13,15 @@ namespace Quoridor.Core.Game
         INeighbors<Movement>
     {
         List<IPlayer> Players { get; }
+        HashSet<IWall> Walls { get; }
 
         void Initialize();
 
         void AddPlayer(IPlayer player);
-        void MovePlayer(Direction dir);
+        void MovePlayer(IPlayer player, Direction dir);
         void ChangeTurn();
 
-        void AddWall(Vector2 from, Direction placement);
-        void RemoveWall(Vector2 from, Direction placement);
+        void AddWall(IPlayer player, Vector2 from, Direction placement);
+        void RemoveWall(IPlayer player, Vector2 from, Direction placement);
     }
 }

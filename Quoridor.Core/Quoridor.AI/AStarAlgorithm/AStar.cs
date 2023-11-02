@@ -6,14 +6,14 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.AStarAlgorithm
 {
-    public class AStar<TMove, TMaze, TPlayer> : AIAgent<TMove, TMaze, TPlayer>
+    public class AStar<TMove, TMaze, TPlayer> : AIStrategy<TMove, TMaze, TPlayer>
         where TPlayer : IAStarPlayer<TMove>
         where TMove : Movement
         where TMaze : INeighbors<TMove>
     {
         public override string Name => nameof(AStarAlgorithm);
 
-        public override TMove BestMove(TMaze maze, TPlayer player)
+        public override AIStrategyResult<TMove> BestMove(TMaze maze, TPlayer player)
         {
             ValidateParams(maze, player);
 
@@ -64,13 +64,17 @@ namespace Quoridor.AI.AStarAlgorithm
             return null;
         }
 
-        private static TMove ConstructPath(Node<TMove> currNode)
+        private static AIStrategyResult<TMove> ConstructPath(Node<TMove> currNode)
         {
             //we only need the next position so we skip the rest
+            var pathLen = 1;
             while (currNode.Parent.Parent != null)
+            {
+                pathLen++;
                 currNode = currNode.Parent;
+            }
 
-            return currNode.CurrMove;
+            return new AIStrategyResult<TMove> { Value = pathLen, BestMove = currNode.CurrMove };
         }
 
         private static void ValidateParams(
