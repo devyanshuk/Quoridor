@@ -49,11 +49,27 @@ namespace Quoridor.ConsoleApp.GameManager
                 _settings.OutputDest.WriteLine(@$"Player '{player.Id}''s Turn. {
                     player.NumWalls} wall(s) left. Using {strategy.Name} strategy");
 
-                var bestMove = strategy.BestMove(_gameEnvironment, player);
-                Process(bestMove);
+                GetAndDoMove(strategy, player);
 
                 _gameEnvironment.ChangeTurn();
                 StrategyTurn = (StrategyTurn + 1) % _settings.NumPlayers;
+            }
+        }
+
+        public void GetAndDoMove(AIAgent<Movement, IGameEnvironment, IPlayer> strategy, IPlayer player)
+        {
+            while (true)
+            {
+                try
+                {
+                    var bestMove = strategy.BestMove(_gameEnvironment, player);
+                    Process(bestMove);
+                    break;
+                }
+                catch(Exception ex)
+                {
+                    _settings.OutputDest.WriteLine(ex.Message);
+                }
             }
         }
 
