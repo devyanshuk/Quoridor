@@ -9,42 +9,37 @@ namespace Quoridor.Core.Environment
         public Vector2 Position { get; private set; }
 
         /// <summary>
-        /// eg. Walls[0] != null indicates that there's a wall above the cell
+        /// eg. Blocked[0] == true indicates that there's a wall above the cell
         /// </summary>
-        public IWall[] Walls { get; set; } = new IWall[4];
+        public bool[] Blocked { get; set; } = new bool[4];
 
         public Cell(Vector2 position)
         {
             Position = position;
+            for(int i = 0; i < 4; i++)
+                Blocked[i] = false;
+
         }
 
         public bool IsAccessible(Direction direction)
         {
-            return Walls[(int)direction] == null;
+            return Blocked[(int)direction] == false;
         }
 
-        public bool AddWall(IWall wall)
+        public void Block(Direction dir)
         {
-            if (!IsAccessible(wall.Placement))
-                return false;
-
-            Walls[(int)wall.Placement] = wall;
-            return true;
+            Blocked[(int)dir] = true;
         }
 
-        public bool RemoveWall(IWall wall)
+        public void Unblock(Direction dir)
         {
-            if (IsAccessible(wall.Placement))
-                return false;
-
-            Walls[(int)wall.Placement] = null;
-            return true;
+            Blocked[(int)dir] = false;
         }
 
         public bool Equals(Cell other)
         {
             if (other == null) return false;
-            return Position.Equals(other.Position) && Walls.Equals(other.Walls);
+            return Position.Equals(other.Position);
         }
     }
 }

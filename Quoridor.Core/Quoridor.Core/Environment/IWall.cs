@@ -10,6 +10,8 @@ namespace Quoridor.Core.Environment
         bool IsHorizontal();
         bool IsVertical();
 
+        IWall Opposite();
+
         // check if one wall intersects with the other.
         // this only happens if the centre points of two walls
         // have the same coordinate.

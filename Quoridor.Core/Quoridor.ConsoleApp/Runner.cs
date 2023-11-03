@@ -1,10 +1,8 @@
 ﻿using CLAP;
+using System;
 using System.IO;
-using System.Linq;
 using Castle.Windsor;
 using CLAP.Validation;
-
-using System;
 using System.Collections.Generic;
 
 using Quoridor.AI;
@@ -76,7 +74,11 @@ namespace Quoridor.ConsoleApp
             for (int i = 0; i < NumPlayers; i++)
                 settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
 
-            var gameManager = gameManagerFactory.CreateManager(settings);
+            var gameEnv = _container
+                .Resolve<IGameFactory>()
+                .CreateGameEnvironment(settings.NumPlayers, settings.NumWalls);
+
+            var gameManager = gameManagerFactory.CreateManager(settings, gameEnv);
             gameManager.Start();
         }
 
@@ -98,7 +100,7 @@ namespace Quoridor.ConsoleApp
             string AI,
 
             [Description("Depth of the search tree")]
-            [DefaultValue(1)]
+            [DefaultValue(10)]
             [Aliases("de")]
             int Depth
             )
@@ -123,10 +125,14 @@ namespace Quoridor.ConsoleApp
             settings.Strategies.Add(GetStrategy(aiType, Depth));
 
             //add player
+
             settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
 
+            var gameEnv = _container
+                .Resolve<IGameFactory>()
+                .CreateGameEnvironment(settings.NumPlayers, settings.NumWalls);
 
-            var gameManager = gameManagerFactory.CreateManager(settings);
+            var gameManager = gameManagerFactory.CreateManager(settings, gameEnv);
             gameManager.Start();
         }
 

@@ -48,20 +48,8 @@ namespace Quoridor.Core.Environment
 
         public IEnumerable<Cell> Neighbors(Cell refCell)
         {
-            var x = refCell.Position.X;
-            var y = refCell.Position.Y;
-
-            if (y + 1 < Dimension && refCell.IsAccessible(Direction.South))
-                yield return Cells[x, y + 1];
-
-            if (y - 1 >= 0 && refCell.IsAccessible(Direction.North))
-                yield return Cells[x, y - 1];
-
-            if (x + 1 < Dimension && refCell.IsAccessible(Direction.East))
-                yield return Cells[x + 1, y];
-
-            if (x - 1 >= 0 && refCell.IsAccessible(Direction.West))
-                yield return Cells[x - 1, y];
+            foreach (var neighborDir in NeighborDirs(refCell))
+                yield return GetCell(refCell.Position.GetPosFor(neighborDir));
         }
 
         public IEnumerable<Direction> NeighborDirs(Cell refCell)

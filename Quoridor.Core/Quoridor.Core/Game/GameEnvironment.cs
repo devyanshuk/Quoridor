@@ -27,12 +27,15 @@ namespace Quoridor.Core.Game
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
 
         public GameEnvironment(
+            int numPlayers,
+            int numWalls,
             IBoard board)
         {
             _board = board;
             _aStar = new AStar<Vector2, IBoard, IPlayer>();
             Players = new List<IPlayer>();
             Walls = new HashSet<IWall>();
+            InitAndAddPlayers(numPlayers, numWalls);
         }
 
         public void Initialize()
@@ -42,10 +45,48 @@ namespace Quoridor.Core.Game
             Walls.Clear();
         }
 
+        private void InitAndAddPlayers(int numPlayers, int numWalls)
+        {
+            var startXs = new int[4] { _board.Dimension / 2, _board.Dimension / 2, 0, _board.Dimension - 1 };
+            var startYs = new int[4] { 0, _board.Dimension - 1, _board.Dimension / 2, _board.Dimension / 2 };
+            var goalConditions = new IsGoal<Vector2>[] {
+                (pos) => pos.Y == _board.Dimension - 1,
+                (pos) => pos.Y == 0,
+                (pos) => pos.X == 0,
+                (pos) => pos.X == _board.Dimension - 1
+            };
+            var heuristics = new H_n<Vector2>[]
+            {
+                (pos) => Math.Abs(_board.Dimension - 1 - pos.Y),
+                (pos) => pos.Y,
+                (pos) => pos.X,
+                (pos) => Math.Abs(_board.Dimension - 1 - pos.Y)
+            };
+
+            var currIdAscii = 65;
+
+            for (int i = 0; i < numPlayers; i++)
+            {
+                var startX = startXs[i];
+                var startY = startYs[i];
+                var playerId = (char)currIdAscii++;
+
+                var startPos = new Vector2(startX, startY);
+                var player = new Player(playerId, numWalls, startPos)
+                {
+                    ManhattanHeuristicFn = heuristics[i],
+                    IsGoalMove = goalConditions[i]
+                };
+
+                AddPlayer(player);
+                _log.Info($"Successfully added player '{player}'. Start pos: '{startPos}'");
+            }
+        }
+
         public void AddPlayer(IPlayer player)
         {
             Players.Add(player);
-            _log.Info($@"Adding player '{player.Id}'. Available players: '{
+            _log.Info($@"Added player '{player.Id}'. Available players: '{
                 string.Join(", ", Players.Select(p => p.Id))}'");
         }
 
@@ -77,46 +118,53 @@ namespace Quoridor.Core.Game
         {
             _log.Info($"Attempting to add '{placement}ern' wall from '{from}' for player '{player}'");
 
+            //check if player has any wall remaining
             if (player.NumWalls <= 0)
                 throw new NoWallRemainingException($"player {player} has no walls left");
 
-            if (!_board.WithinBounds(from))
+            //check if wall is valid and within bounds
+            var wall = CreateAndValidateWall(from, placement);
+
+            //check if wall is already present
+            if (Walls.Contains(wall))
+                throw new WallAlreadyPresentException($"{wall} already present");
+
+            //check if wall is already present or intersects with another wall
+            if (Walls.Any(w => w.Intersects(from, placement)))
+                throw new WallIntersectsException($"{placement}ern wall from '{from}' intersects with already present wall");
+
+            //get 4 cells affected by the wall and block cell access
+            var affectedCells = GetCellsAffectedByWall(wall);
+            BlockAccess(affectedCells);
+
+            //check if all players can move to their goal, and if not, unblock the path and throw
+            var blockedPlayers = Players.Where(player => _aStar.BestMove(_board, player) is null);
+            if (blockedPlayers.Count() > 0)
             {
-                var errorMessage = $"{placement}ern wall from '{from}' could not be added. Invalid dimension.";
-                _log.Error(errorMessage);
-                throw new InvalidWallException(errorMessage);
+                UnblockAccess(affectedCells);
+                throw new NewWallBlocksPlayerException($"{wall} blocks player(s) {String.Join(",", blockedPlayers)}");
             }
 
-            var walls = GetWallsForAffectedCells(from, placement);
-            if (walls.All(w => _board.GetCell(w.From).IsAccessible(w.Placement)))
-            {
-                _log.Info(@$"Wall validity check complete. Adding wall '{from}': '{
-                    placement}' to the board and checking if it's accessible for all players.");
-                foreach (var wall in walls)
-                    _board.GetCell(wall.From).AddWall(wall);
-                CheckForBlockedPath(walls);
-            }
-            else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
+            //wall check complete, add it to the wall cache
+            Walls.Add(wall);
 
-            Walls.Add(walls.First());
-
-            _log.Info($"Successfully added '{placement}ern' wall from '{from}'");
-
+            //player used up a wall, so decrease the wall count
             player.DecreaseWallCount();
         }
 
-        private void CheckForBlockedPath(IEnumerable<IWall> walls)
+        private void BlockAccess(IEnumerable<AffectedCell> affectedCells)
         {
-            foreach(var player in Players)
+            foreach (var affectedCell in affectedCells)
             {
-                var bestNextPath = _aStar.BestMove(_board, player);
-                if (bestNextPath is null)
-                {
-                    //undo the walls first
-                    foreach (var wall in walls)
-                        _board.GetCell(wall.From).RemoveWall(wall);
-                    throw new NewWallBlocksPlayerException($"{walls.First()} wall blocks player '{player}'");
-                }
+                affectedCell.Cell.Block(affectedCell.BlockedDirection);
+            }
+        }
+
+        private void UnblockAccess(IEnumerable<AffectedCell> affectedCells)
+        {
+            foreach (var affectedCell in affectedCells)
+            {
+                affectedCell.Cell.Unblock(affectedCell.BlockedDirection);
             }
         }
 
@@ -124,27 +172,21 @@ namespace Quoridor.Core.Game
         {
             _log.Info($"Attempting to remove '{placement}ern' wall from '{from}'");
 
-            if (!_board.WithinBounds(from))
-            {
-                var errorMessage = $"{placement}ern wall from '{from}' could not be removed. Invalid dimension";
-                _log.Error(errorMessage);
-                throw new InvalidWallException(errorMessage);
-            }
+            //check if wall is valid and within bounds
+            var wall = CreateAndValidateWall(from, placement);
 
-            var walls = GetWallsForAffectedCells(from, placement);
-            if (walls.All(w => !_board.GetCell(w.From).IsAccessible(w.Placement)))
-            {
-                _log.Info($"'{placement}'ern wall from '{from}' exists. Removing it");
-                foreach(var wall in walls)
-                {
-                    _board.GetCell(wall.From).RemoveWall(wall);
-                }
-            }
-            else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
+            //check if wall was previously added
+            if (!Walls.Contains(wall))
+                throw new WallNotPresentException($"{wall} not present'");
 
-            Walls.Remove(walls.First());
+            //get cells affected by the wall and unblock access
+            var affectedCells = GetCellsAffectedByWall(wall);
+            UnblockAccess(affectedCells);
 
-            _log.Info($"Successfully removed '{placement}ern' wall from '{from}'");
+            //remove wall from the cache
+            Walls.Remove(wall);
+
+            _log.Info($"Successfully removed {wall}");
 
             player.IncreaseWallCount();
         }
@@ -155,32 +197,38 @@ namespace Quoridor.Core.Game
             return neighbors.All(n => !n.Equals(newPos));
         }
 
-        public IEnumerable<IWall> GetWallsForAffectedCells(Vector2 from, Direction placement)
+        //each wall blocks one direction from exactly 4 cell
+        public IEnumerable<AffectedCell> GetCellsAffectedByWall(IWall wall)
         {
-            var wall = CreateAndValidateWall(from, placement);
-            var wall2 = CreateAndValidateWall(_board.GetCellAt(from, placement).Position, placement.Opposite());
+            var result = new List<AffectedCell>() {
+                new AffectedCell { Cell = _board.GetCell(wall.From), BlockedDirection = wall.Placement } };
 
-            var newPos = from.Copy();
+            var newPos = wall.From.Copy();
             if (wall.IsHorizontal()) newPos.X++;
             else newPos.Y++;
 
-            var wall3 = new Wall(placement, newPos);
-            var wall4 = new Wall(placement.Opposite(), _board.GetCellAt(newPos, placement).Position);
+            result.Add(new AffectedCell {
+                Cell = _board.GetCell(newPos), BlockedDirection = wall.Placement });
 
-            var dir1 = wall.From.GetDirFor(wall3.From);
-            var dir2 = wall2.From.GetDirFor(wall4.From);
+            var oppositeWall = wall.Opposite();
+            result.Add(new AffectedCell {
+                Cell = _board.GetCell(oppositeWall.From), BlockedDirection = oppositeWall.Placement });
 
-            if (!_board.GetCell(wall.From).IsAccessible(dir1) && !_board.GetCell(wall2.From).IsAccessible(dir2))
-            {
-                var errorMessage = $"wall '{from}' : '{placement}' intersects with a previously added wall";
-                throw new WallIntersectsException(errorMessage);
-            }
+            result.Add(new AffectedCell {
+                Cell = _board.GetCellAt(newPos, wall.Placement), BlockedDirection = oppositeWall.Placement });
 
-            return new List<IWall> { wall, wall2, wall3, wall4 };
+            return result;
         }
 
         public IWall CreateAndValidateWall(Vector2 from, Direction dir)
         {
+            if (!_board.WithinBounds(from))
+            {
+                var errorMessage = $"{dir}ern wall from '{from}' could not be removed. Invalid dimension";
+                _log.Error(errorMessage);
+                throw new InvalidWallException(errorMessage);
+            }
+
             var wall = new Wall(dir, from);
 
             if ((wall.From.X == 0 && wall.Placement.Equals(Direction.West))
@@ -231,7 +279,6 @@ namespace Quoridor.Core.Game
 
         public void Move(Movement move)
         {
-            ValidateNotNull(CurrentPlayer, nameof(CurrentPlayer));
             ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
@@ -255,7 +302,6 @@ namespace Quoridor.Core.Game
             //previous player index
             Turn = (Turn + Players.Count - 1) % Players.Count;
 
-            ValidateNotNull(CurrentPlayer, nameof(CurrentPlayer));
             ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
@@ -270,6 +316,10 @@ namespace Quoridor.Core.Game
         public IEnumerable<Movement> GetValidMoves()
         {
             var validMoves = new List<Movement>();
+
+            //if player reached the goal, no need to return any moves.
+            if (CurrentPlayer.IsGoal(CurrentPlayer.CurrentPos))
+                return validMoves;
 
             //movable player positions (at most 4)
             var validPlayerMoves = _board

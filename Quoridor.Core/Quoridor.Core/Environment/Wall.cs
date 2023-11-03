@@ -20,17 +20,15 @@ namespace Quoridor.Core.Environment
         public override bool Equals(object obj)
         {
             if (obj == null || !(obj is Wall)) return false;
-            var wall = obj as Wall;
-            var isExactWall = wall.Placement.Equals(Placement) && wall.From.Equals(From);
 
-            // Northern wall from (5,5) is equivalent to Southern wall from (5,4)
-            // So we need to account for that too
+            var otherWall = obj as Wall;
 
-            var oppositePOVFrom = wall.From.GetPosFor(wall.Placement);
-            var oppositeDir = wall.Placement.Opposite();
-            var oppositePovEquals = oppositePOVFrom.Equals(From) && oppositeDir.Equals(Placement);
+            var thisWallPoints = GetAllPointsOfWall(From, Placement);
+            var otherWallPoints = GetAllPointsOfWall(otherWall.From, otherWall.Placement);
 
-            return isExactWall || oppositePovEquals;
+            return thisWallPoints.Item1.Equals(otherWallPoints.Item1) &&
+                thisWallPoints.Item2.Equals(otherWallPoints.Item2) &&
+                thisWallPoints.Item3.Equals(otherWallPoints.Item3);
         }
 
         public override int GetHashCode()
@@ -44,6 +42,11 @@ namespace Quoridor.Core.Environment
             hashCode += oppositeDir.GetHashCode();
 
             return hashCode;
+        }
+
+        public IWall Opposite()
+        {
+            return new Wall(Placement.Opposite(), From.GetPosFor(Placement));
         }
 
         public bool IsHorizontal()

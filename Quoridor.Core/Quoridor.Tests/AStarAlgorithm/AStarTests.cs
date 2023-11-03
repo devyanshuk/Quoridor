@@ -79,7 +79,7 @@ namespace Quoridor.Tests.AStarAlgorithm
         {
             var board = new Board();
             board.SetDimension(9);
-            var gameEnv = new GameEnvironment(board);
+            var gameEnv = new GameEnvironment(0, 0, board);
 
             return Tuple.Create<IBoard, GameEnvironment>(board, gameEnv);
         }

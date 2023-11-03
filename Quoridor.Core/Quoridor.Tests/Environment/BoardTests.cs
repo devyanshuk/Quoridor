@@ -62,7 +62,7 @@ namespace Quoridor.Tests.Environment
             board.SetDimension(9);
             var refCell = board.Cells[x, y];
             foreach (var dir in directions)
-                refCell.Walls[(int)dir] = new Wall();
+                refCell.Blocked[(int)dir] = true;
 
             //Act
             var neighbors = board.Neighbors(refCell);

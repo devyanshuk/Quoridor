@@ -63,9 +63,8 @@ namespace Quoridor.Tests.Game
 
         [TestCase(5, 5, North, 6, 5)]
         [TestCase(5, 5, South, 6, 5)]
-        [TestCase(3, 4, East, 3, 4)]
         [TestCase(5, 5, West, 5, 6)]
-        public void Should_Throw_If_Wall_Added_WRT_Another_Cell_Is_Already_Present_Or_Intersects_With_Another_Wall(
+        public void Should_Throw_If_Wall_Added_Intersects_OR_Overlaps_Another_Wall(
             int f_x, int f_y, Direction dir, int t_x, int t_y)
         {
             //Arrange
@@ -73,16 +72,19 @@ namespace Quoridor.Tests.Game
             var gameEnv = token.Item2;
             var pos = new Vector2(f_x, f_y);
             var pos2 = new Vector2(t_x, t_y);
+            var oppWall = new Wall(dir, pos).Opposite();
             var player = token.Item3;
 
             //Act
             gameEnv.AddWall(player, pos, dir);
             Action a = () => gameEnv.AddWall(player, pos2, dir);
             Action b = () => gameEnv.AddWall(player, pos, dir);
+            Action c = () => gameEnv.AddWall(player, oppWall.From, oppWall.Placement);
 
             //Assert
-            a.Should().Throw<WallAlreadyPresentException>();
+            a.Should().Throw<WallIntersectsException>();
             b.Should().Throw<WallAlreadyPresentException>();
+            c.Should().Throw<WallAlreadyPresentException>();
         }
 
         [Test]
@@ -444,7 +446,6 @@ namespace Quoridor.Tests.Game
             gameEnv.Walls.Contains(new Wall(dir, pos)).Should().BeTrue();
             var oppPos = pos.GetPosFor(dir);
             var oppDir = dir.Opposite();
-            var h = gameEnv.Walls.First().GetHashCode();
             gameEnv.Walls.Contains(new Wall(oppDir, oppPos)).Should().BeTrue();
         }
 
@@ -454,7 +455,7 @@ namespace Quoridor.Tests.Game
         {
             var board = new Board();
             board.SetDimension(9);
-            var gameEnv = new GameEnvironment(board);
+            var gameEnv = new GameEnvironment(0, 0, board);
             var player = new Player('A', 8, new Vector2(4, 0))
             {
                 ManhattanHeuristicFn = (cell) => Math.Abs(8 - cell.Y),
