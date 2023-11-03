@@ -95,9 +95,17 @@ namespace Quoridor.Core.Game
             Turn = (Turn + 1) % Players.Count;
         }
 
-        public IPlayer CurrentPlayer => Players?[Turn] ?? throw new Exception($"No player registered");
+        public IPlayer CurrentPlayer
+        {
+            get
+            {
+                if (Players.Count() == 0)
+                    throw new Exception($"No player registered");
+                return Players[Turn];
+            }
+         }
 
-        public bool IsTerminal => Players?.Any(p => p.IsGoalMove(p.CurrentPos)) ?? false;
+        public bool HasFinished => Players.Any(p => p.IsGoalMove(p.CurrentPos));
 
         public void MovePlayer(IPlayer player, Direction dir)
         {
@@ -191,12 +199,6 @@ namespace Quoridor.Core.Game
             player.IncreaseWallCount();
         }
 
-        public bool NewMoveBlockedByWall(Vector2 currPos, Vector2 newPos)
-        {
-            var neighbors = _board.Neighbors(currPos);
-            return neighbors.All(n => !n.Equals(newPos));
-        }
-
         //each wall blocks one direction from exactly 4 cell
         public IEnumerable<AffectedCell> GetCellsAffectedByWall(IWall wall)
         {
@@ -259,7 +261,8 @@ namespace Quoridor.Core.Game
                 throw new InvalidAgentMoveException(errorMessage);
             }
 
-            if (NewMoveBlockedByWall(currentPos, newPos))
+            //if newPos can't be reached from currentPos, then there's a wall blocking access between those cells
+            if (!_board.GetCell(currentPos).IsAccessible(currentPos.GetDirFor(newPos)))
             {
                 var errorMessage = $"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall";
                 _log.Error(errorMessage);
@@ -317,42 +320,86 @@ namespace Quoridor.Core.Game
         {
             var validMoves = new List<Movement>();
 
-            //if player reached the goal, no need to return any moves.
+            var validMoveDirs = GetWalkableNeighbors();
+            validMoves.AddRange(validMoveDirs);
+
+            var validWalls = GetAllUnplacedWalls();
+            validMoves.AddRange(validWalls);
+           
+            return validMoves;
+        }
+
+        public IEnumerable<Movement> GetWalkableNeighbors()
+        {
+            var moves = new List<Movement>();
+
+            //if player already at goal, no need to return neighbors
             if (CurrentPlayer.IsGoal(CurrentPlayer.CurrentPos))
-                return validMoves;
+                return moves;
 
-            //movable player positions (at most 4)
-            var validPlayerMoves = _board
-                .NeighborDirs(CurrentPlayer.CurrentPos)
-                .Select(d => new AgentMove(d));
+            //we do this to ensure any possible jumps won't be blocked by a wall
+            foreach(var validDir in _board.NeighborDirs(CurrentPlayer.CurrentPos))
+            {
+                try
+                {
+                    TryMove(CurrentPlayer, CurrentPlayer.CurrentPos, validDir);
+                    moves.Add(new AgentMove(validDir));
+                }
+                catch(Exception) { }
+            }
+            return moves;
+        }
 
-            validMoves.AddRange(validPlayerMoves);
+        private IEnumerable<Movement> GetAllUnplacedWalls()
+        {
+            //all wall pieces that can be placed on the board. We need to check if the wall
+            //isn't already present or intersects with another wall, and also the wall should
+            //not block any player from reaching the goal.
+            var validWallMoves = new List<Movement>();
 
             //if player has no wall remaining, we don't need to add in wall moves.
             if (CurrentPlayer.NumWalls <= 0)
-                return validMoves;
+                return validWallMoves;
 
-            //all wall pieces that can be placed on the board
             //horizontal walls
-            for (int i = 0; i <= _board.Dimension - 3; i++)
-                for (int j = 1; j < _board.Dimension - 1; j++)
-                {
-                    var from = new Vector2(i, j);
-                    if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
-                        validMoves.Add(new WallPlacement(Direction.North, from));
-                }
+            validWallMoves.AddRange(
+                GetValidWallsInDir(0, _board.Dimension - 3, 1, _board.Dimension - 2, Direction.North));
 
             ////vertical walls
-            for (int i = 1; i < _board.Dimension - 1; i++)
+            validWallMoves.AddRange(
+                GetValidWallsInDir(1, _board.Dimension - 2, 0, _board.Dimension - 3, Direction.West));
+            
+            return validWallMoves;
+        }
+
+        private IEnumerable<Movement> GetValidWallsInDir(int x0, int x1, int y0, int y1, Direction dir)
+        {
+            var result = new List<Movement>();
+
+            for (int i = x0; i <= x1; i++)
             {
-                for (int j = 0; j <= _board.Dimension - 3; j++)
+                for (int j = y0; j <= y1; j++)
                 {
                     var from = new Vector2(i, j);
-                    if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
-                        validMoves.Add(new WallPlacement(Direction.West, from));
+                    // check if wall overlaps/intersects another wall, if so, ignore
+                    if (Walls.Any(wall => wall.Intersects(from, dir)))
+                        continue;
+
+                    //check if adding in this wall blocks any players
+                    try
+                    {
+                        AddWall(CurrentPlayer, from, dir);
+                        RemoveWall(CurrentPlayer, from, dir);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+
+                    result.Add(new WallPlacement(dir, from));
                 }
             }
-            return validMoves;
+            return result;
         }
 
         public double Evaluate()

@@ -21,7 +21,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
 
         public override AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
-            if (game.IsTerminal)
+            if (game.HasFinished)
                 throw new Exception($"Game already over. Cannot perform minimax");
             if (player == null)
                 throw new Exception($"No agent to get scores from");
@@ -32,7 +32,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
 
         private AIStrategyResult<TMove> MinimaxStep(TGame game, int depth, bool maximizingPlayer)
         {
-            if (depth <= 0 || game.IsTerminal)
+            if (depth <= 0 || game.HasFinished)
                 return new AIStrategyResult<TMove> { Value = game.Evaluate() };
 
             var bestScore = maximizingPlayer ? double.MinValue : double.MaxValue;

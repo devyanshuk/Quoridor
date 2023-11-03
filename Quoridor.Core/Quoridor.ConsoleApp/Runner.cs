@@ -100,7 +100,7 @@ namespace Quoridor.ConsoleApp
             string AI,
 
             [Description("Depth of the search tree")]
-            [DefaultValue(10)]
+            [DefaultValue(1)]
             [Aliases("de")]
             int Depth
             )

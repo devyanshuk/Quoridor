@@ -44,7 +44,7 @@ namespace Quoridor.ConsoleApp.GameManager
 
                 _boardVisualizer.DrawBoard(_settings.OutputDest);
 
-                if (_gameEnvironment.IsTerminal)
+                if (_gameEnvironment.HasFinished)
                     break;
 
                 StrategyTurn = (StrategyTurn + 1) % _settings.NumPlayers;

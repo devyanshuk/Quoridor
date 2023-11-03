@@ -94,7 +94,10 @@ namespace Quoridor.Core.Environment
                 thisMidPoint.Equals(otherWallPoints.Item1) ||
                 thisMidPoint.Equals(otherWallPoints.Item3);
 
-            return midPointIntersect || sideIntersectWithMid;
+            //case 3: If both walls are the same
+            var sameWalls = Equals(new Wall(dir, from));
+
+            return midPointIntersect || sideIntersectWithMid || sameWalls;
         }
 
         private Tuple<Vector2, Vector2, Vector2> GetAllPointsOfWall(Vector2 from, Direction dir)
