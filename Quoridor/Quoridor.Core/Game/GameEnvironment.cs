@@ -202,24 +202,18 @@ namespace Quoridor.Core.Game
         //each wall blocks one direction from exactly 4 cell
         public IEnumerable<AffectedCell> GetCellsAffectedByWall(IWall wall)
         {
-            var result = new List<AffectedCell>() {
-                new AffectedCell { Cell = _board.GetCell(wall.From), BlockedDirection = wall.Placement } };
+            yield return new AffectedCell(_board.GetCell(wall.From), wall.Placement);
 
             var newPos = wall.From.Copy();
             if (wall.IsHorizontal()) newPos.X++;
             else newPos.Y++;
 
-            result.Add(new AffectedCell {
-                Cell = _board.GetCell(newPos), BlockedDirection = wall.Placement });
+            yield return new AffectedCell(_board.GetCell(newPos), wall.Placement);
 
             var oppositeWall = wall.Opposite();
-            result.Add(new AffectedCell {
-                Cell = _board.GetCell(oppositeWall.From), BlockedDirection = oppositeWall.Placement });
 
-            result.Add(new AffectedCell {
-                Cell = _board.GetCellAt(newPos, wall.Placement), BlockedDirection = oppositeWall.Placement });
-
-            return result;
+            yield return new AffectedCell(_board.GetCell(oppositeWall.From), oppositeWall.Placement);
+            yield return new AffectedCell(_board.GetCellAt(newPos, wall.Placement), oppositeWall.Placement);
         }
 
         public IWall CreateAndValidateWall(Vector2 from, Direction dir)
