@@ -18,5 +18,10 @@ namespace Quoridor.Core.Move
             if (other is null) return false;
             return Dir.Equals(other.Dir);
         }
+
+        public override string ToString()
+        {
+            return $"{Dir}ern direction move";
+        }
     }
 }

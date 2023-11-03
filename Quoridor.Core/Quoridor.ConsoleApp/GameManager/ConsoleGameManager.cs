@@ -55,7 +55,6 @@ namespace Quoridor.ConsoleApp.GameManager
                 if (_gameEnvironment.IsTerminal)
                     break;
 
-                _gameEnvironment.ChangeTurn();
                 StrategyTurn = (StrategyTurn + 1) % _settings.NumPlayers;
             }
             _settings.OutputDest.WriteLine(@$"Game over. Player {_gameEnvironment.CurrentPlayer} : {
@@ -69,6 +68,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 try
                 {
                     var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
+                    Console.WriteLine($"{strategy.Name} made {result}");
                     Process(result.BestMove);
                     break;
                 }

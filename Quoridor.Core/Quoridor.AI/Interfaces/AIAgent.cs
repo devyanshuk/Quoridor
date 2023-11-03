@@ -12,5 +12,10 @@
     {
         public double Value { get; set; }
         public TMove BestMove { get; set; }
+
+        public override string ToString()
+        {
+            return $"BestMove : {BestMove}, Value : {Value}";
+        }
     }
 }

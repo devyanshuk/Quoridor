@@ -21,5 +21,10 @@ namespace Quoridor.Core.Move
             if (other is null) return false;
             return other.From.Equals(From) && other.Dir.Equals(Dir);
         }
+
+        public override string ToString()
+        {
+            return $"{Dir}ern wall from {From}";
+        }
     }
 }
