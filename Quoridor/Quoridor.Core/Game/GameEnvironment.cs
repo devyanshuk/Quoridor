@@ -355,27 +355,20 @@ namespace Quoridor.Core.Game
             //all wall pieces that can be placed on the board. We need to check if the wall
             //isn't already present or intersects with another wall, and also the wall should
             //not block any player from reaching the goal.
-            var validWallMoves = new List<Movement>();
 
             //if player has no wall remaining, we don't need to add in wall moves.
             if (CurrentPlayer.NumWalls <= 0)
-                return validWallMoves;
+                return new List<Movement>();
 
+            return
             //horizontal walls
-            validWallMoves.AddRange(
-                GetValidWallsInDir(0, _board.Dimension - 3, 1, _board.Dimension - 2, Direction.North));
-
-            ////vertical walls
-            validWallMoves.AddRange(
-                GetValidWallsInDir(1, _board.Dimension - 2, 0, _board.Dimension - 3, Direction.West));
-            
-            return validWallMoves;
+            GetValidWallsInDir(0, _board.Dimension - 3, 1, _board.Dimension - 2, Direction.North)
+            //vertical walls
+            .Concat(GetValidWallsInDir(1, _board.Dimension - 2, 0, _board.Dimension - 3, Direction.West));
         }
 
         private IEnumerable<Movement> GetValidWallsInDir(int x0, int x1, int y0, int y1, Direction dir)
         {
-            var result = new List<Movement>();
-
             for (int i = x0; i <= x1; i++)
             {
                 for (int j = y0; j <= y1; j++)
@@ -396,10 +389,9 @@ namespace Quoridor.Core.Game
                         continue;
                     }
 
-                    result.Add(new WallPlacement(dir, from));
+                    yield return new WallPlacement(dir, from);
                 }
             }
-            return result;
         }
 
         public double Evaluate()

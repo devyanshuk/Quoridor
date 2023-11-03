@@ -23,7 +23,7 @@ namespace Quoridor.Core.Environment
 
         public bool IsAccessible(Direction direction)
         {
-            return Blocked[(int)direction] == false;
+            return !Blocked[(int)direction];
         }
 
         public void Block(Direction dir)
