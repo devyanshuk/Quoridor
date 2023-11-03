@@ -22,9 +22,6 @@ namespace Quoridor.Core.Game
         public List<IPlayer> Players { get; private set; }
         public HashSet<IWall> Walls { get; private set; }
 
-        int COUNT = 0;
-        Wall WALL = new Wall(Direction.North, new Vector2(0, 1));
-
         private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
 
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
@@ -99,21 +96,9 @@ namespace Quoridor.Core.Game
                     _board.GetCell(wall.From).AddWall(wall);
                 CheckForBlockedPath(walls);
             }
-            else
-            {
-                //Console.WriteLine("Walls");
-                //foreach(var wall in Walls)
-                //    Console.WriteLine(wall);
-                throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
-            }
+            else throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
 
             Walls.Add(walls.First());
-
-            //if (Walls.Contains(WALL))
-            //{
-            //    COUNT++;
-            //    Console.WriteLine($"WALL COUNT (ADD) = {COUNT}");
-            //}
 
             _log.Info($"Successfully added '{placement}ern' wall from '{from}'");
 
@@ -139,12 +124,6 @@ namespace Quoridor.Core.Game
         {
             _log.Info($"Attempting to remove '{placement}ern' wall from '{from}'");
 
-            //if (from.X == 0 && from.Y == 1) {
-            //    Console.WriteLine($"Removing {placement} wall from {from}");
-            //    Console.WriteLine("----------");
-            //}
-            
-
             if (!_board.WithinBounds(from))
             {
                 var errorMessage = $"{placement}ern wall from '{from}' could not be removed. Invalid dimension";
@@ -163,37 +142,9 @@ namespace Quoridor.Core.Game
             }
             else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
 
-            //if (from.X == 0 && from.Y == 1)
-            //{
-            //    Console.WriteLine($"Almost removing {placement}ern wall from {from}");
-            //    foreach (var wall in Walls)
-            //        Console.WriteLine(wall);
-            //}
-
-            //if (Walls.Contains(WALL))
-            //{
-            //    COUNT--;
-            //    Console.WriteLine($"WALL COUNT (REMOVE)= {COUNT}");
-            //}
             Walls.Remove(walls.First());
 
-            //if (from.X == 0 && from.Y == 1)
-            //{
-            //    Console.WriteLine($"REMOVED {placement}ern wall from {from}");
-            //    foreach (var wall in Walls)
-            //        Console.WriteLine(wall);
-            //}
-
             _log.Info($"Successfully removed '{placement}ern' wall from '{from}'");
-
-            //if (Walls.Count > 0)
-            //{
-            //    Console.WriteLine($"Removed {placement}ern wall from {from}");
-            //    Console.WriteLine();
-            //    foreach (var wall in Walls)
-            //        Console.WriteLine(wall);
-            //    Console.WriteLine();
-            //}
 
             player.IncreaseWallCount();
         }
@@ -333,24 +284,24 @@ namespace Quoridor.Core.Game
 
             //all wall pieces that can be placed on the board
             //horizontal walls
-            //for (int i = 0; i <= _board.Dimension - 3; i++)
-            //    for (int j = 1; j < _board.Dimension - 1; j++)
-            //    {
-            //        var from = new Vector2(i, j);
-            //        if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
-            //            validMoves.Add(new WallPlacement(Direction.North, from));
-            //    }
+            for (int i = 0; i <= _board.Dimension - 3; i++)
+                for (int j = 1; j < _board.Dimension - 1; j++)
+                {
+                    var from = new Vector2(i, j);
+                    if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
+                        validMoves.Add(new WallPlacement(Direction.North, from));
+                }
 
             ////vertical walls
-            //for (int i = 1; i < _board.Dimension - 1; i++)
-            //{
-            //    for (int j = 0; j <= _board.Dimension - 3; j++)
-            //    {
-            //        var from = new Vector2(i, j);
-            //        if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
-            //            validMoves.Add(new WallPlacement(Direction.West, from));
-            //    }
-            //}
+            for (int i = 1; i < _board.Dimension - 1; i++)
+            {
+                for (int j = 0; j <= _board.Dimension - 3; j++)
+                {
+                    var from = new Vector2(i, j);
+                    if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
+                        validMoves.Add(new WallPlacement(Direction.West, from));
+                }
+            }
             return validMoves;
         }
 

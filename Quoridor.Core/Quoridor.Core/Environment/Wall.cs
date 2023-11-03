@@ -68,23 +68,45 @@ namespace Quoridor.Core.Environment
         // eg: (5,5) south wall intersects (5,5) east wall
         public bool Intersects(Vector2 from, Direction dir)
         {
-            return GetMidPoint(from, dir).Equals(GetMidPoint(From, Placement));
+            //case 1 : if mid points intersect
+            var otherWallPoints = GetAllPointsOfWall(from, dir);
+            var otherMidPoint = otherWallPoints.Item2;
+
+            var thisWallPoints = GetAllPointsOfWall(From, Placement);
+            var thisMidPoint = thisWallPoints.Item2;
+
+            var midPointIntersect = otherMidPoint.Equals(thisMidPoint);
+
+            if ((IsHorizontal() && (dir.Equals(Direction.East) || (dir.Equals(Direction.West)))) ||
+                (IsVertical() && ( dir.Equals(Direction.North) || dir.Equals(Direction.South))))
+            {
+                return midPointIntersect;
+            }
+
+            //case 2: if both walls are vertical or horizontal and mid point of one wall intersects
+            // with one of the end-points of another wall
+
+            var sideIntersectWithMid = otherMidPoint.Equals(thisWallPoints.Item1) ||
+                otherMidPoint.Equals(thisWallPoints.Item3) ||
+                thisMidPoint.Equals(otherWallPoints.Item1) ||
+                thisMidPoint.Equals(otherWallPoints.Item3);
+
+            return midPointIntersect || sideIntersectWithMid;
         }
 
-        // (5,5) North [(6,5)] x+1      INTERSECTS (6,4) West [(6,5)] y+1
-        // (5,5) South [(6,6)] x+1, y+1 INTERSECTS (6,5) West [(6,6)] y+1
-        // (5,5) South [(6,6)] x+1, y+1 INTERSECTS (5,5) East [(6,6))] x+1, y+1
-        private Vector2 GetMidPoint(Vector2 from, Direction dir)
+        private Tuple<Vector2, Vector2, Vector2> GetAllPointsOfWall(Vector2 from, Direction dir)
         {
-            var copy = from.Copy();
             switch(dir)
             {
-                case Direction.North: { copy.X++; break; }
+                case Direction.North:
+                        return Tuple.Create(from, new Vector2(from.X + 1, from.Y), new Vector2(from.X + 2, from.Y));
+                case Direction.South:
+                        return Tuple.Create(new Vector2(from.X, from.Y + 1), new Vector2(from.X + 1, from.Y + 1), new Vector2(from.X + 2, from.Y + 1));
                 case Direction.East:
-                case Direction.South: { copy.X++; copy.Y++; break; }
-                default: { copy.Y++; break; }
+                    return Tuple.Create(new Vector2(from.X + 1, from.Y), new Vector2(from.X + 1, from.Y + 1), new Vector2(from.X + 1, from.Y + 2));
+                default:
+                    return Tuple.Create(from, new Vector2(from.X, from.Y + 1), new Vector2(from.X, from.Y + 2));
             }
-            return copy;
         }
 
         public override string ToString()
