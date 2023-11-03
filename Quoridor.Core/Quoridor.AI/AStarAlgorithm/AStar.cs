@@ -67,6 +67,9 @@ namespace Quoridor.AI.AStarAlgorithm
         private static AIStrategyResult<TMove> ConstructPath(Node<TMove> currNode)
         {
             //we only need the next position so we skip the rest
+            if (currNode.Parent == null)
+                return new AIStrategyResult<TMove> { Value = 0, BestMove = currNode.CurrMove };
+
             var pathLen = 1;
             while (currNode.Parent.Parent != null)
             {

@@ -323,8 +323,8 @@ namespace Quoridor.Core.Game
             var validMoveDirs = GetWalkableNeighbors();
             validMoves.AddRange(validMoveDirs);
 
-            var validWalls = GetAllUnplacedWalls();
-            validMoves.AddRange(validWalls);
+            //var validWalls = GetAllUnplacedWalls();
+            //validMoves.AddRange(validWalls);
            
             return validMoves;
         }
@@ -413,7 +413,7 @@ namespace Quoridor.Core.Game
             var goalDistance2 = result2.Value;
             var wallsLeft2 = otherAgent.NumWalls;
 
-            var score = goalDistance2 - goalDistance + wallsLeft - wallsLeft2;
+            var score = goalDistance - goalDistance2 + wallsLeft - wallsLeft2;
             return score;
         }
 
