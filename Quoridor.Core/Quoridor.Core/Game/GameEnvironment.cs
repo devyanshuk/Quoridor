@@ -301,6 +301,9 @@ namespace Quoridor.Core.Game
 
         public void UndoMove(Movement move)
         {
+            //previous player index
+            Turn = (Turn + Players.Count - 1) % Players.Count;
+
             ValidateNotNull(CurrentPlayer, nameof(CurrentPlayer));
             ValidateNotNull(move, nameof(move));
 
@@ -311,9 +314,6 @@ namespace Quoridor.Core.Game
                 RemoveWall(CurrentPlayer, wallMove.From, wallMove.Dir);
 
             else throw new Exception($"move type {move.GetType().Name} not supported");
-
-            //previous player index
-            Turn = (Turn + Players.Count - 1) % Players.Count;
         }
 
         public IEnumerable<Movement> GetValidMoves()

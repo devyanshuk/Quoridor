@@ -8,6 +8,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
         where TGame : IGame<TPlayer, TMove>
     {
         private readonly int _depth;
+        private int COUNT = 0;
 
         public Minimax(int depth)
         {
@@ -42,15 +43,19 @@ namespace Quoridor.AI.MinimaxAlgorithm
             foreach(var move in game.GetValidMoves())
             {
                 game.Move(move);
+                COUNT++;
 
                 var result = MinimaxStep(game, depth - 1, !maximizingPlayer);
-                if ((maximizingPlayer && result.Value > bestScore) || (!maximizingPlayer && result.Value < bestScore)) {
+                if ((maximizingPlayer && result.Value > bestMove.Value) || (!maximizingPlayer && result.Value < bestMove.Value)) {
                     bestMove.BestMove = move;
                     bestMove.Value = result.Value;
                 }
 
                 game.UndoMove(move);
+                COUNT--;
             }
+
+            Console.WriteLine($"COUNT =  {COUNT}");
 
             return bestMove;
         }
