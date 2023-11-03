@@ -57,7 +57,7 @@ namespace Quoridor.Core.Game
             Turn = (Turn + 1) % Players.Count;
         }
 
-        public IPlayer CurrentPlayer => Players?[Turn];
+        public IPlayer CurrentPlayer => Players?[Turn] ?? throw new Exception($"No player registered");
 
         public bool IsTerminal => Players?.Any(p => p.IsGoalMove(p.CurrentPos)) ?? false;
 
@@ -101,19 +101,19 @@ namespace Quoridor.Core.Game
             }
             else
             {
-                Console.WriteLine("Walls");
-                foreach(var wall in Walls)
-                    Console.WriteLine(wall);
+                //Console.WriteLine("Walls");
+                //foreach(var wall in Walls)
+                //    Console.WriteLine(wall);
                 throw new WallAlreadyPresentException($"{placement}ern wall from '{from}' intersects with already present wall");
             }
 
             Walls.Add(walls.First());
 
-            if (Walls.Contains(WALL))
-            {
-                COUNT++;
-                Console.WriteLine($"WALL COUNT (ADD) = {COUNT}");
-            }
+            //if (Walls.Contains(WALL))
+            //{
+            //    COUNT++;
+            //    Console.WriteLine($"WALL COUNT (ADD) = {COUNT}");
+            //}
 
             _log.Info($"Successfully added '{placement}ern' wall from '{from}'");
 
@@ -139,10 +139,10 @@ namespace Quoridor.Core.Game
         {
             _log.Info($"Attempting to remove '{placement}ern' wall from '{from}'");
 
-            if (from.X == 0 && from.Y == 1) {
-                Console.WriteLine($"Removing {placement} wall from {from}");
-                Console.WriteLine("----------");
-            }
+            //if (from.X == 0 && from.Y == 1) {
+            //    Console.WriteLine($"Removing {placement} wall from {from}");
+            //    Console.WriteLine("----------");
+            //}
             
 
             if (!_board.WithinBounds(from))
@@ -163,37 +163,37 @@ namespace Quoridor.Core.Game
             }
             else throw new WallNotPresentException($"{placement}ern wall from '{from} not present'");
 
-            if (from.X == 0 && from.Y == 1)
-            {
-                Console.WriteLine($"Almost removing {placement}ern wall from {from}");
-                foreach (var wall in Walls)
-                    Console.WriteLine(wall);
-            }
+            //if (from.X == 0 && from.Y == 1)
+            //{
+            //    Console.WriteLine($"Almost removing {placement}ern wall from {from}");
+            //    foreach (var wall in Walls)
+            //        Console.WriteLine(wall);
+            //}
 
-            if (Walls.Contains(WALL))
-            {
-                COUNT--;
-                Console.WriteLine($"WALL COUNT (REMOVE)= {COUNT}");
-            }
+            //if (Walls.Contains(WALL))
+            //{
+            //    COUNT--;
+            //    Console.WriteLine($"WALL COUNT (REMOVE)= {COUNT}");
+            //}
             Walls.Remove(walls.First());
 
-            if (from.X == 0 && from.Y == 1)
-            {
-                Console.WriteLine($"REMOVED {placement}ern wall from {from}");
-                foreach (var wall in Walls)
-                    Console.WriteLine(wall);
-            }
+            //if (from.X == 0 && from.Y == 1)
+            //{
+            //    Console.WriteLine($"REMOVED {placement}ern wall from {from}");
+            //    foreach (var wall in Walls)
+            //        Console.WriteLine(wall);
+            //}
 
             _log.Info($"Successfully removed '{placement}ern' wall from '{from}'");
 
-            if (Walls.Count > 0)
-            {
-                Console.WriteLine($"Removed {placement}ern wall from {from}");
-                Console.WriteLine();
-                foreach (var wall in Walls)
-                    Console.WriteLine(wall);
-                Console.WriteLine();
-            }
+            //if (Walls.Count > 0)
+            //{
+            //    Console.WriteLine($"Removed {placement}ern wall from {from}");
+            //    Console.WriteLine();
+            //    foreach (var wall in Walls)
+            //        Console.WriteLine(wall);
+            //    Console.WriteLine();
+            //}
 
             player.IncreaseWallCount();
         }
@@ -278,87 +278,94 @@ namespace Quoridor.Core.Game
             return newPos;
         }
 
-        public void Move(IPlayer player, Movement move)
+        public void Move(Movement move)
         {
-            ValidateNotNull(player, nameof(player));
+            ValidateNotNull(CurrentPlayer, nameof(CurrentPlayer));
             ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
-                MovePlayer(player, agentMove.Dir);
+                MovePlayer(CurrentPlayer, agentMove.Dir);
 
             else if (move is WallPlacement wallMove)
-                AddWall(player, wallMove.From, wallMove.Dir);
+                AddWall(CurrentPlayer, wallMove.From, wallMove.Dir);
 
             else if (move is Vector2 vecMove)
             {
                 var dir = CurrentPlayer.CurrentPos.GetDirFor(vecMove);
-                MovePlayer(player, dir);
+                MovePlayer(CurrentPlayer, dir);
             }
-            else throw new Exception($"move type {typeof(Movement).Name} not supported");
+            else throw new Exception($"move type {move.GetType().Name} not supported");
+
+            ChangeTurn();
         }
 
-        public void UndoMove(IPlayer player, Movement move)
+        public void UndoMove(Movement move)
         {
-            ValidateNotNull(player, nameof(player));
+            ValidateNotNull(CurrentPlayer, nameof(CurrentPlayer));
             ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
-                MovePlayer(player, agentMove.Dir.Opposite());
+                MovePlayer(CurrentPlayer, agentMove.Dir.Opposite());
 
             else if (move is WallPlacement wallMove)
-                RemoveWall(player, wallMove.From, wallMove.Dir);
+                RemoveWall(CurrentPlayer, wallMove.From, wallMove.Dir);
+
+            else throw new Exception($"move type {move.GetType().Name} not supported");
+
+            //previous player index
+            Turn = (Turn + Players.Count - 1) % Players.Count;
         }
 
-        public IEnumerable<Movement> GetValidMovesFor(IPlayer player)
+        public IEnumerable<Movement> GetValidMoves()
         {
             var validMoves = new List<Movement>();
 
             //movable player positions (at most 4)
             var validPlayerMoves = _board
-                .NeighborDirs(player.CurrentPos)
+                .NeighborDirs(CurrentPlayer.CurrentPos)
                 .Select(d => new AgentMove(d));
 
             validMoves.AddRange(validPlayerMoves);
 
             //if player has no wall remaining, we don't need to add in wall moves.
-            if (player.NumWalls <= 0)
+            if (CurrentPlayer.NumWalls <= 0)
                 return validMoves;
 
             //all wall pieces that can be placed on the board
             //horizontal walls
-            for (int i = 0; i <= _board.Dimension - 3; i++)
-                for (int j = 1; j < _board.Dimension - 1; j++)
-                {
-                    var from = new Vector2(i, j);
-                    if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
-                        validMoves.Add(new WallPlacement(Direction.North, from));
-                }
+            //for (int i = 0; i <= _board.Dimension - 3; i++)
+            //    for (int j = 1; j < _board.Dimension - 1; j++)
+            //    {
+            //        var from = new Vector2(i, j);
+            //        if (Walls.All(wall => !wall.Intersects(from, Direction.North)))
+            //            validMoves.Add(new WallPlacement(Direction.North, from));
+            //    }
 
-            //vertical walls
-            for (int i = 1; i < _board.Dimension - 1; i++)
-                for (int j = 0; j <= _board.Dimension - 3; j++)
-                {
-                    var from = new Vector2(i, j);
-                    if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
-                        validMoves.Add(new WallPlacement(Direction.West, from));
-                }
-
-
+            ////vertical walls
+            //for (int i = 1; i < _board.Dimension - 1; i++)
+            //{
+            //    for (int j = 0; j <= _board.Dimension - 3; j++)
+            //    {
+            //        var from = new Vector2(i, j);
+            //        if (Walls.All(wall => !wall.Intersects(from, Direction.West)))
+            //            validMoves.Add(new WallPlacement(Direction.West, from));
+            //    }
+            //}
             return validMoves;
         }
 
-        public double Evaluate(IPlayer agent)
+        public double Evaluate()
         {
-            var result = _aStar.BestMove(_board, agent);
+            var result = _aStar.BestMove(_board, CurrentPlayer);
             var goalDistance = result.Value;
-            var wallsLeft = agent.NumWalls;
+            var wallsLeft = CurrentPlayer.NumWalls;
 
-            var otherAgent = Players.First(p => !p.Equals(agent));
+            var otherAgent = Players.Single(p => !p.Equals(CurrentPlayer));
             var result2 = _aStar.BestMove(_board, otherAgent);
             var goalDistance2 = result2.Value;
             var wallsLeft2 = otherAgent.NumWalls;
 
-            var score = goalDistance - goalDistance2 + wallsLeft - wallsLeft2;
+            var score = goalDistance2 - goalDistance + wallsLeft - wallsLeft2;
             return score;
         }
 

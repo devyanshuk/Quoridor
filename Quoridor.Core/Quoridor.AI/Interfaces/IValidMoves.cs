@@ -2,9 +2,9 @@
 
 namespace Quoridor.AI.Interfaces
 {
-    public interface IValidMoves<TMove, TPlayer>
+    public interface IValidMoves<TMove>
         where TMove : Movement
     {
-        IEnumerable<TMove> GetValidMovesFor(TPlayer player);
+        IEnumerable<TMove> GetValidMoves();
     }
 }

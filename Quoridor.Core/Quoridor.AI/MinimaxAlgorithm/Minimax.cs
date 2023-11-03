@@ -26,31 +26,30 @@ namespace Quoridor.AI.MinimaxAlgorithm
             if (player == null)
                 throw new Exception($"No agent to get scores from");
 
-            var bestMove = MinimaxStep(game, player, _depth);
+            var bestMove = MinimaxStep(game, _depth, player.Equals(game.CurrentPlayer));
             return bestMove;
         }
 
-        private AIStrategyResult<TMove> MinimaxStep(TGame game, TPlayer player, int depth)
+        private AIStrategyResult<TMove> MinimaxStep(TGame game, int depth, bool maximizingPlayer)
         {
             if (depth <= 0 || game.IsTerminal)
-                return new AIStrategyResult<TMove> { Value = game.Evaluate(player) };
+                return new AIStrategyResult<TMove> { Value = game.Evaluate() };
 
-            var maximizingPlayer = player.Equals(game.CurrentPlayer);
             var bestScore = maximizingPlayer ? double.MinValue : double.MaxValue;
 
             var bestMove = new AIStrategyResult<TMove> { Value = bestScore };
 
-            foreach(var move in game.GetValidMovesFor(player))
+            foreach(var move in game.GetValidMoves())
             {
-                game.Move(player, move);
+                game.Move(move);
 
-                var result = MinimaxStep(game, player, depth - 1);
+                var result = MinimaxStep(game, depth - 1, !maximizingPlayer);
                 if ((maximizingPlayer && result.Value > bestScore) || (!maximizingPlayer && result.Value < bestScore)) {
                     bestMove.BestMove = move;
                     bestMove.Value = result.Value;
                 }
 
-                game.UndoMove(player, move);
+                game.UndoMove(move);
             }
 
             return bestMove;

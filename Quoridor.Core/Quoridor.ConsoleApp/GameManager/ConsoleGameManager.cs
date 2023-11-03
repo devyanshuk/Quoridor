@@ -43,13 +43,12 @@ namespace Quoridor.ConsoleApp.GameManager
 
             while(true)
             { 
-                var player = _gameEnvironment.CurrentPlayer;
                 var strategy = _settings.Strategies[StrategyTurn];
 
-                _settings.OutputDest.WriteLine(@$"Player '{player.Id}''s Turn. {
-                    player.NumWalls} wall(s) left. Using {strategy.Name} strategy");
+                _settings.OutputDest.WriteLine(@$"Player '{_gameEnvironment.CurrentPlayer}''s Turn. {
+                    _gameEnvironment.CurrentPlayer} wall(s) left. Using {strategy.Name} strategy");
 
-                GetAndDoMove(strategy, player);
+                GetAndDoMove(strategy);
 
                 _boardVisualizer.DrawBoard(_settings.OutputDest);
 
@@ -63,14 +62,14 @@ namespace Quoridor.ConsoleApp.GameManager
                 _settings.Strategies[StrategyTurn].Name} won.");
         }
 
-        public void GetAndDoMove(AIStrategy<Movement, IGameEnvironment, IPlayer> strategy, IPlayer player)
+        public void GetAndDoMove(AIStrategy<Movement, IGameEnvironment, IPlayer> strategy)
         {
             while (true)
             {
                 try
                 {
-                    var result = strategy.BestMove(_gameEnvironment, player);
-                    Process(result.BestMove, player);
+                    var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
+                    Process(result.BestMove);
                     break;
                 }
                 catch(Exception ex)
@@ -81,10 +80,10 @@ namespace Quoridor.ConsoleApp.GameManager
         }
 
 
-        public void Process<T>(T command, IPlayer player) where T : Movement
+        public void Process<T>(T command) where T : Movement
         {
             _log.Info($"Received '{typeof(T).Name}' command");
-            _gameEnvironment.Move(player, command);
+            _gameEnvironment.Move(command);
         }
 
         private void InitAndAddPlayers()

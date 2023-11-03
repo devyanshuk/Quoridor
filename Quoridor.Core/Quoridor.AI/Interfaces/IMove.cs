@@ -1,9 +1,9 @@
 ﻿namespace Quoridor.AI.Interfaces
 {
-    public interface IMove<TPlayer, TMove>
+    public interface IMove<TMove>
         where TMove : Movement
     {
-        void Move(TPlayer player, TMove move);
-        void UndoMove(TPlayer player, TMove move);
+        void Move(TMove move);
+        void UndoMove(TMove move);
     }
 }

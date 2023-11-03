@@ -1,7 +1,7 @@
 ﻿namespace Quoridor.AI.Interfaces
 {
-    public interface IStaticEvaluation<TPlayer>
+    public interface IStaticEvaluation
     {
-        public double Evaluate(TPlayer player);
+        public double Evaluate();
     }
 }
