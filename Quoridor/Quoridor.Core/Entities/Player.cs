@@ -23,12 +23,21 @@ namespace Quoridor.Core.Entities
         // |0 - player.Position.Y| (vertical distance to the goal row).
         public H_n<Vector2> ManhattanHeuristicFn { get; set; }
 
+        private readonly int _startNumWalls;
+
         public Player(char id, int numWalls, Vector2 startPos)
         {
             Id = id;
             NumWalls = numWalls;
             StartPos = startPos;
             CurrentPos = startPos;
+            _startNumWalls = numWalls;
+        }
+
+        public void Initialize()
+        {
+            CurrentPos = StartPos;
+            NumWalls = _startNumWalls;
         }
 
         public void Move(Vector2 newPos)

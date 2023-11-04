@@ -18,6 +18,8 @@ namespace Quoridor.Core.Entities
         IsGoal<Vector2> IsGoalMove { get; set; }
         H_n<Vector2> ManhattanHeuristicFn { get; set; }
 
+        void Initialize();
+
         void Move(Vector2 newPos);
         void DecreaseWallCount();
         void IncreaseWallCount();

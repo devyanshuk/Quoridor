@@ -28,35 +28,69 @@ namespace Quoridor.ConsoleApp.GameManager
             _gameEnvironment = gameEnvironment;
         }
 
+        public void Initialize()
+        {
+            StrategyTurn = 0;
+            _gameEnvironment.Initialize();
+        }
+
         public void Start()
         {
             _log.Info($"Starting console game application...");
-            _boardVisualizer.DrawBoard(_settings.OutputDest);
+
+            if (!_settings.Simulate)
+                _boardVisualizer.DrawBoard(_settings.OutputDest);
+
+            int simulations = 0;
 
             while(true)
             { 
-                var strategy = _settings.Strategies[StrategyTurn];
+                var info = _settings.Strategies[StrategyTurn];
 
-                _settings.OutputDest.WriteLine(@$"Player '{_gameEnvironment.CurrentPlayer}''s Turn. {
-                    _gameEnvironment.CurrentPlayer.NumWalls} wall(s) left. Using {strategy.Name} strategy");
+                if (!_settings.Simulate)
+                {
+                    _settings.OutputDest.WriteLine(@$"Player '{_gameEnvironment.CurrentPlayer}''s Turn. {
+                        _gameEnvironment.CurrentPlayer.NumWalls} wall(s) left. Using {info.Strategy.Name} strategy");
+                }
 
-                GetAndDoMove(strategy);
+                GetAndDoMove(info.Strategy);
 
-                _boardVisualizer.DrawBoard(_settings.OutputDest);
+                if (!_settings.Simulate)
+                    _boardVisualizer.DrawBoard(_settings.OutputDest);
 
                 if (_gameEnvironment.HasFinished)
-                    break;
+                {
+                    _settings.Strategies[StrategyTurn].GamesWon++;
+
+                    var gameInfo = _settings.Simulate ? simulations.ToString() : String.Empty;
+                    _settings.OutputDest.WriteLine(@$"Game {gameInfo} over. Player {_gameEnvironment.CurrentPlayer} : {
+                        info.Strategy.Name} won.");
+
+                    if (_settings.Simulate && ++simulations < _settings.NumberOfSimulations)
+                        Initialize();
+
+                    else
+                        break;
+                }
 
                 StrategyTurn = (StrategyTurn + 1) % _gameEnvironment.Players.Count;
 
-                if (_settings.WaitForInput)
+                if (!_settings.Simulate && _settings.WaitForInput)
                 {
                     _settings.OutputDest.WriteLine("Press any key to continue...");
                     Console.ReadKey();
                 }
             }
-            _settings.OutputDest.WriteLine(@$"Game over. Player {_gameEnvironment.CurrentPlayer} : {
-                _settings.Strategies[StrategyTurn].Name} won.");
+            if (_settings.Simulate)
+            {
+                _settings.OutputDest.WriteLine("===Results===");
+                foreach (var info in _settings.Strategies)
+                {
+                    var winRate = (double)(100 * info.GamesWon) / _settings.NumberOfSimulations;
+                    _settings.OutputDest.WriteLine(@$"{info.Strategy.Name} won {info.GamesWon}/{
+                        _settings.NumberOfSimulations} games. Win rate : {winRate.ToString("0.##")}%");
+                }
+            }
         }
 
         public void GetAndDoMove(AIStrategy<Movement, IGameEnvironment, IPlayer> strategy)
@@ -66,7 +100,6 @@ namespace Quoridor.ConsoleApp.GameManager
                 try
                 {
                     var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
-                    Console.WriteLine($"{strategy.Name} made {result}");
                     Process(result.BestMove);
                     break;
                 }

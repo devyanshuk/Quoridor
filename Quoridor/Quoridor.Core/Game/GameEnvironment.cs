@@ -43,6 +43,7 @@ namespace Quoridor.Core.Game
             Turn = 0;
             _board.Initialize();
             Walls.Clear();
+            Players.ForEach(p => p.Initialize());
         }
 
         private void InitAndAddPlayers(int numPlayers, int numWalls)

@@ -6,6 +6,7 @@ using Quoridor.Core.Move;
 using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
+using Quoridor.Common.Helpers;
 
 namespace Quoridor.ConsoleApp.GameManager.Command
 {
@@ -45,7 +46,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             }
 
             var directionStr = dir.Groups[nameof(Direction)].Value.ToLower();
-            var dirEnum = ParseEnum<Direction>(
+            var dirEnum = EnumHelper.ParseEnum<Direction>(
                 CultureInfo.CurrentCulture.TextInfo.ToTitleCase(directionStr));
 
             _log.Info($"Parsed direction '{dirEnum}' from '{line}'");
@@ -59,11 +60,6 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             _log.Info($"Parsed coordinate '{pos}' from '{line}'");
 
             return new WallPlacement(dirEnum, pos);
-        }
-
-        private T ParseEnum<T>(string val)
-        {
-            return (T)Enum.Parse(typeof(T), val);
         }
     }
 }
