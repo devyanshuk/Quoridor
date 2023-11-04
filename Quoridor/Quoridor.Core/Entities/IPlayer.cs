@@ -20,6 +20,8 @@ namespace Quoridor.Core.Entities
 
         void Initialize();
 
+        bool Won();
+
         void Move(Vector2 newPos);
         void DecreaseWallCount();
         void IncreaseWallCount();

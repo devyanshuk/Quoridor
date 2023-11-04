@@ -34,15 +34,20 @@ namespace Quoridor.Core.Entities
             _startNumWalls = numWalls;
         }
 
+        public bool Won()
+        {
+            return IsGoalMove(CurrentPos);
+        }
+
         public void Initialize()
         {
-            CurrentPos = StartPos;
+            CurrentPos = StartPos.Copy();
             NumWalls = _startNumWalls;
         }
 
         public void Move(Vector2 newPos)
         {
-            CurrentPos = newPos;
+            CurrentPos = newPos.Copy();
         }
 
         public int CurrX => CurrentPos.X;

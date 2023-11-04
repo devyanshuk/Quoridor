@@ -5,6 +5,7 @@ namespace Quoridor.ConsoleApp.GameManager
 {
     public class ConsoleGameSettings
     {
+        public bool Verbose { get; set; }
         public bool Simulate { get; set; }
         public int NumberOfSimulations { get; set; }
         public bool WaitForInput { get; set; }

@@ -75,6 +75,11 @@ namespace Quoridor.ConsoleApp
             [Aliases("sim")]
             bool Simulate,
 
+            [Description("Display all results of the simulation")]
+            [DefaultValue(true)]
+            [Aliases("v")]
+            bool Verbose,
+
             [Description("Number of games to simulate")]
             [DefaultValue(100), MoreOrEqualTo(0)]
             [Aliases("numsim")]
@@ -98,6 +103,7 @@ namespace Quoridor.ConsoleApp
 
             var settings = new ConsoleGameSettings
             {
+                Verbose = Verbose,
                 Simulate = Simulate,
                 NumberOfSimulations = NumSimulate,
                 WaitForInput = WaitForInput,

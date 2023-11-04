@@ -18,7 +18,6 @@ namespace Quoridor.Core.Environment
             Position = position;
             for(int i = 0; i < 4; i++)
                 Blocked[i] = false;
-
         }
 
         public bool IsAccessible(Direction direction)

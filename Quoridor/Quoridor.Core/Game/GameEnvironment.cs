@@ -104,7 +104,17 @@ namespace Quoridor.Core.Game
                     throw new Exception($"No player registered");
                 return Players[Turn];
             }
-         }
+        }
+
+        public IPlayer PreviousPlayer
+        {
+            get
+            {
+                if (Players.Count() == 0)
+                    throw new Exception($"No player registered");
+                return Players[PreviousTurn()];
+            }
+        }
 
         public bool HasFinished => Players.Any(p => p.IsGoalMove(p.CurrentPos));
 
@@ -298,12 +308,17 @@ namespace Quoridor.Core.Game
             ChangeTurn();
         }
 
+        private int PreviousTurn()
+        {
+            return (Turn + Players.Count - 1) % Players.Count;
+        }
+
         public void UndoMove(Movement move)
         {
-            //previous player index
-            Turn = (Turn + Players.Count - 1) % Players.Count;
-
             ValidateNotNull(move, nameof(move));
+
+            //previous player index
+            Turn = PreviousTurn();
 
             if (move is AgentMove agentMove)
                 MovePlayer(CurrentPlayer, agentMove.Dir.Opposite());
