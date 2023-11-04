@@ -312,24 +312,14 @@ namespace Quoridor.Core.Game
 
         public IEnumerable<Movement> GetValidMoves()
         {
-            var validMoves = new List<Movement>();
-
-            var validMoveDirs = GetWalkableNeighbors();
-            validMoves.AddRange(validMoveDirs);
-
-            //var validWalls = GetAllUnplacedWalls();
-            //validMoves.AddRange(validWalls);
-           
-            return validMoves;
+            return GetWalkableNeighbors().Concat(GetAllUnplacedWalls());
         }
 
         public IEnumerable<Movement> GetWalkableNeighbors()
         {
-            var moves = new List<Movement>();
-
             //if player already at goal, no need to return neighbors
             if (CurrentPlayer.IsGoal(CurrentPlayer.CurrentPos))
-                return moves;
+                yield break;
 
             //we do this to ensure any possible jumps won't be blocked by a wall
             foreach(var validDir in _board.NeighborDirs(CurrentPlayer.CurrentPos))
@@ -337,11 +327,12 @@ namespace Quoridor.Core.Game
                 try
                 {
                     TryMove(CurrentPlayer, CurrentPlayer.CurrentPos, validDir);
-                    moves.Add(new AgentMove(validDir));
                 }
-                catch(Exception) { }
+                catch(Exception) {
+                    continue;
+                }
+                yield return new AgentMove(validDir);
             }
-            return moves;
         }
 
         private IEnumerable<Movement> GetAllUnplacedWalls()
@@ -352,7 +343,7 @@ namespace Quoridor.Core.Game
 
             //if player has no wall remaining, we don't need to add in wall moves.
             if (CurrentPlayer.NumWalls <= 0)
-                return new List<Movement>();
+                return Enumerable.Empty<Movement>();
 
             return
             //horizontal walls
