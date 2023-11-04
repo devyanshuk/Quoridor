@@ -20,12 +20,12 @@ namespace Quoridor.Tests.Configuration
             var boardChars = XmlHelper.Deserialize<BoardChars>(path);
 
             //Assert
-            boardChars.BorderSeparator.Horizontal.Should().NotBeEmpty();
-            boardChars.BorderSeparator.Vertical.Should().NotBeEmpty();
-            boardChars.BorderSeparator.Intersection.Should().NotBeEmpty();
+            boardChars.BorderSeparator.HorizontalBorderSeparator.Should().NotBeEmpty();
+            boardChars.BorderSeparator.VerticalBorderSeparator.Should().NotBeEmpty();
+            boardChars.BorderSeparator.IntersectionBorderSeparator.Should().NotBeEmpty();
 
-            boardChars.WallSeparator.Horizontal.Should().NotBeEmpty();
-            boardChars.WallSeparator.Vertical.Should().NotBeEmpty();
+            boardChars.WallSeparator.HorizontalWallSeparator.Should().NotBeEmpty();
+            boardChars.WallSeparator.VerticalWallSeparator.Should().NotBeEmpty();
         }
     }
 }

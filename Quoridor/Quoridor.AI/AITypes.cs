@@ -5,6 +5,7 @@
         Random,
         Minimax,
         AStar,
-        MonteCarlo
+        MonteCarlo,
+        Human
     }
 }

@@ -48,6 +48,12 @@ namespace Quoridor.ConsoleApp.GameManager
                     break;
 
                 StrategyTurn = (StrategyTurn + 1) % _gameEnvironment.Players.Count;
+
+                if (_settings.WaitForInput)
+                {
+                    _settings.OutputDest.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                }
             }
             _settings.OutputDest.WriteLine(@$"Game over. Player {_gameEnvironment.CurrentPlayer} : {
                 _settings.Strategies[StrategyTurn].Name} won.");

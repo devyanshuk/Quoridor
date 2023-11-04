@@ -1,14 +1,19 @@
-﻿using Quoridor.Common.Helpers;
+﻿using System.IO;
+using Quoridor.Common.Helpers;
 
 namespace Quoridor.ConsoleApp.Configuration
 {
     public class ConfigProvider : IConfigProvider
     {
-        private BoardChars _boardChars;
+        private readonly ILocalSettings _localSettings;
 
-        public ConfigProvider()
+
+        public ConfigProvider(ILocalSettings localSettings)
         {
+            _localSettings = localSettings;
         }
+
+        private BoardChars _boardChars;
 
         public BoardChars BoardChars
         {
@@ -16,22 +21,16 @@ namespace Quoridor.ConsoleApp.Configuration
             {
                 if (_boardChars == null)
                 {
-                    var path = GetFullConfigPathFor("BoardCharacters.xml");
+                    var path = GetFullConfigPath();
                     _boardChars = XmlHelper.Deserialize<BoardChars>(path);
                 }
                 return _boardChars;
             }
         }
 
-        private string GetFullConfigPathFor(string file)
+        private string GetFullConfigPath()
         {
-#if _WINDOWS
-            return $"ConfigTemplates\\{file}";
-#else
-            return $"ConfigTemplates/{file}";
-#endif
+            return Path.Combine(_localSettings.ConfigTemplatesDir, _localSettings.BoardCharXml);
         }
-
-
     }
 }

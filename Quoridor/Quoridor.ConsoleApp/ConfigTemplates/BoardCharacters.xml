@@ -3,9 +3,9 @@
         <CellWidth>5</CellWidth>
     </CellProperties>
     <BorderSeparators>
-        <HorizontalSeparator>=</HorizontalSeparator>
-        <VerticalSeparator>|</VerticalSeparator>
-        <IntersectionSeparator>+</IntersectionSeparator>
+        <HorizontalBorderSeparator>=</HorizontalBorderSeparator>
+        <VerticalBorderSeparator>|</VerticalBorderSeparator>
+        <IntersectionBorderSeparator>+</IntersectionBorderSeparator>
     </BorderSeparators>
     <WallSeparators>
         <HorizontalWallSeparator>■</HorizontalWallSeparator>

@@ -23,6 +23,7 @@ namespace Quoridor.ConsoleApp
     public class Runner : BaseRunner
     {
         private readonly IWindsorContainer _container;
+        private readonly IConsoleGameManagerFactory _gameManagerFactory;
         private readonly ILogger _log = Logger.InstanceFor<Runner>();
 
         private readonly TextReader _stdIn;
@@ -36,6 +37,7 @@ namespace Quoridor.ConsoleApp
         {
             _stdIn = stdIn;
             _container = container;
+            _gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
         }
 
         [Verb(IsDefault=true)]
@@ -62,20 +64,17 @@ namespace Quoridor.ConsoleApp
             {nameof(NumWalls)}: {NumWalls}, {nameof(NumPlayers)}: {NumPlayers}");
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
-            var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
-            var commandParser = _container.Resolve<ICommandParser>();
 
             var settings = new ConsoleGameSettings { OutputDest = _stdOut };
             settings.Strategies = new List<AIStrategy<Movement, IGameEnvironment, IPlayer>>();
             for (int i = 0; i < NumPlayers; i++)
-                settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
+                settings.Strategies.Add(new HumanAgentConsole(_stdIn, _container.Resolve<ICommandParser>()));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
                 .CreateGameEnvironment(NumPlayers, NumWalls);
 
-            var gameManager = gameManagerFactory.CreateManager(settings, gameEnv);
-            gameManager.Start();
+            _gameManagerFactory.CreateManager(settings, gameEnv).Start();
         }
 
         [Verb]
@@ -90,10 +89,20 @@ namespace Quoridor.ConsoleApp
             [Aliases("w")]
             int NumWalls,
 
-            [Description("AI to play against")]
+            [Description("First strategy")]
             [DefaultValue("AStar")]
-            [Aliases("a")]
-            string AI,
+            [Aliases("s1")]
+            string Strategy1,
+
+            [Description("Second strategy")]
+            [DefaultValue("Human")]
+            [Aliases("s2")]
+            string Strategy2,
+
+            [Description("Enable viewer to press any key before the other agent makes move.")]
+            [DefaultValue(false)]
+            [Aliases("e")]
+            bool WaitForInput,
 
             [Description("Depth of the search tree")]
             [DefaultValue(1)]
@@ -110,25 +119,23 @@ namespace Quoridor.ConsoleApp
             Logger.Disable = true;
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
-            var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
-            var commandParser = _container.Resolve<ICommandParser>();
 
             var settings = new ConsoleGameSettings
             {
+                WaitForInput = WaitForInput,
                 OutputDest = _stdOut,
                 Strategies = new List<AIStrategy<Movement, IGameEnvironment, IPlayer>>()
             };
-            //add selected ai
-            var aiType = ParseEnum<AITypes>(AI);
-            settings.Strategies.Add(GetStrategy(aiType, Depth, Seed));
-            //add human player
-            settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
+
+            //add selected ai/human strategy
+            settings.Strategies.Add(GetStrategy(ParseEnum<AITypes>(Strategy1), Depth, Seed));
+            settings.Strategies.Add(GetStrategy(ParseEnum<AITypes>(Strategy2), Depth, Seed));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
                 .CreateGameEnvironment(2, NumWalls);
-            var gameManager = gameManagerFactory.CreateManager(settings, gameEnv);
-            gameManager.Start();
+
+            _gameManagerFactory.CreateManager(settings, gameEnv).Start();
         }
 
         public static T ParseEnum<T>(string value)
@@ -144,6 +151,8 @@ namespace Quoridor.ConsoleApp
                     return new AStar<Movement, IGameEnvironment, IPlayer>();
                 case AITypes.Random:
                     return new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed);
+                case AITypes.Human:
+                    return new HumanAgentConsole(_stdIn, _container.Resolve<ICommandParser>());
                 default:
                     return new Minimax<IPlayer, Movement, IGameEnvironment>(depth);
             }

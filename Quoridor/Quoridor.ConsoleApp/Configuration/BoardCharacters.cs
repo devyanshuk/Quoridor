@@ -40,23 +40,23 @@ namespace Quoridor.ConsoleApp.Configuration
     [Serializable]
     public class BorderSeparators
     {
-        [XmlElement("HorizontalSeparator")]
-        public string Horizontal { get; set; }
+        [XmlElement(nameof(HorizontalBorderSeparator))]
+        public string HorizontalBorderSeparator { get; set; }
 
-        [XmlElement("VerticalSeparator")]
-        public string Vertical { get; set; }
+        [XmlElement(nameof(VerticalBorderSeparator))]
+        public string VerticalBorderSeparator { get; set; }
 
-        [XmlElement("IntersectionSeparator")]
-        public string Intersection { get; set; }
+        [XmlElement(nameof(IntersectionBorderSeparator))]
+        public string IntersectionBorderSeparator { get; set; }
     }
 
     [Serializable]
     public class WallSeparators
     {
-        [XmlElement("HorizontalWallSeparator")]
-        public string Horizontal { get; set; }
+        [XmlElement(nameof(HorizontalWallSeparator))]
+        public string HorizontalWallSeparator { get; set; }
 
-        [XmlElement("VerticalWallSeparator")]
-        public string Vertical { get; set; }
+        [XmlElement(nameof(VerticalWallSeparator))]
+        public string VerticalWallSeparator { get; set; }
     }
 }

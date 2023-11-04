@@ -15,6 +15,7 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
             return new IRegistration[]
             {
                 //LifestyleSingleton
+                Component.For<ILocalSettings>().ImplementedBy<LocalSettings>().LifestyleSingleton(),
                 Component.For<ICommandParser>().ImplementedBy<CommandParser>().LifestyleSingleton(),
                 Component.For<IConfigProvider>().ImplementedBy<ConfigProvider>().LifestyleSingleton(),
                 Component.For<IBoardVisualizer>().ImplementedBy<BoardVisualizer>().LifestyleSingleton(),

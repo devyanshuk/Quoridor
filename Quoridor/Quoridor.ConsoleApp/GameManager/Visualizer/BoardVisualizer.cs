@@ -49,26 +49,27 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
         private void AppendWallRow(StringBuilder sb, int row)
         {
             var wallCount = 0;
+            var boardChars = _configProvider.BoardChars;
 
-            sb.Append(PadStrWithChar(_configProvider.BoardChars.BorderSeparator.Horizontal));
-            sb.Append(_configProvider.BoardChars.BorderSeparator.Intersection);
+            sb.Append(PadStrWithChar(boardChars.BorderSeparator.HorizontalBorderSeparator));
+            sb.Append(boardChars.BorderSeparator.IntersectionBorderSeparator);
 
             for (var k = 0; k < _board.Dimension; k++)
             {
                 if (row > 0 && row < _board.Dimension && !_board.GetCell(k, row).IsAccessible(Direction.North))
                 {
-                    sb.Append(PadStrWithChar(_configProvider.BoardChars.WallSeparator.Horizontal));
+                    sb.Append(PadStrWithChar(boardChars.WallSeparator.HorizontalWallSeparator));
                     wallCount++;
                 }
                 else
-                    sb.Append(PadStrWithChar(_configProvider.BoardChars.BorderSeparator.Horizontal));
+                    sb.Append(PadStrWithChar(boardChars.BorderSeparator.HorizontalBorderSeparator));
 
                 if (_verticalWalls[k] % 2 == 1)
-                    sb.Append(_configProvider.BoardChars.WallSeparator.Vertical);
+                    sb.Append(boardChars.WallSeparator.VerticalWallSeparator);
                 else if (wallCount % 2 == 1)
-                    sb.Append(_configProvider.BoardChars.WallSeparator.Horizontal);
+                    sb.Append(boardChars.WallSeparator.HorizontalWallSeparator);
                 else
-                    sb.Append(_configProvider.BoardChars.BorderSeparator.Intersection);
+                    sb.Append(boardChars.BorderSeparator.IntersectionBorderSeparator);
             }
             sb.AppendLine();
         }
@@ -78,10 +79,10 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
             sb.Append(PadStr(" "));
             for (var i = 0; i < _board.Dimension; i++)
             {
-                sb.Append(_configProvider.BoardChars.BorderSeparator.Vertical);
+                sb.Append(_configProvider.BoardChars.BorderSeparator.VerticalBorderSeparator);
                 sb.Append(PadStr(i));
             }
-            sb.AppendLine(_configProvider.BoardChars.BorderSeparator.Vertical);
+            sb.AppendLine(_configProvider.BoardChars.BorderSeparator.VerticalBorderSeparator);
         }
 
         /// <summary>
@@ -93,7 +94,7 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
         private void AppendCellRow(StringBuilder sb, int rowNumber, bool displayItems)
         {
             sb.Append(PadStr(displayItems ? rowNumber.ToString() : " "));
-            sb.Append(_configProvider.BoardChars.BorderSeparator.Vertical);
+            sb.Append(_configProvider.BoardChars.BorderSeparator.VerticalBorderSeparator);
 
             for (var j = 0; j < _board.Dimension; j++)
             {
@@ -112,12 +113,12 @@ namespace Quoridor.ConsoleApp.GameManager.Visualizer
 
                 if (j < _board.Dimension - 1 && !cell.IsAccessible(Direction.East))
                 {
-                    sb.Append(_configProvider.BoardChars.WallSeparator.Vertical);
+                    sb.Append(_configProvider.BoardChars.WallSeparator.VerticalWallSeparator);
                     if (displayItems)
                         _verticalWalls[j]++;
                 }
                 else
-                    sb.Append(_configProvider.BoardChars.BorderSeparator.Vertical);
+                    sb.Append(_configProvider.BoardChars.BorderSeparator.VerticalBorderSeparator);
             }
             sb.AppendLine();
         }
