@@ -1,10 +1,10 @@
 ﻿namespace Quoridor.AI.Interfaces
 {
-    public abstract class AIStrategy<TMove, TGameView, TPlayer>
+    public abstract class AIStrategy<TMove, TGame, TPlayer>
         where TMove : Movement
     {
         public abstract string Name { get; }
-        public abstract AIStrategyResult<TMove> BestMove(TGameView gameView, TPlayer player);
+        public abstract AIStrategyResult<TMove> BestMove(TGame game, TPlayer player);
     }
 
     public class AIStrategyResult<TMove>

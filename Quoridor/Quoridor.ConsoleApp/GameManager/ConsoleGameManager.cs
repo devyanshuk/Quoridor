@@ -38,7 +38,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 var strategy = _settings.Strategies[StrategyTurn];
 
                 _settings.OutputDest.WriteLine(@$"Player '{_gameEnvironment.CurrentPlayer}''s Turn. {
-                    _gameEnvironment.CurrentPlayer} wall(s) left. Using {strategy.Name} strategy");
+                    _gameEnvironment.CurrentPlayer.NumWalls} wall(s) left. Using {strategy.Name} strategy");
 
                 GetAndDoMove(strategy);
 
@@ -47,7 +47,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 if (_gameEnvironment.HasFinished)
                     break;
 
-                StrategyTurn = (StrategyTurn + 1) % _settings.NumPlayers;
+                StrategyTurn = (StrategyTurn + 1) % _gameEnvironment.Players.Count;
             }
             _settings.OutputDest.WriteLine(@$"Game over. Player {_gameEnvironment.CurrentPlayer} : {
                 _settings.Strategies[StrategyTurn].Name} won.");

@@ -9,8 +9,6 @@ namespace Quoridor.ConsoleApp.GameManager
 {
     public class ConsoleGameSettings
     {
-        public int NumPlayers { get; set; }
-        public int NumWalls { get; set; }
         public TextWriter OutputDest { get; set; }
         public List<AIStrategy<Movement, IGameEnvironment, IPlayer>> Strategies { get; set; }
     }

@@ -6,6 +6,7 @@ using CLAP.Validation;
 using System.Collections.Generic;
 
 using Quoridor.AI;
+using Quoridor.AI.Random;
 using Quoridor.Core.Game;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
@@ -37,7 +38,7 @@ namespace Quoridor.ConsoleApp
             _container = container;
         }
 
-        [Verb]
+        [Verb(IsDefault=true)]
         public void Play(
 
             [Description("Game Board Dimension")]
@@ -64,19 +65,14 @@ namespace Quoridor.ConsoleApp
             var gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
             var commandParser = _container.Resolve<ICommandParser>();
 
-            var settings = new ConsoleGameSettings
-            {
-                NumPlayers = NumPlayers,
-                NumWalls = NumWalls,
-                OutputDest = _stdOut,
-            };
+            var settings = new ConsoleGameSettings { OutputDest = _stdOut };
             settings.Strategies = new List<AIStrategy<Movement, IGameEnvironment, IPlayer>>();
             for (int i = 0; i < NumPlayers; i++)
                 settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
-                .CreateGameEnvironment(settings.NumPlayers, settings.NumWalls);
+                .CreateGameEnvironment(NumPlayers, NumWalls);
 
             var gameManager = gameManagerFactory.CreateManager(settings, gameEnv);
             gameManager.Start();
@@ -102,7 +98,12 @@ namespace Quoridor.ConsoleApp
             [Description("Depth of the search tree")]
             [DefaultValue(1)]
             [Aliases("de")]
-            int Depth
+            int Depth,
+
+            [Description("Random seed")]
+            [DefaultValue(20)]
+            [Aliases("s")]
+            int Seed
             )
         {
             // for large tree, logs might be very big, so we disable it.
@@ -114,24 +115,18 @@ namespace Quoridor.ConsoleApp
 
             var settings = new ConsoleGameSettings
             {
-                NumPlayers = 2,
-                NumWalls = NumWalls,
                 OutputDest = _stdOut,
                 Strategies = new List<AIStrategy<Movement, IGameEnvironment, IPlayer>>()
             };
-
             //add selected ai
             var aiType = ParseEnum<AITypes>(AI);
-            settings.Strategies.Add(GetStrategy(aiType, Depth));
-
-            //add player
-
+            settings.Strategies.Add(GetStrategy(aiType, Depth, Seed));
+            //add human player
             settings.Strategies.Add(new HumanAgentConsole(_stdIn, commandParser));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
-                .CreateGameEnvironment(settings.NumPlayers, settings.NumWalls);
-
+                .CreateGameEnvironment(2, NumWalls);
             var gameManager = gameManagerFactory.CreateManager(settings, gameEnv);
             gameManager.Start();
         }
@@ -141,12 +136,14 @@ namespace Quoridor.ConsoleApp
             return (T)Enum.Parse(enumType: typeof(T), value: value, ignoreCase: true);
         }
 
-        private AIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy(AITypes aiType, int depth)
+        private AIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy(AITypes aiType, int depth, int seed)
         {
             switch (aiType)
             {
                 case AITypes.AStar:
                     return new AStar<Movement, IGameEnvironment, IPlayer>();
+                case AITypes.Random:
+                    return new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed);
                 default:
                     return new Minimax<IPlayer, Movement, IGameEnvironment>(depth);
             }

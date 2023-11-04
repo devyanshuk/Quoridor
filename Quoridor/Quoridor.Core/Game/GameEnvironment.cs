@@ -138,8 +138,10 @@ namespace Quoridor.Core.Game
                 throw new WallAlreadyPresentException($"{wall} already present");
 
             //check if wall is already present or intersects with another wall
-            if (Walls.Any(w => w.Intersects(from, placement)))
-                throw new WallIntersectsException($"{placement}ern wall from '{from}' intersects with already present wall");
+            var intersectingWalls = Walls.Where(w => w.Intersects(from, placement));
+            if (intersectingWalls.Count() > 0)
+                throw new WallIntersectsException(@$"{wall} intersects with already present wall(s) {
+                    String.Join(",", intersectingWalls)}");
 
             //get 4 cells affected by the wall and block cell access
             var affectedCells = GetCellsAffectedByWall(wall);
@@ -150,7 +152,8 @@ namespace Quoridor.Core.Game
             if (blockedPlayers.Count() > 0)
             {
                 UnblockAccess(affectedCells);
-                throw new NewWallBlocksPlayerException($"{wall} blocks player(s) {String.Join(",", blockedPlayers)}");
+                throw new NewWallBlocksPlayerException(@$"{wall} blocks player(s) {
+                    String.Join(",", blockedPlayers.Select(b => b.Id))}");
             }
 
             //wall check complete, add it to the wall cache

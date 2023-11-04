@@ -2,6 +2,7 @@
 {
     public enum AITypes
     {
+        Random,
         Minimax,
         AStar,
         MonteCarlo

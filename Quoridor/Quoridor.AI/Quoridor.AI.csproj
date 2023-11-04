@@ -9,11 +9,13 @@
     <None Remove="Minimax\" />
     <None Remove="Interfaces\" />
     <None Remove="AStar\" />
+    <None Remove="Random\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MCTS\" />
     <Folder Include="MinimaxAlgorithm\" />
     <Folder Include="Interfaces\" />
     <Folder Include="AStarAlgorithm\" />
+    <Folder Include="Random\" />
   </ItemGroup>
 </Project>
