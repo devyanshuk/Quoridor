@@ -10,7 +10,6 @@ using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;
 using Quoridor.AI.Interfaces;
-using Quoridor.Core.Move;
 
 namespace Quoridor.Core.Game
 {
@@ -21,6 +20,7 @@ namespace Quoridor.Core.Game
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
         public HashSet<IWall> Walls { get; private set; }
+        private HashSet<IWall> AvailableWalls { get; set; }
 
         private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
 
@@ -149,27 +149,23 @@ namespace Quoridor.Core.Game
                 throw new WallAlreadyPresentException($"{wall} already present");
 
             //check if wall is already present or intersects with another wall
-            var intersectingWalls = Walls.Where(w => w.Intersects(from, placement));
-            if (intersectingWalls.Count() > 0)
-                throw new WallIntersectsException(@$"{wall} intersects with already present wall(s) {
-                    String.Join(",", intersectingWalls)}");
+            var intersectingWall = Walls.FirstOrDefault(w => w.Intersects(from, placement));
+            if (intersectingWall != default(IWall))
+                throw new WallIntersectsException($"{wall} intersects with already present wall {intersectingWall}");
 
             //get 4 cells affected by the wall and block cell access
             var affectedCells = GetCellsAffectedByWall(wall);
             BlockAccess(affectedCells);
 
             //check if all players can move to their goal, and if not, unblock the path and throw
-            var blockedPlayers = Players.Where(player => _aStar.BestMove(_board, player) is null);
-            if (blockedPlayers.Count() > 0)
+            var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
+            if (blockedPlayer != default(IPlayer))
             {
                 UnblockAccess(affectedCells);
-                throw new NewWallBlocksPlayerException(@$"{wall} blocks player(s) {
-                    String.Join(",", blockedPlayers.Select(b => b.Id))}");
+                throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
             }
-
             //wall check complete, add it to the wall cache
             Walls.Add(wall);
-
             //player used up a wall, so decrease the wall count
             player.DecreaseWallCount();
         }
@@ -295,8 +291,8 @@ namespace Quoridor.Core.Game
             if (move is AgentMove agentMove)
                 MovePlayer(CurrentPlayer, agentMove.Dir);
 
-            else if (move is WallPlacement wallMove)
-                AddWall(CurrentPlayer, wallMove.From, wallMove.Dir);
+            else if (move is Wall wallMove)
+                AddWall(CurrentPlayer, wallMove.From, wallMove.Placement);
 
             else if (move is Vector2 vecMove)
             {
@@ -323,8 +319,8 @@ namespace Quoridor.Core.Game
             if (move is AgentMove agentMove)
                 MovePlayer(CurrentPlayer, agentMove.Dir.Opposite());
 
-            else if (move is WallPlacement wallMove)
-                RemoveWall(CurrentPlayer, wallMove.From, wallMove.Dir);
+            else if (move is Wall wallMove)
+                RemoveWall(CurrentPlayer, wallMove.From, wallMove.Placement);
 
             else throw new Exception($"move type {move.GetType().Name} not supported");
         }
@@ -388,12 +384,12 @@ namespace Quoridor.Core.Game
                         AddWall(CurrentPlayer, from, dir);
                         RemoveWall(CurrentPlayer, from, dir);
                     }
-                    catch (Exception)
+                    catch (WallException)
                     {
                         continue;
                     }
 
-                    yield return new WallPlacement(dir, from);
+                    yield return new Wall(dir, from);
                 }
             }
         }

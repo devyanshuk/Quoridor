@@ -2,11 +2,12 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-using Quoridor.Core.Move;
 using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.Common.Helpers;
+using Quoridor.Core.Game;
+using Quoridor.Core.Environment;
 
 namespace Quoridor.ConsoleApp.GameManager.Command
 {
@@ -59,7 +60,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             var pos = new Vector2(x, y);
             _log.Info($"Parsed coordinate '{pos}' from '{line}'");
 
-            return new WallPlacement(dirEnum, pos);
+            return new Wall(dirEnum, pos);
         }
     }
 }

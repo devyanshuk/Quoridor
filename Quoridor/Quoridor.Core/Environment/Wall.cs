@@ -1,10 +1,12 @@
 ﻿using System;
-using Quoridor.Core.Extensions;
 using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
+using Quoridor.Core.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Quoridor.Core.Environment
 {
-    public class Wall : IWall
+    public class Wall : Movement, IWall, IEquatable<Wall>
     {
         public Direction Placement { get; private set; }
         public Vector2 From { get; private set; }
@@ -22,13 +24,7 @@ namespace Quoridor.Core.Environment
             if (obj == null || !(obj is Wall)) return false;
 
             var otherWall = obj as Wall;
-
-            var thisWallPoints = GetAllPointsOfWall(From, Placement);
-            var otherWallPoints = GetAllPointsOfWall(otherWall.From, otherWall.Placement);
-
-            return thisWallPoints.Item1.Equals(otherWallPoints.Item1) &&
-                thisWallPoints.Item2.Equals(otherWallPoints.Item2) &&
-                thisWallPoints.Item3.Equals(otherWallPoints.Item3);
+            return Equals(otherWall);
         }
 
         public override int GetHashCode()
@@ -118,6 +114,18 @@ namespace Quoridor.Core.Environment
         public override string ToString()
         {
             return $"{Placement}ern wall at {From}";
+        }
+
+        public bool Equals(Wall otherWall)
+        {
+            if (otherWall is null) return false;
+
+            var thisWallPoints = GetAllPointsOfWall(From, Placement);
+            var otherWallPoints = GetAllPointsOfWall(otherWall.From, otherWall.Placement);
+
+            return thisWallPoints.Item1.Equals(otherWallPoints.Item1) &&
+                thisWallPoints.Item2.Equals(otherWallPoints.Item2) &&
+                thisWallPoints.Item3.Equals(otherWallPoints.Item3);
         }
     }
 }

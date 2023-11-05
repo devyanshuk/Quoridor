@@ -3,7 +3,7 @@ using Quoridor.Core.Utils;
 
 using Quoridor.AI.Interfaces;
 
-namespace Quoridor.Core.Move
+namespace Quoridor.Core.Game
 {
     public sealed class AgentMove : Movement, IEquatable<AgentMove>
     {
