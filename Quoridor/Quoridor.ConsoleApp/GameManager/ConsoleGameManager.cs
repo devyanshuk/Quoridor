@@ -106,7 +106,13 @@ namespace Quoridor.ConsoleApp.GameManager
             {
                 try
                 {
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
                     var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
+                    watch.Stop();
+
+                    if (_settings.Verbose && !(strategy is HumanAgentConsole))
+                        _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
+
                     Process(result.BestMove);
                     break;
                 }
