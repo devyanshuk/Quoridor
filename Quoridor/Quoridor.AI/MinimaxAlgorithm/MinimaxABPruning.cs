@@ -32,10 +32,8 @@ namespace Quoridor.AI.MinimaxAlgorithm
             if (depth <= 0 || game.HasFinished)
                 return new AIStrategyResult<TMove> { Value = game.Evaluate() };
 
-            var bestScore = maximizingPlayer ? double.MinValue : double.MaxValue;
-            Func<double, bool> cutoff_condition = (value) => maximizingPlayer ? value > beta : value < alpha;
-
-            var bestMove = new AIStrategyResult<TMove> { Value = bestScore };
+            var bestMove = new AIStrategyResult<TMove> {
+                Value = maximizingPlayer ? double.MinValue : double.MaxValue };
 
             foreach (var move in game.GetValidMoves())
             {
@@ -43,24 +41,32 @@ namespace Quoridor.AI.MinimaxAlgorithm
 
                 var result = MinimaxStep(game, alpha, beta, depth - 1, !maximizingPlayer);
 
-                if ((maximizingPlayer && result.Value > bestMove.Value) || (!maximizingPlayer && result.Value < bestMove.Value))
-                {
-                    bestMove.BestMove = move;
-                    bestMove.Value = result.Value;
-                }
-
-                if (cutoff_condition(bestMove.Value))
-                {
-                    game.UndoMove(move);
-                    break;
-                }
+                game.UndoMove(move);
 
                 if (maximizingPlayer)
-                    alpha = Math.Max(alpha, bestMove.Value);
-                else
-                    beta = Math.Min(beta, bestMove.Value);
+                {
+                    if (result.Value > bestMove.Value)
+                    {
+                        bestMove.BestMove = move;
+                        bestMove.Value = result.Value;
+                    }
+                    if (bestMove.Value > beta)
+                        break;
 
-                game.UndoMove(move);
+                    alpha = Math.Max(alpha, bestMove.Value);
+                }
+                else
+                {
+                    if (result.Value < bestMove.Value)
+                    {
+                        bestMove.BestMove = move;
+                        bestMove.Value = result.Value;
+                    }
+                    if (bestMove.Value < alpha)
+                        break;
+
+                    beta = Math.Min(beta, bestMove.Value);
+                }
             }
             return bestMove;
         }
