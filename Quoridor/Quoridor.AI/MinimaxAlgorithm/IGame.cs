@@ -1,4 +1,6 @@
-﻿namespace Quoridor.AI.Interfaces
+﻿using Quoridor.AI.Interfaces;
+
+namespace Quoridor.AI.MinimaxAlgorithm
 {
     public interface IGame<TPlayer, TMove> :
             ICurrentPlayer<TPlayer>,

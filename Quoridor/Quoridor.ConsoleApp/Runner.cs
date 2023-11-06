@@ -132,6 +132,8 @@ namespace Quoridor.ConsoleApp
                     return new StrategyInfo { Strategy = new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed) }; 
                 case AITypes.Human:
                     return new StrategyInfo { Strategy = new HumanAgentConsole(_stdIn, _container.Resolve<ICommandParser>()) };
+                case AITypes.MinimaxAB:
+                    return new StrategyInfo { Strategy = new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 default:
                     return new StrategyInfo { Strategy = new Minimax<IPlayer, Movement, IGameEnvironment>(depth) };
             }

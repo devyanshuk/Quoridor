@@ -4,6 +4,7 @@ using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Core.Environment;
+using Quoridor.AI.MinimaxAlgorithm;
 
 namespace Quoridor.Core.Game
 {

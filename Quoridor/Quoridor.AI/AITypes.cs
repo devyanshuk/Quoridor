@@ -4,6 +4,7 @@
     {
         Random,
         Minimax,
+        MinimaxAB,
         AStar,
         MonteCarlo,
         Human
