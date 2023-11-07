@@ -24,6 +24,8 @@ namespace Quoridor.Core.Game
 
         private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
 
+        public int ASTAR_COUNT { get; set; } = 0;
+
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
 
         public GameEnvironment(
@@ -158,12 +160,19 @@ namespace Quoridor.Core.Game
             BlockAccess(affectedCells);
 
             //check if all players can move to their goal, and if not, unblock the path and throw
-            var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
-            if (blockedPlayer != default(IPlayer))
+            //var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
+            foreach(var p in Players)
             {
-                UnblockAccess(affectedCells);
-                throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
+                var moveToGoal = _aStar.BestMove(_board, player);
+                ASTAR_COUNT++;
+                if (moveToGoal is null)
+                    throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
             }
+            //if (blockedPlayer != default(IPlayer))
+            //{
+            //    UnblockAccess(affectedCells);
+            //    throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
+            //}
             //wall check complete, add it to the wall cache
             Walls.Add(wall);
             //player used up a wall, so decrease the wall count
@@ -397,11 +406,13 @@ namespace Quoridor.Core.Game
         public double Evaluate()
         {
             var result = _aStar.BestMove(_board, CurrentPlayer);
+            ASTAR_COUNT++;
             var goalDistance = result.Value;
             var wallsLeft = CurrentPlayer.NumWalls;
 
             var otherAgent = Players.Single(p => !p.Equals(CurrentPlayer));
             var result2 = _aStar.BestMove(_board, otherAgent);
+            ASTAR_COUNT++;
             var goalDistance2 = result2.Value;
             var wallsLeft2 = otherAgent.NumWalls;
 

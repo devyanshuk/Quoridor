@@ -1,5 +1,4 @@
 ﻿using CLAP;
-using System;
 using System.IO;
 using Castle.Windsor;
 using CLAP.Validation;
@@ -11,13 +10,13 @@ using Quoridor.Core.Game;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
+using Quoridor.Common.Helpers;
 using Quoridor.ConsoleApp.Utils;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.AI.MinimaxAlgorithm;
 using Quoridor.ConsoleApp.GameManager;
 using Quoridor.ConsoleApp.GameManager.Command;
-using Quoridor.Common.Helpers;
 
 namespace Quoridor.ConsoleApp
 {
@@ -55,13 +54,13 @@ namespace Quoridor.ConsoleApp
 
             [Description("First strategy")]
             [DefaultValue("Minimax")]
-            [RegexMatches("AStar|Minimax|MonteCarlo|Human")]
+            [StrategyValidation]
             [Aliases("s1")]
             string Strategy1,
 
             [Description("Second strategy")]
             [DefaultValue("Human")]
-            [RegexMatches("AStar|Minimax|MonteCarlo|Human")]
+            [StrategyValidation]
             [Aliases("s2")]
             string Strategy2,
 
@@ -86,7 +85,7 @@ namespace Quoridor.ConsoleApp
             int NumSimulate,
 
             [Description("Maximum depth of the search tree")]
-            [DefaultValue(2), MoreOrEqualTo(0)]
+            [DefaultValue(3), MoreOrEqualTo(0)]
             [Aliases("d")]
             int Depth,
 
@@ -131,7 +130,7 @@ namespace Quoridor.ConsoleApp
                 case AITypes.Random:
                     return new StrategyInfo { Strategy = new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed) }; 
                 case AITypes.Human:
-                    return new StrategyInfo { Strategy = new HumanAgentConsole(_stdIn, _container.Resolve<ICommandParser>()) };
+                    return new StrategyInfo { Strategy = new HumanAgentConsole(_stdIn, _stdOut, _container.Resolve<ICommandParser>()) };
                 case AITypes.MinimaxAB:
                     return new StrategyInfo { Strategy = new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 default:

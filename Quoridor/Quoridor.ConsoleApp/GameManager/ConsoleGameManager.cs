@@ -102,24 +102,24 @@ namespace Quoridor.ConsoleApp.GameManager
 
         public void GetAndDoMove(AIStrategy<Movement, IGameEnvironment, IPlayer> strategy)
         {
-            while (true)
+            try
             {
-                try
-                {
-                    var watch = System.Diagnostics.Stopwatch.StartNew();
-                    var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
-                    watch.Stop();
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
+                watch.Stop();
 
-                    if (_settings.Verbose && !(strategy is HumanAgentConsole))
-                        _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
-
-                    Process(result.BestMove);
-                    break;
-                }
-                catch(Exception ex)
+                if (_settings.Verbose && !(strategy is HumanAgentConsole))
                 {
-                    _settings.OutputDest.WriteLine(ex.Message);
+                    _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
+                    _settings.OutputDest.WriteLine($"A Star algorithm used {_gameEnvironment.ASTAR_COUNT} times");
+                    _gameEnvironment.ASTAR_COUNT = 0;
                 }
+
+                Process(result.BestMove);
+            }
+            catch (Exception ex)
+            {
+                _settings.OutputDest.WriteLine(ex.Message);
             }
         }
 
