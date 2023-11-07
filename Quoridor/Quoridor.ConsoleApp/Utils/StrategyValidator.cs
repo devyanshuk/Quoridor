@@ -4,7 +4,7 @@ using System;
 using Quoridor.AI;
 using Quoridor.Common.Helpers;
 
-namespace Quoridor.ConsoleApp
+namespace Quoridor.ConsoleApp.Utils
 {
     public class StrategyValidationAttribute : ValidationAttribute
     {

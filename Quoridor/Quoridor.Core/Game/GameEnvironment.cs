@@ -163,7 +163,7 @@ namespace Quoridor.Core.Game
             //var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
             foreach(var p in Players)
             {
-                var moveToGoal = _aStar.BestMove(_board, player);
+                var moveToGoal = _aStar.BestMove(_board, p);
                 ASTAR_COUNT++;
                 if (moveToGoal is null)
                     throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
