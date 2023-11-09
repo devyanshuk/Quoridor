@@ -20,7 +20,6 @@ namespace Quoridor.Core.Game
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
         public HashSet<IWall> Walls { get; private set; }
-        private HashSet<IWall> AvailableWalls { get; set; }
 
         private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
 
@@ -161,12 +160,20 @@ namespace Quoridor.Core.Game
 
             //check if all players can move to their goal, and if not, unblock the path and throw
             //var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
-            foreach(var p in Players)
+
+            //check if players are blocked if there's a reasonable number of walls
+            if (ShouldCheckForBlockage())
             {
-                var moveToGoal = _aStar.BestMove(_board, p);
-                ASTAR_COUNT++;
-                if (moveToGoal is null)
-                    throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
+                foreach (var p in Players)
+                {
+                    var moveToGoal = _aStar.BestMove(_board, p);
+                    ASTAR_COUNT++;
+                    if (moveToGoal is null)
+                    {
+                        UnblockAccess(affectedCells);
+                        throw new NewWallBlocksPlayerException(@$"{wall} blocks player {p}");
+                    }
+                }
             }
             //if (blockedPlayer != default(IPlayer))
             //{
@@ -177,6 +184,22 @@ namespace Quoridor.Core.Game
             Walls.Add(wall);
             //player used up a wall, so decrease the wall count
             player.DecreaseWallCount();
+        }
+
+        private bool ShouldCheckForBlockage()
+        {
+            //case 1: there are 3 walls and player is at edge or 1 step away from edge
+            //because player may have no possible path to goal
+            return Walls.Count >= 2 && Players.Any(IsInCorners) || Walls.Count >= _board.Dimension / 2;
+        }
+
+        private bool IsInCorners(IPlayer player)
+        {
+            return
+                player.CurrentPos.X <= 1 ||
+                player.CurrentPos.X >= _board.Dimension - 3 ||
+                player.CurrentPos.Y <= 1 ||
+                player.CurrentPos.Y >= _board.Dimension - 3;
         }
 
         private void BlockAccess(IEnumerable<AffectedCell> affectedCells)
