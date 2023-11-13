@@ -54,15 +54,15 @@ namespace Quoridor.Core.Game
             var goalConditions = new IsGoal<Vector2>[] {
                 (pos) => pos.Y == _board.Dimension - 1,
                 (pos) => pos.Y == 0,
-                (pos) => pos.X == 0,
-                (pos) => pos.X == _board.Dimension - 1
+                (pos) => pos.X == _board.Dimension - 1,
+                (pos) => pos.X == 0
             };
             var heuristics = new H_n<Vector2>[]
             {
                 (pos) => Math.Abs(_board.Dimension - 1 - pos.Y),
                 (pos) => pos.Y,
-                (pos) => pos.X,
-                (pos) => Math.Abs(_board.Dimension - 1 - pos.Y)
+                (pos) => Math.Abs(_board.Dimension - 1 - pos.X),
+                (pos) => pos.X
             };
 
             var currIdAscii = 65;
@@ -77,7 +77,7 @@ namespace Quoridor.Core.Game
                 var player = new Player(playerId, numWalls, startPos)
                 {
                     ManhattanHeuristicFn = heuristics[i],
-                    IsGoalMove = goalConditions[i]
+                    IsGoalMove = goalConditions[i],
                 };
 
                 AddPlayer(player);
@@ -190,7 +190,7 @@ namespace Quoridor.Core.Game
         {
             //case 1: there are 3 walls and player is at edge or 1 step away from edge
             //because player may have no possible path to goal
-            return Walls.Count >= 2 && Players.Any(IsInCorners) || Walls.Count >= _board.Dimension / 2;
+            return Walls.Count >= 2 && Players.Any(IsInCorners) || Walls.Count >= ((_board.Dimension / 2) - 1);
         }
 
         private bool IsInCorners(IPlayer player)
@@ -430,12 +430,14 @@ namespace Quoridor.Core.Game
         {
             var result = _aStar.BestMove(_board, CurrentPlayer);
             ASTAR_COUNT++;
+            //var goalDistance = CurrentPlayer.ManhattanHeuristicFn(CurrentPlayer.CurrentPos);
             var goalDistance = result.Value;
             var wallsLeft = CurrentPlayer.NumWalls;
 
             var otherAgent = Players.Single(p => !p.Equals(CurrentPlayer));
             var result2 = _aStar.BestMove(_board, otherAgent);
             ASTAR_COUNT++;
+            //var goalDistance2 = otherAgent.ManhattanHeuristicFn(otherAgent.CurrentPos);
             var goalDistance2 = result2.Value;
             var wallsLeft2 = otherAgent.NumWalls;
 

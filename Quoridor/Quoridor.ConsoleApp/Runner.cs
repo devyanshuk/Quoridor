@@ -85,7 +85,7 @@ namespace Quoridor.ConsoleApp
             int NumSimulate,
 
             [Description("Maximum depth of the search tree")]
-            [DefaultValue(1), MoreOrEqualTo(0)]
+            [DefaultValue(3), MoreOrEqualTo(0)]
             [Aliases("d")]
             int Depth,
 
