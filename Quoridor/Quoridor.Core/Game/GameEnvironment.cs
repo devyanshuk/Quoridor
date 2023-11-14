@@ -426,22 +426,51 @@ namespace Quoridor.Core.Game
             }
         }
 
-        public double Evaluate()
+        public double Evaluate(bool currentMaximizer)
         {
             var result = _aStar.BestMove(_board, CurrentPlayer);
             ASTAR_COUNT++;
-            //var goalDistance = CurrentPlayer.ManhattanHeuristicFn(CurrentPlayer.CurrentPos);
             var goalDistance = result.Value;
             var wallsLeft = CurrentPlayer.NumWalls;
 
-            var otherAgent = Players.Single(p => !p.Equals(CurrentPlayer));
-            var result2 = _aStar.BestMove(_board, otherAgent);
+            var result2 = _aStar.BestMove(_board, PreviousPlayer);
             ASTAR_COUNT++;
-            //var goalDistance2 = otherAgent.ManhattanHeuristicFn(otherAgent.CurrentPos);
             var goalDistance2 = result2.Value;
-            var wallsLeft2 = otherAgent.NumWalls;
+            var wallsLeft2 = PreviousPlayer.NumWalls;
 
-            var score = goalDistance - goalDistance2 + wallsLeft - wallsLeft2;
+            double score;
+
+            if (!currentMaximizer) // previous is maximizer (>= 0 means strong pos for prev)
+            {
+                score = goalDistance - goalDistance2 + (wallsLeft - wallsLeft2);
+
+                if (CurrentPlayer.NumWalls == 0) score -= PreviousPlayer.NumWalls * 2;
+
+                if (CurrentPlayer.IsGoalMove(CurrentPlayer.CurrentPos))
+                {
+                    score = -100;
+                }
+                if (PreviousPlayer.IsGoalMove(PreviousPlayer.CurrentPos))
+                {
+                    score = 100;
+                }
+            }
+            else // current is maximizer (>= 0 means strong pos for curr)
+            {
+                score = goalDistance2 - goalDistance + (wallsLeft2 - wallsLeft);
+
+                if (PreviousPlayer.NumWalls == 0) score += CurrentPlayer.NumWalls * 2;
+
+                if (CurrentPlayer.IsGoalMove(CurrentPlayer.CurrentPos))
+                {
+                    score = 100;
+                }
+                if (PreviousPlayer.IsGoalMove(PreviousPlayer.CurrentPos))
+                {
+                    score = -100;
+                }
+            }
+
             return score;
         }
 

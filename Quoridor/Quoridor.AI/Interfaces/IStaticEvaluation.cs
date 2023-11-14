@@ -2,6 +2,6 @@
 {
     public interface IStaticEvaluation
     {
-        public double Evaluate();
+        public double Evaluate(bool currentMaximizer);
     }
 }

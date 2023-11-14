@@ -33,7 +33,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
         private AIStrategyResult<TMove> MinimaxStep(TGame game, int depth, bool maximizingPlayer)
         {
             if (depth <= 0 || game.HasFinished)
-                return new AIStrategyResult<TMove> { Value = game.Evaluate() };
+                return new AIStrategyResult<TMove> { Value = game.Evaluate(maximizingPlayer) };
 
             var bestScore = maximizingPlayer ? double.MinValue : double.MaxValue;
 

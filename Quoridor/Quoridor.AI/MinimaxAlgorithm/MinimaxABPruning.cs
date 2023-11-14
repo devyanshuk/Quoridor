@@ -31,7 +31,8 @@ namespace Quoridor.AI.MinimaxAlgorithm
         {
             if (depth <= 0 || game.HasFinished)
             {
-                return new AIStrategyResult<TMove> { Value = game.Evaluate() };
+                var score = game.Evaluate(maximizingPlayer);
+                return new AIStrategyResult<TMove> { Value = score };
             }
 
             var bestMove = new AIStrategyResult<TMove> {
