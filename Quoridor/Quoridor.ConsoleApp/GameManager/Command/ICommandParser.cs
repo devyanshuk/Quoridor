@@ -1,4 +1,4 @@
-﻿using Quoridor.AI.Interfaces;
+﻿using Quoridor.Core;
 
 namespace Quoridor.ConsoleApp.GameManager.Command
 {

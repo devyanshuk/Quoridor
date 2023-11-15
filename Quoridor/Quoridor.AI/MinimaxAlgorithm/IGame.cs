@@ -8,7 +8,6 @@ namespace Quoridor.AI.MinimaxAlgorithm
             IMove<TMove>,
             IStaticEvaluation,
             ITerminal
-        where TMove : Movement
     {
     }
 }

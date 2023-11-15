@@ -5,9 +5,9 @@ using CLAP.Validation;
 using System.Collections.Generic;
 
 using Quoridor.AI;
+using Quoridor.Core;
 using Quoridor.AI.Random;
 using Quoridor.Core.Game;
-using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Common.Helpers;

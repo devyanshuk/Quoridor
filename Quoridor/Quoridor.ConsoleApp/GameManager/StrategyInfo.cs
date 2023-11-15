@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Quoridor.Core;
+using Quoridor.Core.Game;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
-using Quoridor.Core.Game;
 
 namespace Quoridor.ConsoleApp.GameManager
 {

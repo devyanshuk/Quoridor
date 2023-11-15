@@ -8,7 +8,6 @@ namespace Quoridor.AI.AStarAlgorithm
 {
     public class AStar<TMove, TMaze, TPlayer> : AIStrategy<TMove, TMaze, TPlayer>
         where TPlayer : IAStarPlayer<TMove>
-        where TMove : Movement
         where TMaze : INeighbors<TMove>
     {
         public override string Name => nameof(AStarAlgorithm);

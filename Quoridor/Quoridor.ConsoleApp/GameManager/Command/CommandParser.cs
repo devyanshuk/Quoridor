@@ -2,11 +2,11 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using Quoridor.Core;
+using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
-using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.Common.Helpers;
-using Quoridor.Core.Game;
 using Quoridor.Core.Environment;
 
 namespace Quoridor.ConsoleApp.GameManager.Command

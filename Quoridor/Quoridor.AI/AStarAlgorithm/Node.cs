@@ -1,10 +1,8 @@
 ﻿using System;
-using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.AStarAlgorithm
 {
     public class Node<TMove>
-        where TMove : Movement
     {
         public TMove CurrMove { get; set; }
         public double FValue { get; set; }

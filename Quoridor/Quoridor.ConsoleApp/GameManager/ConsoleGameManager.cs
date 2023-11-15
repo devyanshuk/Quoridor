@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
 
+using Quoridor.Core;
 using Quoridor.Core.Game;
 using Quoridor.Core.Entities;
 using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.ConsoleApp.GameManager.Visualizer;
-using System.Linq;
 
 namespace Quoridor.ConsoleApp.GameManager
 {

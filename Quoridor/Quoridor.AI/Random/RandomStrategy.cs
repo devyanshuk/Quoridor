@@ -4,7 +4,6 @@ using Quoridor.AI.Interfaces;
 namespace Quoridor.AI.Random
 {
     public class RandomStrategy<TMove, TGame, TPlayer>  : AIStrategy<TMove, TGame, TPlayer>
-        where TMove : Movement
         where TGame : IValidMoves<TMove>
     {
         private readonly System.Random _random;

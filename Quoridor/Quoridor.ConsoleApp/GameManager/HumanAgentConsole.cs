@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 
+using Quoridor.Core;
 using Quoridor.Core.Game;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;

@@ -1,4 +1,4 @@
-﻿namespace Quoridor.AI.Interfaces
+﻿namespace Quoridor.Core
 {
     public abstract class Movement
     {
