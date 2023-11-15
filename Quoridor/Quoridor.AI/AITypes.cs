@@ -5,6 +5,7 @@
         Random,
         Minimax,
         MinimaxAB,
+        ParallelMinimaxAB,
         AStar,
         MonteCarlo,
         Human

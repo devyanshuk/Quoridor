@@ -6,7 +6,8 @@ namespace Quoridor.Core.Entities
 {
     public interface IPlayer :
         IAStarPlayer<Movement>,
-        IAStarPlayer<Vector2>
+        IAStarPlayer<Vector2>,
+        IDeepCopy<IPlayer>
     {
         char Id { get; }
         int NumWalls { get; set; }

@@ -46,6 +46,25 @@ namespace Quoridor.Tests.Environment
                 }
         }
 
+        [Test]
+        public void Correctly_Return_Deep_Copy_Of_The_Board()
+        {
+            //Arrange
+            var board = new Board();
+            board.SetDimension(9);
+
+            //Act
+            var copy = board.DeepCopy();
+
+            //Assert
+            for (int i = 0; i < board.Dimension; i++)
+                for (int j = 0; j < board.Dimension; j++)
+                {
+                    ReferenceEquals(board.Cells[i, j], copy.Cells[i, j]).Should().BeFalse();
+                    board.Cells[i, j].Should().Be(copy.Cells[i, j]);
+                }
+        }
+
         [TestCase(5, 5, 3, North)]
         [TestCase(0, 0, 1, South)]
         [TestCase(5, 5, 2, North, South)]

@@ -23,7 +23,7 @@ namespace Quoridor.Core.Entities
         // |0 - player.Position.Y| (vertical distance to the goal row).
         public H_n<Vector2> ManhattanHeuristicFn { get; set; }
 
-        private readonly int _startNumWalls;
+        private int _startNumWalls;
 
         public Player(char id, int numWalls, Vector2 startPos)
         {
@@ -84,5 +84,14 @@ namespace Quoridor.Core.Entities
         public bool IsGoal(Vector2 move) => IsGoalMove(move);
 
         public double CalculateHeuristic(Vector2 move) => ManhattanHeuristicFn(move);
+
+        public IPlayer DeepCopy()
+        {
+            return new Player(Id, NumWalls, StartPos.Copy())
+            {
+                CurrentPos = this.CurrentPos.Copy(),
+                _startNumWalls = this._startNumWalls
+            };
+        }
     }
 }

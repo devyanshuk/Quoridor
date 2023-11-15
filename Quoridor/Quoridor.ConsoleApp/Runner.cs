@@ -133,6 +133,8 @@ namespace Quoridor.ConsoleApp
                     return new StrategyInfo { Strategy = new HumanAgentConsole(_stdIn, _stdOut, _container.Resolve<ICommandParser>()) };
                 case AITypes.MinimaxAB:
                     return new StrategyInfo { Strategy = new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
+                case AITypes.ParallelMinimaxAB:
+                    return new StrategyInfo { Strategy = new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 default:
                     return new StrategyInfo { Strategy = new Minimax<IPlayer, Movement, IGameEnvironment>(depth) };
             }

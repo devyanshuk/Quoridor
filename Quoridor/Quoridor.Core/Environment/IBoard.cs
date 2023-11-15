@@ -6,7 +6,8 @@ namespace Quoridor.Core.Environment
 {
     public interface IBoard :
         INeighbors<Vector2>,
-        INeighbors<Movement>
+        INeighbors<Movement>,
+        IDeepCopy<IBoard>
     {
         // Dimension of the game board.
         int Dimension { get; }

@@ -1,8 +1,9 @@
 ﻿using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
 
 namespace Quoridor.Core.Environment
 {
-    public interface IWall
+    public interface IWall : IDeepCopy<IWall>
     {
         Direction Placement { get; }
         Vector2 From { get; }

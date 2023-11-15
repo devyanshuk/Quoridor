@@ -1,8 +1,8 @@
 ﻿using System;
+
 using Quoridor.Core.Utils;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Extensions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Quoridor.Core.Environment
 {
@@ -126,6 +126,11 @@ namespace Quoridor.Core.Environment
             return thisWallPoints.Item1.Equals(otherWallPoints.Item1) &&
                 thisWallPoints.Item2.Equals(otherWallPoints.Item2) &&
                 thisWallPoints.Item3.Equals(otherWallPoints.Item3);
+        }
+
+        public IWall DeepCopy()
+        {
+            return new Wall(Placement, From.Copy());
         }
     }
 }

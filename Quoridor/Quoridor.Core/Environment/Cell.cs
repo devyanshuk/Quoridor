@@ -1,10 +1,11 @@
 ﻿using System;
 
 using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
 
 namespace Quoridor.Core.Environment
 {
-    public class Cell : IEquatable<Cell>
+    public class Cell : IEquatable<Cell>, IDeepCopy<Cell>
     {
         public Vector2 Position { get; private set; }
 
@@ -39,6 +40,27 @@ namespace Quoridor.Core.Environment
         {
             if (other == null) return false;
             return Position.Equals(other.Position);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (obj is Cell cell) return Equals(cell);
+            return false;
+        }
+
+        public Cell DeepCopy()
+        {
+            return new Cell(Position.Copy())
+            {
+                //Blocked[] is an array of bool struct so shallow copy is fine
+                Blocked = this.Blocked.Clone() as bool[]
+            };
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Position);
         }
     }
 }

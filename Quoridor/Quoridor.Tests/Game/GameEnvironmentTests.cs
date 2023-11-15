@@ -451,6 +451,30 @@ namespace Quoridor.Tests.Game
 
         #endregion
 
+        #region DeepCopy
+
+        [Test]
+        public void Should_Correctly_Return_DeepCopy_Of_The_Game()
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            var board = token.Item1;
+
+            //Act
+            gameEnv.Walls.Add(new Wall(North, new Vector2(4,4)));
+            gameEnv.Walls.Add(new Wall(South, new Vector2(3, 5)));
+            var gameCopy = gameEnv.DeepCopy();
+            var numRemoved = gameCopy.Walls.RemoveWhere(wall => ReferenceEquals(wall, gameEnv.Walls.Single(w => w.Equals(wall))));
+            gameCopy.Walls.Clear();
+
+            //Assert
+            numRemoved.Should().Be(0);
+            gameEnv.Walls.Count.Should().Be(2);
+            ReferenceEquals(gameEnv.Players.First(), gameCopy.Players.First()).Should().BeFalse();
+        }
+        #endregion
+
         private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()
         {
             var board = new Board();

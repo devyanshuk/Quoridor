@@ -87,5 +87,15 @@ namespace Quoridor.Core.Environment
             var posVec = pos as Vector2;
             return Neighbors(posVec);
         }
+
+        public IBoard DeepCopy()
+        {
+            var ret = new Board();
+            ret.SetDimension(Dimension);
+            for (int i = 0; i < Dimension; i++)
+                for (int j = 0; j < Dimension; j++)
+                    ret.Cells[i, j] = Cells[i, j].DeepCopy();
+            return ret;
+        }
     }
 }

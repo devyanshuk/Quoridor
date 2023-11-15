@@ -11,7 +11,8 @@ namespace Quoridor.Core.Game
     public interface IGameEnvironment :
         IGame<IPlayer, Movement>,
         INeighbors<Vector2>,
-        INeighbors<Movement>
+        INeighbors<Movement>,
+        IDeepCopy<IGameEnvironment>
     {
         List<IPlayer> Players { get; }
         HashSet<IWall> Walls { get; }

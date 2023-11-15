@@ -4,34 +4,35 @@ using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
 using Quoridor.Core.Entities;
+using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;
-using Quoridor.AI.Interfaces;
 
 namespace Quoridor.Core.Game
 {
     public class GameEnvironment : IGameEnvironment
     {
+        private readonly int _numPlayers;
+        private readonly int _numWalls;
         private readonly IBoard _board;
+        private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
+        private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
 
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
         public HashSet<IWall> Walls { get; private set; }
-
-        private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
-
         public int ASTAR_COUNT { get; set; } = 0;
-
-        private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
 
         public GameEnvironment(
             int numPlayers,
             int numWalls,
             IBoard board)
         {
+            _numPlayers = numPlayers;
+            _numWalls = numWalls;
             _board = board;
             _aStar = new AStar<Vector2, IBoard, IPlayer>();
             Players = new List<IPlayer>();
@@ -483,6 +484,16 @@ namespace Quoridor.Core.Game
         {
             var posVec = pos as Vector2;
             return Neighbors(posVec);
+        }
+
+        public IGameEnvironment DeepCopy()
+        {
+            return new GameEnvironment(_numPlayers, _numWalls, _board.DeepCopy())
+            {
+                Players = this.Players.Select(p => p.DeepCopy()).ToList(),
+                Walls = this.Walls.Select(wall => wall.DeepCopy()).ToHashSet(),
+                Turn = this.Turn
+            };
         }
 
         private void ValidateNotNull<T>(T param, string paramName)
