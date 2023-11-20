@@ -3,13 +3,13 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
+using ConcurrentCollections;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;
-using ConcurrentCollections;
 
 namespace Quoridor.Core.Game
 {
@@ -20,11 +20,12 @@ namespace Quoridor.Core.Game
         private readonly IBoard _board;
         private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
+        private readonly object _lock = new object();
 
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
         public ConcurrentHashSet<IWall> Walls { get; private set; }
-        public int ASTAR_COUNT { get; set; } = 0;
+
 
         public GameEnvironment(
             int numPlayers,
@@ -42,7 +43,8 @@ namespace Quoridor.Core.Game
 
         public void Initialize()
         {
-            Turn = 0;
+            lock(_lock)
+                Turn = 0;
             _board.Initialize();
             Walls.Clear();
             Players.ForEach(p => p.Initialize());
@@ -95,7 +97,8 @@ namespace Quoridor.Core.Game
 
         public void ChangeTurn()
         {
-            Turn = (Turn + 1) % Players.Count;
+            lock(_lock)
+                Turn = (Turn + 1) % Players.Count;
         }
 
         public IPlayer CurrentPlayer
@@ -129,7 +132,7 @@ namespace Quoridor.Core.Game
             _log.Info($"Moving player '{player}' '{dir}'...");
 
             var newPos = TryMove(player, player.CurrentPos, dir);
-            player.CurrentPos = newPos;
+            player.Move(newPos);
 
             _log.Info($"Moved player '{player}' to '{newPos}'");
         }
@@ -160,27 +163,16 @@ namespace Quoridor.Core.Game
             BlockAccess(affectedCells);
 
             //check if all players can move to their goal, and if not, unblock the path and throw
-            //var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
-
-            //check if players are blocked if there's a reasonable number of walls
             if (ShouldCheckForBlockage())
             {
-                foreach (var p in Players)
+                var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
+                if (blockedPlayer != default(IPlayer))
                 {
-                    var moveToGoal = _aStar.BestMove(_board, p);
-                    ASTAR_COUNT++;
-                    if (moveToGoal is null)
-                    {
-                        UnblockAccess(affectedCells);
-                        throw new NewWallBlocksPlayerException(@$"{wall} blocks player {p}");
-                    }
+                    UnblockAccess(affectedCells);
+                    throw new NewWallBlocksPlayerException(@$"{wall} blocks player {blockedPlayer}");
                 }
             }
-            //if (blockedPlayer != default(IPlayer))
-            //{
-            //    UnblockAccess(affectedCells);
-            //    throw new NewWallBlocksPlayerException(@$"{wall} blocks player");
-            //}
+           
             //wall check complete, add it to the wall cache
             Walls.Add(wall);
 
@@ -349,7 +341,8 @@ namespace Quoridor.Core.Game
             ValidateNotNull(move, nameof(move));
 
             //previous player index
-            Turn = PreviousTurn();
+            lock(_lock)
+                Turn = PreviousTurn();
 
             if (move is AgentMove agentMove)
                 MovePlayer(CurrentPlayer, agentMove.Dir.Opposite());
@@ -378,14 +371,14 @@ namespace Quoridor.Core.Game
                 {
                     TryMove(CurrentPlayer, CurrentPlayer.CurrentPos, validDir);
                 }
-                catch(Exception) {
+                catch(MoveException) {
                     continue;
                 }
                 yield return new AgentMove(validDir);
             }
         }
 
-        private IEnumerable<Movement> GetAllUnplacedWalls()
+        public IEnumerable<Movement> GetAllUnplacedWalls()
         {
             //all wall pieces that can be placed on the board. We need to check if the wall
             //isn't already present or intersects with another wall, and also the wall should
@@ -397,9 +390,9 @@ namespace Quoridor.Core.Game
 
             return
             //horizontal walls
-            GetValidWallsInDir(0, _board.Dimension - 3, 1, _board.Dimension - 2, Direction.North)
+            GetValidWallsInDir(0, _board.Dimension - 2, 1, _board.Dimension - 1, Direction.North)
             //vertical walls
-            .Concat(GetValidWallsInDir(1, _board.Dimension - 2, 0, _board.Dimension - 3, Direction.West));
+            .Concat(GetValidWallsInDir(1, _board.Dimension - 1, 0, _board.Dimension - 2, Direction.West));
         }
 
         private IEnumerable<Movement> GetValidWallsInDir(int x0, int x1, int y0, int y1, Direction dir)
@@ -432,12 +425,10 @@ namespace Quoridor.Core.Game
         public double Evaluate(bool currentMaximizer)
         {
             var result = _aStar.BestMove(_board, CurrentPlayer);
-            ASTAR_COUNT++;
             var goalDistance = result.Value;
             var wallsLeft = CurrentPlayer.NumWalls;
 
             var result2 = _aStar.BestMove(_board, PreviousPlayer);
-            ASTAR_COUNT++;
             var goalDistance2 = result2.Value;
             var wallsLeft2 = PreviousPlayer.NumWalls;
 
@@ -497,7 +488,7 @@ namespace Quoridor.Core.Game
             {
                 Players = playerCopy,
                 Walls = wallCopy,
-                Turn = this.Turn
+                Turn = Turn
             };
         }
 

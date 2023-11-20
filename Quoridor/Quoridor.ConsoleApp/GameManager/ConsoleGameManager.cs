@@ -110,11 +110,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 watch.Stop();
 
                 if (_settings.Verbose && !(strategy is HumanAgentConsole))
-                {
                     _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
-                    _settings.OutputDest.WriteLine($"A Star algorithm used {_gameEnvironment.ASTAR_COUNT} times");
-                    _gameEnvironment.ASTAR_COUNT = 0;
-                }
 
                 Process(result.BestMove);
             }

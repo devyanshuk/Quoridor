@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Quoridor.Core.Utils;
-using Quoridor.AI.Interfaces;
 using Quoridor.AI.AStarAlgorithm;
 
 namespace Quoridor.Core.Entities
@@ -24,6 +23,7 @@ namespace Quoridor.Core.Entities
         public H_n<Vector2> ManhattanHeuristicFn { get; set; }
 
         private int _startNumWalls;
+        private readonly object _lock = new object();
 
         public Player(char id, int numWalls, Vector2 startPos)
         {
@@ -34,20 +34,21 @@ namespace Quoridor.Core.Entities
             _startNumWalls = numWalls;
         }
 
-        public bool Won()
-        {
-            return IsGoalMove(CurrentPos);
-        }
+        public bool Won() => IsGoalMove(CurrentPos);
 
         public void Initialize()
         {
-            CurrentPos = StartPos.Copy();
-            NumWalls = _startNumWalls;
+            lock (_lock)
+            {
+                CurrentPos = StartPos.Copy();
+                NumWalls = _startNumWalls;
+            }
         }
 
         public void Move(Vector2 newPos)
         {
-            CurrentPos = newPos.Copy();
+            lock(_lock)
+                CurrentPos = newPos.Copy();
         }
 
         public int CurrX => CurrentPos.X;
@@ -55,23 +56,21 @@ namespace Quoridor.Core.Entities
 
         public void DecreaseWallCount()
         {
-            NumWalls--;
+            lock(_lock)
+                NumWalls--;
         }
 
         public void IncreaseWallCount()
         {
-            NumWalls++;
+            lock(_lock)
+                NumWalls++;
         }
 
         public bool Equals(Player other)
-        {
-            return Id == other.Id && StartPos.Equals(other.StartPos);
-        }
+            => Id == other.Id && StartPos.Equals(other.StartPos);
 
         public override string ToString()
-        {
-            return Id.ToString();
-        }
+            => Id.ToString();
 
         public Vector2 GetCurrentMove() => CurrentPos;
 
@@ -89,10 +88,10 @@ namespace Quoridor.Core.Entities
         {
             return new Player(Id, NumWalls, StartPos.Copy())
             {
-                CurrentPos = this.CurrentPos.Copy(),
-                _startNumWalls = this._startNumWalls,
-                IsGoalMove = this.IsGoalMove,
-                ManhattanHeuristicFn = this.ManhattanHeuristicFn
+                CurrentPos = CurrentPos.Copy(),
+                _startNumWalls = _startNumWalls,
+                IsGoalMove = IsGoalMove,
+                ManhattanHeuristicFn = ManhattanHeuristicFn
             };
         }
     }

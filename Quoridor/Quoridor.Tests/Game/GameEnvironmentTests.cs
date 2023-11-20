@@ -475,6 +475,33 @@ namespace Quoridor.Tests.Game
         }
         #endregion
 
+        [Test]
+        public void Should_Return_Correct_Valid_Movements()
+        {
+            //Arrange
+            var board = new Board();
+            board.SetDimension(3);
+            var gameEnv = new GameEnvironment(0, 3, board);
+            var player = new Player('A', 3, new Vector2(1, 0))
+            {
+                ManhattanHeuristicFn = (cell) => Math.Abs(2 - cell.Y),
+                IsGoalMove = (cell) => cell.Y == 2
+            };
+            gameEnv.AddPlayer(player);
+
+            //Act
+            //Assert
+            gameEnv.GetValidMoves().Count().Should().Be(11);
+            gameEnv.GetWalkableNeighbors().Count().Should().Be(3);
+            gameEnv.GetAllUnplacedWalls().Count().Should().Be(8);
+
+            gameEnv.AddWall(player, new Vector2(1, 0), West);
+
+            gameEnv.GetValidMoves().Count().Should().Be(5);
+            gameEnv.GetWalkableNeighbors().Count().Should().Be(2);
+            gameEnv.GetAllUnplacedWalls().Count().Should().Be(3);
+        }
+
         private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()
         {
             var board = new Board();

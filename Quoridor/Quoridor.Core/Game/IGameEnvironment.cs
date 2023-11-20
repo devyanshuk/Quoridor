@@ -17,7 +17,6 @@ namespace Quoridor.Core.Game
     {
         List<IPlayer> Players { get; }
         ConcurrentHashSet<IWall> Walls { get; }
-        int ASTAR_COUNT { get; set; }
         int Turn { get; }
 
         void Initialize();

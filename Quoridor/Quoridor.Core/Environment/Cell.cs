@@ -14,6 +14,8 @@ namespace Quoridor.Core.Environment
         /// </summary>
         public bool[] Blocked { get; set; } = new bool[4];
 
+        private readonly object _lock = new object();
+
         public Cell(Vector2 position)
         {
             Position = position;
@@ -21,19 +23,18 @@ namespace Quoridor.Core.Environment
                 Blocked[i] = false;
         }
 
-        public bool IsAccessible(Direction direction)
-        {
-            return !Blocked[(int)direction];
-        }
+        public bool IsAccessible(Direction direction) => !Blocked[(int)direction];
 
         public void Block(Direction dir)
         {
-            Blocked[(int)dir] = true;
+            lock(_lock)
+                Blocked[(int)dir] = true;
         }
 
         public void Unblock(Direction dir)
         {
-            Blocked[(int)dir] = false;
+            lock(_lock)
+                Blocked[(int)dir] = false;
         }
 
         public bool Equals(Cell other)
@@ -54,7 +55,7 @@ namespace Quoridor.Core.Environment
             return new Cell(Position.Copy())
             {
                 //Blocked[] is an array of bool struct so shallow copy is fine
-                Blocked = this.Blocked.Clone() as bool[]
+                Blocked = Blocked.Clone() as bool[]
             };
         }
 
