@@ -49,8 +49,6 @@ namespace Quoridor.AI.MinimaxAlgorithm
 
                 var result = ParallelMinimaxStep(clonedGame, alpha, beta, depth - 1, !maximizingPlayer);
 
-                clonedGame.UndoMove(move);
-
                 lock (locker)
                 {
                     if (maximizingPlayer)
