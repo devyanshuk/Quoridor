@@ -43,7 +43,7 @@ namespace Quoridor.ConsoleApp
         [Verb(IsDefault=true)]
         public void Play(
             [Description("Game Board Dimension")]
-            [DefaultValue(3), MoreOrEqualTo(3)]
+            [DefaultValue(9), MoreOrEqualTo(3)]
             [Aliases("dim")]
             int Dimension,
 
@@ -85,7 +85,7 @@ namespace Quoridor.ConsoleApp
             int NumSimulate,
 
             [Description("Maximum depth of the search tree")]
-            [DefaultValue(2), MoreOrEqualTo(0)]
+            [DefaultValue(1), MoreOrEqualTo(0)]
             [Aliases("d")]
             int Depth,
 

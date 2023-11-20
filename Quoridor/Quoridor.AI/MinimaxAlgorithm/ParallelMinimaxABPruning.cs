@@ -9,6 +9,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
         where TGame : IGame<TPlayer, TMove>, IDeepCopy<TGame>
     {
         private readonly int _depth;
+        private readonly object _lock = new object();
 
         public ParallelMinimaxABPruning(int depth)
         {
@@ -41,16 +42,16 @@ namespace Quoridor.AI.MinimaxAlgorithm
                 Value = maximizingPlayer ? double.MinValue : double.MaxValue
             };
 
-            var locker = new object();
+            var validMoves = game.GetValidMoves().ToList();
 
-            Parallel.ForEach(game.GetValidMoves(), (move, loopState) =>
+            Parallel.ForEach(validMoves, (move, loopState) =>
             {
                 var clonedGame = game.DeepCopy();
                 clonedGame.Move(move);
 
                 var result = ParallelMinimaxStep(clonedGame, alpha, beta, depth - 1, !maximizingPlayer);
 
-                lock (locker)
+                lock (_lock)
                 {
                     if (maximizingPlayer)
                     {
