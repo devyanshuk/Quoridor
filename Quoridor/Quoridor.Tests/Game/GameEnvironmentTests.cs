@@ -465,7 +465,7 @@ namespace Quoridor.Tests.Game
             gameEnv.Walls.Add(new Wall(North, new Vector2(4,4)));
             gameEnv.Walls.Add(new Wall(South, new Vector2(3, 5)));
             var gameCopy = gameEnv.DeepCopy();
-            var numRemoved = gameCopy.Walls.RemoveWhere(wall => ReferenceEquals(wall, gameEnv.Walls.Single(w => w.Equals(wall))));
+            var numRemoved = gameCopy.Walls.ToHashSet().RemoveWhere(wall => ReferenceEquals(wall, gameEnv.Walls.Single(w => w.Equals(wall))));
             gameCopy.Walls.Clear();
 
             //Assert

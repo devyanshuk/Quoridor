@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
 using Quoridor.Core.Entities;
-using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;
+using ConcurrentCollections;
 
 namespace Quoridor.Core.Game
 {
@@ -23,7 +23,7 @@ namespace Quoridor.Core.Game
 
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
-        public HashSet<IWall> Walls { get; private set; }
+        public ConcurrentHashSet<IWall> Walls { get; private set; }
         public int ASTAR_COUNT { get; set; } = 0;
 
         public GameEnvironment(
@@ -36,7 +36,7 @@ namespace Quoridor.Core.Game
             _board = board;
             _aStar = new AStar<Vector2, IBoard, IPlayer>();
             Players = new List<IPlayer>();
-            Walls = new HashSet<IWall>();
+            Walls = new ConcurrentHashSet<IWall>();
             InitAndAddPlayers(numPlayers, numWalls);
         }
 
@@ -183,6 +183,7 @@ namespace Quoridor.Core.Game
             //}
             //wall check complete, add it to the wall cache
             Walls.Add(wall);
+
             //player used up a wall, so decrease the wall count
             player.DecreaseWallCount();
         }
@@ -232,14 +233,15 @@ namespace Quoridor.Core.Game
 
             //get cells affected by the wall and unblock access
             var affectedCells = GetCellsAffectedByWall(wall);
+
             UnblockAccess(affectedCells);
 
             //remove wall from the cache
-            Walls.Remove(wall);
-
-            _log.Info($"Successfully removed {wall}");
+            Walls.TryRemove(wall);
 
             player.IncreaseWallCount();
+
+            _log.Info($"Successfully removed {wall}");
         }
 
         //each wall blocks one direction from exactly 4 cell
@@ -488,10 +490,13 @@ namespace Quoridor.Core.Game
 
         public IGameEnvironment DeepCopy()
         {
-            return new GameEnvironment(_numPlayers, _numWalls, _board.DeepCopy())
+            var boardCopy = _board.DeepCopy();
+            var playerCopy = new List<IPlayer>(Players.Select(p => p.DeepCopy()));
+            var wallCopy = new ConcurrentHashSet<IWall>(Walls.Select(wall => wall.DeepCopy()));
+            return new GameEnvironment(_numPlayers, _numWalls, boardCopy)
             {
-                Players = this.Players.Select(p => p.DeepCopy()).ToList(),
-                Walls = this.Walls.Select(wall => wall.DeepCopy()).ToHashSet(),
+                Players = playerCopy,
+                Walls = wallCopy,
                 Turn = this.Turn
             };
         }

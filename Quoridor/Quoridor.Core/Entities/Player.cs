@@ -90,7 +90,9 @@ namespace Quoridor.Core.Entities
             return new Player(Id, NumWalls, StartPos.Copy())
             {
                 CurrentPos = this.CurrentPos.Copy(),
-                _startNumWalls = this._startNumWalls
+                _startNumWalls = this._startNumWalls,
+                IsGoalMove = this.IsGoalMove,
+                ManhattanHeuristicFn = this.ManhattanHeuristicFn
             };
         }
     }

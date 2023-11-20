@@ -14,9 +14,11 @@
     <None Remove="Utils\" />
     <None Remove="Utils\CustomExceptions\" />
     <None Remove="Extensions\" />
+    <None Remove="ConcurrentHashSet" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
+    <PackageReference Include="ConcurrentHashSet" Version="1.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DependencyRegistry\" />

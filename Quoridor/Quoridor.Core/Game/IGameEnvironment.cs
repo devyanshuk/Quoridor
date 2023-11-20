@@ -5,6 +5,7 @@ using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Core.Environment;
 using Quoridor.AI.MinimaxAlgorithm;
+using ConcurrentCollections;
 
 namespace Quoridor.Core.Game
 {
@@ -15,7 +16,7 @@ namespace Quoridor.Core.Game
         IDeepCopy<IGameEnvironment>
     {
         List<IPlayer> Players { get; }
-        HashSet<IWall> Walls { get; }
+        ConcurrentHashSet<IWall> Walls { get; }
         int ASTAR_COUNT { get; set; }
         int Turn { get; }
 

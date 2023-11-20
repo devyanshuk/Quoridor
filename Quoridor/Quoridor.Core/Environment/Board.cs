@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.Core.Utils;
-using Quoridor.AI.Interfaces;
 
 namespace Quoridor.Core.Environment
 {

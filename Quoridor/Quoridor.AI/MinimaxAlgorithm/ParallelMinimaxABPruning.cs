@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.MinimaxAlgorithm
@@ -22,13 +23,64 @@ namespace Quoridor.AI.MinimaxAlgorithm
             if (player == null)
                 throw new Exception($"No agent to get scores from");
 
-            var bestMove = MinimaxStep(game, double.MinValue, double.MaxValue, _depth, player.Equals(game.CurrentPlayer));
+            var bestMove = ParallelMinimaxStep(game, double.MinValue, double.MaxValue, _depth, player.Equals(game.CurrentPlayer));
             return bestMove;
         }
 
-        private AIStrategyResult<TMove> MinimaxStep(TGame game, double alpha, double beta, int depth, bool maximizingPlayer)
+        private AIStrategyResult<TMove> ParallelMinimaxStep(TGame game, double alpha, double beta, int depth, bool maximizingPlayer)
         {
-            return null;
+            if (depth <= 0 || game.HasFinished)
+            {
+                var score = game.Evaluate(maximizingPlayer);
+                return new AIStrategyResult<TMove> { Value = score };
+            }
+
+            var bestMove = new AIStrategyResult<TMove>
+            {
+                Value = maximizingPlayer ? double.MinValue : double.MaxValue
+            };
+
+            var locker = new object();
+
+            Parallel.ForEach(game.GetValidMoves(), (move, loopState) =>
+            {
+                var clonedGame = game.DeepCopy();
+                clonedGame.Move(move);
+
+                var result = ParallelMinimaxStep(clonedGame, alpha, beta, depth - 1, !maximizingPlayer);
+
+                clonedGame.UndoMove(move);
+
+                lock (locker)
+                {
+                    if (maximizingPlayer)
+                    {
+                        if (result.Value > bestMove.Value)
+                        {
+                            bestMove.BestMove = move;
+                            bestMove.Value = result.Value;
+                        }
+                        if (bestMove.Value > beta)
+                            loopState.Break();
+
+                        alpha = Math.Max(alpha, bestMove.Value);
+                    }
+                    else
+                    {
+                        if (result.Value < bestMove.Value)
+                        {
+                            bestMove.BestMove = move;
+                            bestMove.Value = result.Value;
+                        }
+                        if (bestMove.Value < alpha)
+                            loopState.Break();
+
+                        beta = Math.Min(beta, bestMove.Value);
+                    }
+                }
+            });
+
+            return bestMove;
         }
     }
 }
