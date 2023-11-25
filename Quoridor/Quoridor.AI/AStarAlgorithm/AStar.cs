@@ -6,13 +6,13 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.AStarAlgorithm
 {
-    public class AStar<TMove, TMaze, TPlayer> : AIStrategy<TMove, TMaze, TPlayer>
+    public class AStar<TMove, TMaze, TPlayer> : IAIStrategy<TMove, TMaze, TPlayer>
         where TPlayer : IAStarPlayer<TMove>
         where TMaze : INeighbors<TMove>
     {
-        public override string Name => nameof(AStarAlgorithm);
+        public string Name => nameof(AStarAlgorithm);
 
-        public override AIStrategyResult<TMove> BestMove(TMaze maze, TPlayer player)
+        public AIStrategyResult<TMove> BestMove(TMaze maze, TPlayer player)
         {
             ValidateParams(maze, player);
 

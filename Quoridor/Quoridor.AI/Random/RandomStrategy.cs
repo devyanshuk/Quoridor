@@ -1,9 +1,10 @@
 ﻿using System.Linq;
+
 using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.Random
 {
-    public class RandomStrategy<TMove, TGame, TPlayer>  : AIStrategy<TMove, TGame, TPlayer>
+    public class RandomStrategy<TMove, TGame, TPlayer>  : IAIStrategy<TMove, TGame, TPlayer>
         where TGame : IValidMoves<TMove>
     {
         private readonly System.Random _random;
@@ -15,9 +16,9 @@ namespace Quoridor.AI.Random
             _random = new System.Random(seed);
         }
 
-        public override string Name => nameof(Random);
+        public string Name => nameof(Random);
 
-        public override AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
+        public AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
             var validMoves = game.GetValidMoves();
             var randIndex = _random.Next(0, validMoves.Count());

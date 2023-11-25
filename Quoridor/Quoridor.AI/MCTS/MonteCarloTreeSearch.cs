@@ -1,19 +1,26 @@
 ﻿using System;
+
 using Quoridor.AI.Interfaces;
 using Quoridor.AI.MinimaxAlgorithm;
 
 namespace Quoridor.AI.MCTS
 {
-    public class MonteCarloTreeSearch<TMove, TGame, TPlayer> : AIStrategy<TMove, TGame, TPlayer>
+    public class MonteCarloTreeSearch<TMove, TGame, TPlayer> : IAIStrategy<TMove, TGame, TPlayer>
         where TGame : IGame<TPlayer, TMove>, IDeepCopy<TGame>
     {
-        public MonteCarloTreeSearch()
+        //exploration parameter
+        private readonly double _c;
+        private readonly int _simulations;
+
+        public MonteCarloTreeSearch(double c, int simulations)
         {
+            _c = c;
+            _simulations = simulations;
         }
 
-        public override string Name => nameof(MCTS);
+        public string Name => nameof(MCTS);
 
-        public override AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
+        public AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
             throw new NotImplementedException();
         }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 using Quoridor.AI;
 using Quoridor.Core;
+using Quoridor.AI.MCTS;
 using Quoridor.AI.Random;
 using Quoridor.Core.Game;
 using Quoridor.Core.Entities;
@@ -40,7 +41,7 @@ namespace Quoridor.ConsoleApp
             _gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
         }
 
-        [Verb(IsDefault=true)]
+        [Verb(IsDefault = true)]
         public void Play(
             [Description("Game Board Dimension")]
             [DefaultValue(9), MoreOrEqualTo(3)]
@@ -85,14 +86,24 @@ namespace Quoridor.ConsoleApp
             int NumSimulate,
 
             [Description("Maximum depth of the search tree")]
-            [DefaultValue(1), MoreOrEqualTo(0)]
+            [DefaultValue(2), MoreOrEqualTo(0)]
             [Aliases("d")]
             int Depth,
 
             [Description("Seed for the random number generator")]
             [DefaultValue(20)]
             [Aliases("s")]
-            int Seed
+            int Seed,
+
+            [Description("Exploration parameter for UCT")]
+            [DefaultValue(1.41)]
+            [Aliases("exploration")]
+            double C,
+
+            [Description("Simulation limit for MCTS")]
+            [DefaultValue(1000)]
+            [Aliases("mctsims")]
+            int MctsSim
             )
         {
             // for large tree, logs might be very big, so we disable it.
@@ -111,8 +122,8 @@ namespace Quoridor.ConsoleApp
             };
 
             //add selected ai/human strategy
-            settings.Strategies.Add(GetStrategy(EnumHelper.ParseEnum<AITypes>(Strategy1), Depth, Seed));
-            settings.Strategies.Add(GetStrategy(EnumHelper.ParseEnum<AITypes>(Strategy2), Depth, Seed));
+            settings.Strategies.Add(GetStrategy(EnumHelper.ParseEnum<AITypes>(Strategy1), Depth, Seed, C, MctsSim));
+            settings.Strategies.Add(GetStrategy(EnumHelper.ParseEnum<AITypes>(Strategy2), Depth, Seed, C, MctsSim));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
@@ -121,7 +132,7 @@ namespace Quoridor.ConsoleApp
             _gameManagerFactory.CreateManager(settings, gameEnv).Start();
         }
 
-        private StrategyInfo GetStrategy(AITypes aiType, int depth, int seed)
+        private StrategyInfo GetStrategy(AITypes aiType, int depth, int seed, double c, int mctSim)
         {
             switch (aiType)
             {
@@ -135,6 +146,8 @@ namespace Quoridor.ConsoleApp
                     return new StrategyInfo { Strategy = new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 case AITypes.ParallelMinimaxAB:
                     return new StrategyInfo { Strategy = new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
+                case AITypes.MonteCarlo:
+                    return new StrategyInfo { Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(c, mctSim) };
                 default:
                     return new StrategyInfo { Strategy = new Minimax<IPlayer, Movement, IGameEnvironment>(depth) };
             }

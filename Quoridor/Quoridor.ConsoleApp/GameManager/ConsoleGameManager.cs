@@ -101,7 +101,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 info.Strategy.Name} won. Player {losingPlayer} : {losingStrategy.Strategy.Name} lost");
         }
 
-        public void GetAndDoMove(AIStrategy<Movement, IGameEnvironment, IPlayer> strategy)
+        public void GetAndDoMove(IAIStrategy<Movement, IGameEnvironment, IPlayer> strategy)
         {
             try
             {

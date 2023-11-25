@@ -7,7 +7,7 @@ namespace Quoridor.ConsoleApp.GameManager
 {
     public class StrategyInfo
     {
-        public AIStrategy<Movement, IGameEnvironment, IPlayer> Strategy { get; set; }
+        public IAIStrategy<Movement, IGameEnvironment, IPlayer> Strategy { get; set; }
         public int GamesWon { get; set; }
     }
 }

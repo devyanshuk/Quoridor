@@ -3,7 +3,7 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.MinimaxAlgorithm
 {
-    public class Minimax<TPlayer, TMove, TGame> : AIStrategy<TMove, TGame, TPlayer>
+    public class Minimax<TPlayer, TMove, TGame> : IAIStrategy<TMove, TGame, TPlayer>
         where TGame : IGame<TPlayer, TMove>
     {
         private readonly int _depth;
@@ -16,9 +16,9 @@ namespace Quoridor.AI.MinimaxAlgorithm
             _depth = depth;
         }
 
-        public override string Name => nameof(MinimaxAlgorithm);
+        public string Name => nameof(MinimaxAlgorithm);
 
-        public override AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
+        public AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
             if (game.HasFinished)
                 throw new Exception($"Game already over. Cannot perform minimax");
