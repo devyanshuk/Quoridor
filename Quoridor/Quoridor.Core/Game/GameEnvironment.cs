@@ -111,7 +111,7 @@ namespace Quoridor.Core.Game
             }
         }
 
-        public IPlayer PreviousPlayer
+        public IPlayer Opponent
         {
             get
             {
@@ -428,9 +428,9 @@ namespace Quoridor.Core.Game
             var goalDistance = result.Value;
             var wallsLeft = CurrentPlayer.NumWalls;
 
-            var result2 = _aStar.BestMove(_board, PreviousPlayer);
+            var result2 = _aStar.BestMove(_board, Opponent);
             var goalDistance2 = result2.Value;
-            var wallsLeft2 = PreviousPlayer.NumWalls;
+            var wallsLeft2 = Opponent.NumWalls;
 
             double score;
 
@@ -438,13 +438,13 @@ namespace Quoridor.Core.Game
             {
                 score = goalDistance - goalDistance2 + (wallsLeft - wallsLeft2);
 
-                if (CurrentPlayer.NumWalls == 0) score -= PreviousPlayer.NumWalls * 2;
+                if (CurrentPlayer.NumWalls == 0) score -= Opponent.NumWalls * 2;
 
                 if (CurrentPlayer.IsGoalMove(CurrentPlayer.CurrentPos))
                 {
                     score = -100;
                 }
-                if (PreviousPlayer.IsGoalMove(PreviousPlayer.CurrentPos))
+                if (Opponent.IsGoalMove(Opponent.CurrentPos))
                 {
                     score = 100;
                 }
@@ -453,13 +453,13 @@ namespace Quoridor.Core.Game
             {
                 score = goalDistance2 - goalDistance + (wallsLeft2 - wallsLeft);
 
-                if (PreviousPlayer.NumWalls == 0) score += CurrentPlayer.NumWalls * 2;
+                if (Opponent.NumWalls == 0) score += CurrentPlayer.NumWalls * 2;
 
                 if (CurrentPlayer.IsGoalMove(CurrentPlayer.CurrentPos))
                 {
                     score = 100;
                 }
-                if (PreviousPlayer.IsGoalMove(PreviousPlayer.CurrentPos))
+                if (Opponent.IsGoalMove(Opponent.CurrentPos))
                 {
                     score = -100;
                 }

@@ -7,7 +7,7 @@ using Quoridor.AI.Interfaces;
 namespace Quoridor.AI.MinimaxAlgorithm
 {
     public class ParallelMinimaxABPruning<TPlayer, TMove, TGame> : IAIStrategy<TMove, TGame, TPlayer>
-        where TGame : IGame<TPlayer, TMove>, IDeepCopy<TGame>
+        where TGame : IMinimaxGame<TPlayer, TMove>, IDeepCopy<TGame>
     {
         private readonly int _depth;
         private readonly object _lock = new object();

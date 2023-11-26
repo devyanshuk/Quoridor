@@ -4,7 +4,7 @@ using Quoridor.AI.Interfaces;
 namespace Quoridor.AI.MinimaxAlgorithm
 {
     public class MinimaxABPruning<TPlayer, TMove, TGame> : IAIStrategy<TMove, TGame, TPlayer>
-        where TGame : IGame<TPlayer, TMove>
+        where TGame : IMinimaxGame<TPlayer, TMove>
     {
         private readonly int _depth;
 

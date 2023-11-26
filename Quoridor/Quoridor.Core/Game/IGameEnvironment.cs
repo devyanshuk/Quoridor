@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 
+using Quoridor.AI.MCTS;
 using Quoridor.Core.Utils;
+using ConcurrentCollections;
 using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Core.Environment;
 using Quoridor.AI.MinimaxAlgorithm;
-using ConcurrentCollections;
 
 namespace Quoridor.Core.Game
 {
     public interface IGameEnvironment :
-        IGame<IPlayer, Movement>,
+        IMinimaxGame<IPlayer, Movement>,
+        IMCTSGame<IGameEnvironment, Movement, IPlayer>,
         INeighbors<Vector2>,
         INeighbors<Movement>,
         IDeepCopy<IGameEnvironment>
