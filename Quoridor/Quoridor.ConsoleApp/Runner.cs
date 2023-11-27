@@ -148,7 +148,7 @@ namespace Quoridor.ConsoleApp
                     return new StrategyInfo { Strategy = new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 case AITypes.MonteCarlo:
                     {
-                        var selectionStrategy = new UCT<Movement, IPlayer>(c);
+                        var selectionStrategy = new UCT<Movement, IPlayer, IGameEnvironment>(c);
                         var moveStrategy = new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed);
                         return new StrategyInfo {
                             Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(mctSim, selectionStrategy, moveStrategy)};
