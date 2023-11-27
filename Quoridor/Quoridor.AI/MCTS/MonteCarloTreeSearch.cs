@@ -53,7 +53,7 @@ namespace Quoridor.AI.MCTS
         {
             var currNode = node;
 
-            while (!node.IsLeaf)
+            while (!currNode.IsLeaf)
             {
                 currNode = _selectionStrategy.PromisingNode(currNode);
                 game.Move(currNode.Move);

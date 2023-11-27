@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Quoridor.AI.Extensions;
+
 namespace Quoridor.AI.MCTS
 {
     public class UCT<TMove, TPlayer> : INodeSelectionStrategy<TMove, TPlayer>
@@ -13,7 +15,13 @@ namespace Quoridor.AI.MCTS
 
         public Node<TMove, TPlayer> PromisingNode(Node<TMove, TPlayer> node)
         {
-            throw new NotImplementedException();
+            return node.Children.MaxBy(n => Value(n));
+        }
+
+        private double Value(Node<TMove, TPlayer> node)
+        {
+            var winRate = (double)node.Wins / node.Count;
+            return winRate + _c * Math.Log((double)node.Parent.Count / node.Count);
         }
     }
 }
