@@ -10,6 +10,7 @@
     <None Remove="Interfaces\" />
     <None Remove="AStar\" />
     <None Remove="Random\" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MCTS\" />
@@ -17,5 +18,6 @@
     <Folder Include="Interfaces\" />
     <Folder Include="AStarAlgorithm\" />
     <Folder Include="Random\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

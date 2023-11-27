@@ -123,6 +123,8 @@ namespace Quoridor.Core.Game
 
         public bool HasFinished => Players.Any(p => p.IsGoalMove(p.CurrentPos));
 
+        public IPlayer Winner => Players.FirstOrDefault(p => p.IsGoalMove(p.CurrentPos));
+
         public void MovePlayer(IPlayer player, Direction dir)
         {
             if (Players == null)

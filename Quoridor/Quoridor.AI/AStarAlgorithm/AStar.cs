@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.AI.Interfaces;
+using Quoridor.AI.Extensions;
 
 namespace Quoridor.AI.AStarAlgorithm
 {
@@ -26,7 +27,7 @@ namespace Quoridor.AI.AStarAlgorithm
             while (openSet.Count() > 0)
             {
                 //get the node from the opoen set with the lowest f-score value
-                var nodeWithLowestFscore = openSet.Aggregate((min, x) => x.FValue < min.FValue ? x : min);
+                var nodeWithLowestFscore = openSet.MinBy(s => s.FValue);
                 currNode = nodeWithLowestFscore;
 
                 //put this node in closed set and remove it from open set
