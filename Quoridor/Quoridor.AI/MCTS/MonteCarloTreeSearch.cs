@@ -34,14 +34,13 @@ namespace Quoridor.AI.MCTS
 
             var root = new Node<TMove, TPlayer, TGame>(game.DeepCopy());
 
-            for(int i = 0; i < _simulations; i++)
+            for (int i = 0; i < _simulations; i++)
             {
                 var selectedNode = Selection_Extraction(root);
-                var winner = Simulation(selectedNode.State);
+                var winner = Simulation(selectedNode.State.DeepCopy());
                 BackPropagation(selectedNode, winner);
-                Console.WriteLine($"Simulation {i} done");
             }
-            var bestChild = root.Children.MaxBy(c => c.Wins);
+            var bestChild = root.Children.MaxBy(c => (double)c.Wins/c.Count);
             var winRate = (float)bestChild.Wins / bestChild.Count;
             return new AIStrategyResult<TMove> { BestMove = bestChild.Move, Value = winRate };
         }
@@ -52,7 +51,10 @@ namespace Quoridor.AI.MCTS
 
             while (!currNode.State.HasFinished)
             {
-                if (currNode.Expandable) return currNode.Expand();
+                if (currNode.Expandable)
+                {
+                    return currNode.Expand();
+                }
                 currNode = _selectionStrategy.PromisingNode(currNode);
             }
 
@@ -76,7 +78,7 @@ namespace Quoridor.AI.MCTS
             while (current != null)
             {
                 current.Count++;
-                if (current.State.CurrentPlayer.Equals(winner))
+                if (current.State.Opponent.Equals(winner))
                     current.Wins++;
 
                 current = current.Parent;

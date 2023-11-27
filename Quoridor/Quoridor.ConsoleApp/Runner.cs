@@ -44,7 +44,7 @@ namespace Quoridor.ConsoleApp
         [Verb(IsDefault = true)]
         public void Play(
             [Description("Game Board Dimension")]
-            [DefaultValue(9), MoreOrEqualTo(3)]
+            [DefaultValue(3), MoreOrEqualTo(3)]
             [Aliases("dim")]
             int Dimension,
 

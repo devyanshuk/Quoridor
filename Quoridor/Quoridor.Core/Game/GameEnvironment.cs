@@ -302,6 +302,12 @@ namespace Quoridor.Core.Game
                 throw new NewMoveBlockedByWallException(errorMessage);
             }
 
+            if (player.IsGoalMove(newPos))
+            {
+                _log.Info($"Player reached the goal position");
+                return newPos;
+            }
+
             var playerInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos));
 
             if (playerInNewPos != null)
