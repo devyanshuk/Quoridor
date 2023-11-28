@@ -10,13 +10,12 @@ namespace Quoridor.AI.MCTS
         where TPlayer : IEquatable<TPlayer>
     {
         private readonly int _simulations;
-        private readonly INodeSelectionStrategy<TMove, TPlayer> _selectionStrategy;
+        private readonly INodeSelectionStrategy<TMove, TPlayer, TGame> _selectionStrategy;
         private readonly IAIStrategy<TMove, TGame, TPlayer> _moveStrategy;
-        private readonly System.Random _random = new System.Random();
 
         public MonteCarloTreeSearch(
             int simulations,
-            INodeSelectionStrategy<TMove, TPlayer> selectionStrategy,
+            INodeSelectionStrategy<TMove, TPlayer, TGame> selectionStrategy,
             IAIStrategy<TMove, TGame, TPlayer> moveStrategy)
         {
             _simulations = simulations;
@@ -33,53 +32,35 @@ namespace Quoridor.AI.MCTS
             if (player == null)
                 throw new Exception($"No agent registered");
 
-            var root = new Node<TMove, TPlayer> { Player = player };
+            var root = new Node<TMove, TPlayer, TGame>(game.DeepCopy());
 
-            for(int i = 0; i < _simulations; i++)
+            for (int i = 0; i < _simulations; i++)
             {
-                var copy = game.DeepCopy();
-
-                var selectedNode = Selection(copy, root);
-                var expandedNode = Expansion(copy, selectedNode);
-                var winner = Simulation(copy);
-                BackPropagation(expandedNode, winner);
+                var selectedNode = Selection_Extraction(root);
+                var winner = Simulation(selectedNode.State.DeepCopy());
+                BackPropagation(selectedNode, winner);
             }
-            var bestChild = root.Children.MaxBy(c => c.Wins);
+            var bestChild = root.Children.MaxBy(c => (double)c.Wins/c.Count);
             var winRate = (float)bestChild.Wins / bestChild.Count;
             return new AIStrategyResult<TMove> { BestMove = bestChild.Move, Value = winRate };
         }
 
-        private Node<TMove, TPlayer> Selection(TGame game, Node<TMove, TPlayer> node)
+        private Node<TMove, TPlayer, TGame> Selection_Extraction(Node<TMove, TPlayer, TGame> node)
         {
             var currNode = node;
 
-            while (!currNode.IsLeaf)
+            while (!currNode.State.HasFinished)
             {
+                if (currNode.Expandable)
+                {
+                    return currNode.Expand();
+                }
                 currNode = _selectionStrategy.PromisingNode(currNode);
-                game.Move(currNode.Move);
             }
 
             return currNode;
         }
 
-        private Node<TMove, TPlayer> Expansion(TGame game, Node<TMove, TPlayer> node)
-        {
-            if (game.HasFinished) return node;
-
-            foreach(var move in game.GetValidMoves())
-            {
-                var childNode = new Node<TMove, TPlayer>
-                {
-                    Move = move,
-                    Parent = node,
-                    Player = game.Opponent
-                };
-                node.Children.Add(childNode);
-            }
-            var selectedChild = node.Children[_random.Next(node.Children.Count)];
-            game.Move(selectedChild.Move);
-            return selectedChild;
-        }
 
         private TPlayer Simulation(TGame game)
         {
@@ -91,13 +72,13 @@ namespace Quoridor.AI.MCTS
             return game.Winner;
         }
 
-        private void BackPropagation(Node<TMove, TPlayer> node, TPlayer winner)
+        private void BackPropagation(Node<TMove, TPlayer, TGame> node, TPlayer winner)
         {
             var current = node;
             while (current != null)
             {
                 current.Count++;
-                if (current.Player.Equals(winner))
+                if (current.State.Opponent.Equals(winner))
                     current.Wins++;
 
                 current = current.Parent;

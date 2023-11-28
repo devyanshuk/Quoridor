@@ -341,7 +341,10 @@ namespace Quoridor.Tests.Game
             var token = CreateGameEnvironment();
             var gameEnv = token.Item2;
             gameEnv.Players.Clear();
-            var player = new Player('A', 8, new Vector2(4, 0));
+            var player = new Player('A', 8, new Vector2(4, 0))
+            {
+                IsGoalMove = x => false
+            };
             gameEnv.AddPlayer(player);
             player.CurrentPos = new Vector2(f_x, f_y);
             var expectedNewPos = new Vector2(t_x, t_y);
@@ -353,27 +356,30 @@ namespace Quoridor.Tests.Game
             player.CurrentPos.Should().Be(expectedNewPos);
         }
 
-        [TestCase(0, 7, 0, 8, South)]
-        [TestCase(1, 0, 0, 0, West)]
-        [TestCase(7, 0, 8, 0, East)]
-        [TestCase(2, 1, 2, 0, North)]
+        [TestCase(0, 7, 0, 8, South, 0, 7, East)]
+        [TestCase(1, 0, 0, 0, West, 0, 0, South)]
+        [TestCase(7, 0, 8, 0, East, 7, 0, South)]
         public void Should_Throw_If_Player_Tried_Jumping_Outside_Board_Bounds(
-            int f_x, int f_y, int t_x, int t_y, Direction dir)
+            int f_x, int f_y, int t_x, int t_y, Direction dir, int w_x, int w_y, Direction w_p)
         {
             //Arrange
             var gameEnv = CreateGameEnvironment().Item2;
             gameEnv.Players.Clear();
 
-            var p1 = new Player('A', 8, new Vector2(f_x, f_y));
+            var p1 = new Player('A', 8, new Vector2(f_x, f_y))
+            {
+                IsGoalMove = x => false
+            };
             var p2 = new Player('B', 8, new Vector2(t_x, t_y));
             gameEnv.AddPlayer(p1);
             gameEnv.AddPlayer(p2);
+            gameEnv.AddWall(p1, new Vector2(w_x, w_y), w_p);
 
             //Act
             Action a = () => gameEnv.MovePlayer(p1, dir);
 
             //Assert
-            a.Should().Throw<InvalidAgentMoveException>();
+            a.Should().Throw<PlayerCannotJumpSidewaysException>();
         }
 
 
@@ -388,7 +394,10 @@ namespace Quoridor.Tests.Game
             var gameEnv = CreateGameEnvironment().Item2;
             gameEnv.Players.Clear();
 
-            var p1 = new Player('A', 8, new Vector2(f_x, f_y));
+            var p1 = new Player('A', 8, new Vector2(f_x, f_y))
+            {
+                IsGoalMove = x => x.Y == 0
+            };
             var p2 = new Player('B', 8, new Vector2(t_x, t_y));
             gameEnv.AddPlayer(p1);
             gameEnv.AddPlayer(p2);
@@ -447,6 +456,37 @@ namespace Quoridor.Tests.Game
             var oppPos = pos.GetPosFor(dir);
             var oppDir = dir.Opposite();
             gameEnv.Walls.Contains(new Wall(oppDir, oppPos)).Should().BeTrue();
+        }
+
+        [Test]
+        public void Should_Correctly_Jump_Sideways()
+        {
+            //Arrange
+            var token = CreateGameEnvironment();
+            var gameEnv = token.Item2;
+            gameEnv.Players.Clear();
+            var player = new Player('A', 8, new Vector2(4, 4))
+            {
+                ManhattanHeuristicFn = (cell) => Math.Abs(8 - cell.Y),
+                IsGoalMove = (cell) => cell.Y == 8,
+            };
+            var player2 = new Player('B', 8, new Vector2(4, 5))
+            {
+                ManhattanHeuristicFn = (cell) => cell.Y,
+                IsGoalMove = (cell) => cell.Y == 0,
+            };
+
+            //Act
+            gameEnv.AddPlayer(player);
+            gameEnv.AddPlayer(player2);
+            gameEnv.AddWall(player, new Vector2(4, 4), North);
+            gameEnv.AddWall(player, new Vector2(4, 4), West);
+            gameEnv.AddWall(player, new Vector2(4, 5), East);
+            gameEnv.MovePlayer(player2, North);
+
+            //Assert
+            player2.CurrentPos.X.Should().Be(5);
+            player2.CurrentPos.Y.Should().Be(4);
         }
 
         #endregion

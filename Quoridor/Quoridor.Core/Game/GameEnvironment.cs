@@ -280,16 +280,11 @@ namespace Quoridor.Core.Game
             return wall;
         }
 
-        private Vector2 TryMove(IPlayer player, Vector2 currentPos, Direction dir)
+        private void CheckIfPlayerCanGoToNewPos(Vector2 currentPos, Vector2 newPos)
         {
-            var newPos = currentPos.GetPosFor(dir);
-
-            _log.Info($@"Trying to check if it's possible to move player '{player.Id}' currently at '{
-                player.CurrentPos}' '{dir}' to '{newPos}' from '{currentPos}'");
-
             if (!_board.WithinBounds(newPos))
             {
-                var errorMessage = $"player '{player.Id}' cannot move to '{newPos}'. Invalid move position";
+                var errorMessage = $"player '{CurrentPlayer.Id}' cannot move to '{newPos}'. Invalid move position";
                 _log.Error(errorMessage);
                 throw new InvalidAgentMoveException(errorMessage);
             }
@@ -297,9 +292,46 @@ namespace Quoridor.Core.Game
             //if newPos can't be reached from currentPos, then there's a wall blocking access between those cells
             if (!_board.GetCell(currentPos).IsAccessible(currentPos.GetDirFor(newPos)))
             {
-                var errorMessage = $"player '{player.Id}' cannot move to '{newPos}' since it's blocked by a wall";
+                var errorMessage = $"player '{CurrentPlayer.Id}' cannot move to '{newPos}' since it's blocked by a wall";
                 _log.Error(errorMessage);
                 throw new NewMoveBlockedByWallException(errorMessage);
+            }
+        }
+
+        private bool PlayerCanGoTo(Vector2 currentPos, Vector2 newPos)
+        {
+            try
+            {
+                CheckIfPlayerCanGoToNewPos(currentPos, newPos);
+            }
+            catch (Exception ex) when (ex is InvalidAgentMoveException || ex is NewMoveBlockedByWallException)
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+        private Vector2 TryMove(IPlayer player, Vector2 currentPos, Direction dir, bool jump=false)
+        {
+            var newPos = currentPos.GetPosFor(dir);
+
+            _log.Info($@"Trying to check if it's possible to move player '{player.Id}' currently at '{
+                player.CurrentPos}' '{dir}' to '{newPos}' from '{currentPos}'");
+
+            try
+            {
+                CheckIfPlayerCanGoToNewPos(currentPos, newPos);
+            }
+            catch(Exception ex) when (ex is InvalidAgentMoveException || ex is NewMoveBlockedByWallException) {
+                if (jump) newPos = GetShortestSidewaysJumpPos(currentPos, dir);
+                else throw ex;
+            }
+
+            if (player.IsGoalMove(newPos))
+            {
+                _log.Info($"Player reached the goal position");
+                return newPos;
             }
 
             var playerInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos));
@@ -307,10 +339,50 @@ namespace Quoridor.Core.Game
             if (playerInNewPos != null)
             {
                 _log.Info($"Player '{playerInNewPos.Id}' already is in '{newPos}'. Trying to jump '{dir}' from '{newPos}'");
-                return TryMove(player, newPos, dir);
+                return TryMove(player, newPos, dir, jump:true);
             }
             _log.Info($"No player found in '{newPos}'. Moving player '{player.Id}' from '{player.CurrentPos}' to '{newPos}'");
             return newPos;
+        }
+
+        private Vector2 GetShortestSidewaysJumpPos(Vector2 currentPos, Direction dir)
+        {
+            Vector2 leftSideWaypos;
+            Vector2 rightSideWaypos;
+
+            if (dir.Equals(Direction.North) || dir.Equals(Direction.South))
+            {
+                leftSideWaypos = currentPos.GetPosFor(Direction.West);
+                rightSideWaypos = currentPos.GetPosFor(Direction.East);
+            }
+            else
+            {
+                leftSideWaypos = currentPos.GetPosFor(Direction.South);
+                rightSideWaypos = currentPos.GetPosFor(Direction.North);
+            }
+            var leftPossible = PlayerCanGoTo(currentPos, leftSideWaypos);
+            var rightPossible = PlayerCanGoTo(currentPos, rightSideWaypos);
+
+            if (!leftPossible && !rightPossible)
+                throw new PlayerCannotJumpSidewaysException($"{CurrentPlayer} cannot jump sideways, hence cannot move to {dir}ern direction");
+
+            if (!leftPossible)
+                return rightSideWaypos;
+
+            if (!rightPossible)
+                return leftSideWaypos;
+
+            var temp = CurrentPlayer.CurrentPos;
+
+            CurrentPlayer.CurrentPos = leftSideWaypos;
+            var distFromLeft = _aStar.BestMove(_board, CurrentPlayer).Value;
+
+            CurrentPlayer.CurrentPos = rightSideWaypos;
+            var distFromRight = _aStar.BestMove(_board, CurrentPlayer).Value;
+
+            CurrentPlayer.CurrentPos = temp;
+            return distFromLeft < distFromRight ? leftSideWaypos : rightSideWaypos;
+
         }
 
         public void Move(Movement move)

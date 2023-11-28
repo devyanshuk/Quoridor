@@ -44,7 +44,7 @@ namespace Quoridor.ConsoleApp
         [Verb(IsDefault = true)]
         public void Play(
             [Description("Game Board Dimension")]
-            [DefaultValue(9), MoreOrEqualTo(3)]
+            [DefaultValue(5), MoreOrEqualTo(3)]
             [Aliases("dim")]
             int Dimension,
 
@@ -148,7 +148,7 @@ namespace Quoridor.ConsoleApp
                     return new StrategyInfo { Strategy = new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 case AITypes.MonteCarlo:
                     {
-                        var selectionStrategy = new UCT<Movement, IPlayer>(c);
+                        var selectionStrategy = new UCT<Movement, IPlayer, IGameEnvironment>(c);
                         var moveStrategy = new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed);
                         return new StrategyInfo {
                             Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(mctSim, selectionStrategy, moveStrategy)};
