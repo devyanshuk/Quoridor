@@ -18,4 +18,10 @@ namespace Quoridor.Core.Utils.CustomExceptions
         public NewMoveBlockedByWallException(string message) : base(message) { }
         public NewMoveBlockedByWallException() : base() { }
     }
+
+    public class PlayerCannotJumpSidewaysException : MoveException
+    {
+        public PlayerCannotJumpSidewaysException(string message) : base(message) { }
+        public PlayerCannotJumpSidewaysException() : base() { }
+    }
 }

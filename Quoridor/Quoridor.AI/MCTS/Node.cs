@@ -36,15 +36,18 @@ namespace Quoridor.AI.MCTS
             }
 
             //get a move from the list of available moves
-            Move = ValidMoves.Current;
+            var move = ValidMoves.Current;
             Expandable = ValidMoves.MoveNext();
 
             //copy the game state, apply the action
             var copy = State.DeepCopy();
-            copy.Move(Move);
+            copy.Move(move);
 
             //make a new node of the resulting game state
-            var newNode = new Node<TMove, TPlayer, TGame>(copy) { Parent = this };
+            var newNode = new Node<TMove, TPlayer, TGame>(copy) {
+                Move = move,
+                Parent = this
+            };
             Children.Add(newNode);
             return newNode;
         }
