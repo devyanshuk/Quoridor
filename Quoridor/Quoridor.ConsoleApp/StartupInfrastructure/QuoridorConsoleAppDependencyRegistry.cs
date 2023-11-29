@@ -12,8 +12,8 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
     {
         public static IRegistration[] GetRegistrations()
         {
-            return new IRegistration[]
-            {
+            return
+            [
                 //LifestyleSingleton
                 Component.For<ILocalSettings>().ImplementedBy<LocalSettings>().LifestyleSingleton(),
                 Component.For<ICommandParser>().ImplementedBy<CommandParser>().LifestyleSingleton(),
@@ -23,7 +23,7 @@ namespace Quoridor.ConsoleApp.StartupInfrastructure
 
                 //Factory
                 Component.For<IConsoleGameManagerFactory>().AsFactory().LifestyleSingleton(),
-            };
+            ];
         }
     }
 }

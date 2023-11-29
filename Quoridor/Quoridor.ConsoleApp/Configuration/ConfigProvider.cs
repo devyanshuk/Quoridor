@@ -7,7 +7,6 @@ namespace Quoridor.ConsoleApp.Configuration
     {
         private readonly ILocalSettings _localSettings;
 
-
         public ConfigProvider(ILocalSettings localSettings)
         {
             _localSettings = localSettings;

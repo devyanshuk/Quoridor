@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Windsor" Version="5.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
+    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
+    <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ConfigTemplates\DesktopAppSettings.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

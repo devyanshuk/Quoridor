@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DesktopAppSettings>
+	<FormSettings>
+		<Title>Quoridor</Title>
+		<ScreenHeight>500</ScreenHeight>
+		<ScreenWidth>600</ScreenWidth>
+	</FormSettings>
+	<ColorSettings>
+		<OddTileColor>Blue</OddTileColor>
+		<EvenTileColor>Red</EvenTileColor>
+	</ColorSettings>
+</DesktopAppSettings>
