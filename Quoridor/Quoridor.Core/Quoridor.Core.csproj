@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +31,7 @@
     <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
     <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
+    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
   </ItemGroup>
 </Project>

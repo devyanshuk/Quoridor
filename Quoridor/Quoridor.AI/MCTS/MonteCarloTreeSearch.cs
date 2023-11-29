@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 
 using Quoridor.AI.Interfaces;
-using Quoridor.AI.Extensions;
 
 namespace Quoridor.AI.MCTS
 {

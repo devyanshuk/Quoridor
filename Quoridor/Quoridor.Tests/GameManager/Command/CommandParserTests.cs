@@ -86,7 +86,7 @@ namespace Quoridor.Tests.GameManager.Command
 
         private CommandParser GetCommandParser()
         {
-            return new CommandParser();
+            return new();
         }
     }
 
