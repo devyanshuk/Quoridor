@@ -12,6 +12,12 @@ namespace Quoridor.DesktopApp.Configuration
 
         [XmlElement(nameof(ColorSettings))]
         public ColorSettings ColorSettings { get; set; }
+
+        [XmlElement(nameof(GameSettings))]
+        public GameSettings GameSettings { get; set; }
+
+        [XmlElement(nameof(FontSettings))]
+        public FontSettings FontSettings { get; set; }
     }
 
     [Serializable]
@@ -50,16 +56,51 @@ namespace Quoridor.DesktopApp.Configuration
     [Serializable]
     public class ColorSettings
     {
+        [XmlElement(nameof(BackgroundColor))]
+        public string _backgroundColor { get; set; }
+
         [XmlElement(nameof(OddTileColor))]
         public string _oddTileColor { get; set; }
 
         [XmlElement(nameof(EvenTileColor))]
         public string _evenTileColor { get; set; }
 
-        [XmlIgnore]
-        public Color OddTileColor => Color.FromName(_oddTileColor);
+        [XmlElement(nameof(PlayerColor))]
+        public string _playerColor { get; set; }
+
+        [XmlElement(nameof(WallColor))]
+        public string _wallColor { get; set; }
+
+        [XmlElement(nameof(Opacity))]
+        public int Opacity { get; set; }
 
         [XmlIgnore]
-        public Color EvenTileColor => Color.FromName(_evenTileColor);
+        public Color WallColor => Color.FromName(_wallColor);
+
+        [XmlIgnore]
+        public Color BackgroundColor => Color.FromName(_backgroundColor);
+
+        [XmlIgnore]
+        public Color PlayerColor => Color.FromName(_playerColor);
+
+        [XmlIgnore]
+        public Color OddTileColor => Color.FromArgb(Opacity, Color.FromName(_oddTileColor));
+
+        [XmlIgnore]
+        public Color EvenTileColor => Color.FromArgb(Opacity, Color.FromName(_evenTileColor));
+    }
+
+    [Serializable]
+    public class FontSettings
+    {
+        [XmlElement(nameof(PlayerFont))]
+        public string PlayerFont { get; set; }
+    }
+
+    [Serializable]
+    public class GameSettings
+    {
+        [XmlElement(nameof(WallWidth))]
+        public int WallWidth { get; set; }
     }
 }

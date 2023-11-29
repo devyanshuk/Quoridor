@@ -3,12 +3,22 @@
 	<FormSettings>
 		<Title>Quoridor</Title>
 		<ScreenWidth>500</ScreenWidth>
-		<ScreenHeight>600</ScreenHeight>
+		<ScreenHeight>540</ScreenHeight>
 		<OffsetX>5</OffsetX>
 		<OffsetY>40</OffsetY>
 	</FormSettings>
+	<FontSettings>
+		<PlayerFont>Arial</PlayerFont>
+	</FontSettings>
 	<ColorSettings>
-		<OddTileColor>Blue</OddTileColor>
-		<EvenTileColor>Red</EvenTileColor>
+		<BackgroundColor>LightGray</BackgroundColor>
+		<OddTileColor>LightSkyBlue</OddTileColor>
+		<EvenTileColor>WhiteSmoke</EvenTileColor>
+		<PlayerColor>Black</PlayerColor>
+		<WallColor>Black</WallColor>
+		<Opacity>200</Opacity>
 	</ColorSettings>
+	<GameSettings>
+		<WallWidth>5</WallWidth>
+	</GameSettings>
 </DesktopAppSettings>
