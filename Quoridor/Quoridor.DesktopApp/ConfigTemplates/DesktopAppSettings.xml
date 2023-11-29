@@ -2,8 +2,10 @@
 <DesktopAppSettings>
 	<FormSettings>
 		<Title>Quoridor</Title>
-		<ScreenHeight>500</ScreenHeight>
-		<ScreenWidth>600</ScreenWidth>
+		<ScreenWidth>500</ScreenWidth>
+		<ScreenHeight>600</ScreenHeight>
+		<OffsetX>5</OffsetX>
+		<OffsetY>40</OffsetY>
 	</FormSettings>
 	<ColorSettings>
 		<OddTileColor>Blue</OddTileColor>

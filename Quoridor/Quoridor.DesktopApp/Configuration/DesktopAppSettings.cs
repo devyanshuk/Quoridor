@@ -20,11 +20,31 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlElement(nameof(Title))]
         public string Title { get; set; }
 
-        [XmlElement(nameof(ScreenHeight))]
-        public int ScreenHeight { get; set; }
-
         [XmlElement(nameof(ScreenWidth))]
-        public int ScreenWidth { get; set; }
+        public int _screenWidth { get; set; }
+
+        [XmlElement(nameof(ScreenHeight))]
+        public int _screenHeight { get; set; }
+
+        [XmlElement(nameof(OffsetX))]
+        public int OffsetX { get; set; }
+
+        [XmlElement(nameof(OffsetY))]
+        public int OffsetY { get; set; }
+
+        [XmlIgnore]
+        public int ScreenWidth => ValidateDimension(_screenWidth);
+
+        [XmlIgnore]
+        public int ScreenHeight => ValidateDimension(_screenHeight);
+
+        public int ValidateDimension(int screenprop)
+        {
+            if (_screenHeight < _screenWidth)
+                throw new Exception($"Screen height must be more than width");
+
+            return screenprop;
+        }
     }
 
     [Serializable]
@@ -36,8 +56,10 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlElement(nameof(EvenTileColor))]
         public string _evenTileColor { get; set; }
 
+        [XmlIgnore]
         public Color OddTileColor => Color.FromName(_oddTileColor);
 
+        [XmlIgnore]
         public Color EvenTileColor => Color.FromName(_evenTileColor);
     }
 }
