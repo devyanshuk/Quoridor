@@ -325,7 +325,7 @@ namespace Quoridor.Core.Game
             }
             catch(Exception ex) when (ex is InvalidAgentMoveException || ex is NewMoveBlockedByWallException) {
                 if (jump) newPos = GetShortestSidewaysJumpPos(currentPos, dir);
-                else throw ex;
+                else throw;
             }
 
             if (player.IsGoalMove(newPos))
