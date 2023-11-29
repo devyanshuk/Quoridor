@@ -1,6 +1,5 @@
 ﻿using System;
-
-using Quoridor.AI.Extensions;
+using System.Linq;
 
 namespace Quoridor.AI.MCTS
 {

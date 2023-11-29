@@ -1,53 +1,62 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
 
     <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="NSubstitute" Version="5.0.0" />
-    <PackageReference Include="FluentAssertions" Version="6.11.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\Quoridor.ConsoleApp\ConfigTemplates\BoardCharacters.xml">
+			<Link>ConfigTemplates\BoardCharacters.xml</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="Environment\" />
-    <None Remove="NSubstitute" />
-    <None Remove="FluentAssertions" />
-    <None Remove="Extensions\" />
-    <None Remove="Game\" />
-    <None Remove="Configuration\" />
-    <None Remove="ConfigTemplates\" />
-    <None Remove="GameManager\" />
-    <None Remove="GameManager\Command\" />
-    <None Remove="Utils\" />
-    <None Remove="AStarAlgorithm\" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Environment\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Game\" />
-    <Folder Include="Configuration\" />
-    <Folder Include="ConfigTemplates\" />
-    <Folder Include="GameManager\" />
-    <Folder Include="GameManager\Command\" />
-    <Folder Include="Utils\" />
-    <Folder Include="AStarAlgorithm\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
-    <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
-    <ProjectReference Include="..\Quoridor.ConsoleApp\Quoridor.ConsoleApp.csproj" />
-    <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Quoridor.ConsoleApp\ConfigTemplates\BoardCharacters.xml">
-      <Link>ConfigTemplates\BoardCharacters.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+
+    <ItemGroup>
+	    <None Remove="Environment\" />
+	    <None Remove="NSubstitute" />
+	    <None Remove="FluentAssertions" />
+	    <None Remove="Extensions\" />
+	    <None Remove="Game\" />
+	    <None Remove="Configuration\" />
+	    <None Remove="ConfigTemplates\" />
+	    <None Remove="GameManager\" />
+	    <None Remove="GameManager\Command\" />
+	    <None Remove="Utils\" />
+	    <None Remove="AStarAlgorithm\" />
+    </ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Environment\" />
+		<Folder Include="Extensions\" />
+		<Folder Include="Game\" />
+		<Folder Include="Configuration\" />
+		<Folder Include="ConfigTemplates\" />
+		<Folder Include="GameManager\" />
+		<Folder Include="GameManager\Command\" />
+		<Folder Include="Utils\" />
+		<Folder Include="AStarAlgorithm\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Quoridor.AI\Quoridor.AI.csproj" />
+	  <ProjectReference Include="..\Quoridor.Common\Quoridor.Common.csproj" />
+	  <ProjectReference Include="..\Quoridor.ConsoleApp\Quoridor.ConsoleApp.csproj" />
+	  <ProjectReference Include="..\Quoridor.Core\Quoridor.Core.csproj" />
+	</ItemGroup>
+
 </Project>

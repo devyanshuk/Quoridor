@@ -10,8 +10,8 @@ namespace Quoridor.Core.DependencyRegistry
     {
         public static IRegistration[] GetRegistrations()
         {
-            return new IRegistration[]
-            {
+            return
+            [
                 //LifestyleSingleton
                 Component.For<IBoard>().ImplementedBy<Board>().LifestyleSingleton(),
                 Component.For<IGameEnvironment>().ImplementedBy<GameEnvironment>().LifestyleSingleton(),
@@ -21,7 +21,7 @@ namespace Quoridor.Core.DependencyRegistry
 
                 //Factory
                 Component.For<IGameFactory>().AsFactory().LifestyleTransient(),
-            };
+            ];
         }
     }
 }

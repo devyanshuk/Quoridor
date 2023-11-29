@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
+
 using Quoridor.Common.Logging;
 
 namespace Quoridor.Common.Helpers
@@ -21,9 +22,9 @@ namespace Quoridor.Common.Helpers
             }
             catch(Exception ex)
             {
-                _log.Error($"Error occurred while deserializing xml at path '{path}'");
+                _log.Error($"Error occurred while deserializing xml at path '{path}' : {ex.Message}");
                 sr.Close();
-                throw ex;
+                throw;
             }
         }
     }

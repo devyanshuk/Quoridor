@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Quoridor.AI.Interfaces;
-using Quoridor.AI.Extensions;
 
 namespace Quoridor.AI.AStarAlgorithm
 {
