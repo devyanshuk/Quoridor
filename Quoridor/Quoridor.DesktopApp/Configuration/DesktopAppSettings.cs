@@ -5,9 +5,16 @@ using System.Collections.Generic;
 
 using Quoridor.AI;
 using Quoridor.Core;
+using Quoridor.AI.MCTS;
+using Quoridor.AI.Random;
+using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
+using Quoridor.AI.Interfaces;
+using Quoridor.Core.Entities;
 using Quoridor.Common.Helpers;
 using Quoridor.Core.Environment;
+using Quoridor.AI.MinimaxAlgorithm;
+using Quoridor.AI.AStarAlgorithm;
 
 namespace Quoridor.DesktopApp.Configuration
 {
@@ -37,13 +44,7 @@ namespace Quoridor.DesktopApp.Configuration
             }
         }
 
-        public int WallHeight
-        {
-            get
-            {
-                return CellSize * 2 + FormSettings.WallWidth;
-            }
-        }
+        public int WallHeight => CellSize * 2 + FormSettings.WallWidth;
     }
 
     [Serializable]
@@ -160,7 +161,13 @@ namespace Quoridor.DesktopApp.Configuration
         public int Dimension { get; set; }
 
         [XmlArray(nameof(Strategies))]
-        [XmlArrayItem(nameof(Strategy), typeof(Strategy))]
+        [XmlArrayItem(nameof(HumanStrategy), typeof(HumanStrategy))]
+        [XmlArrayItem(nameof(AStarStrategy), typeof(AStarStrategy))]
+        [XmlArrayItem(nameof(RandomStrategy), typeof(RandomStrategy))]
+        [XmlArrayItem(nameof(MctsStrategy), typeof(MctsStrategy))]
+        [XmlArrayItem(nameof(MinimaxStrategy), typeof(MinimaxStrategy))]
+        [XmlArrayItem(nameof(MinimaxABStrategy), typeof(MinimaxABStrategy))]
+        [XmlArrayItem(nameof(ParallelMinimaxABStrategy), typeof(ParallelMinimaxABStrategy))]
         public List<Strategy> Strategies { get; set; }
 
         [XmlIgnore]
@@ -220,22 +227,119 @@ namespace Quoridor.DesktopApp.Configuration
         }
     }
 
-    [Serializable]
-    public class Strategy
+    [XmlInclude(typeof(HumanStrategy))]
+    [XmlInclude(typeof(AStarStrategy))]
+    [XmlInclude(typeof(RandomStrategy))]
+    [XmlInclude(typeof(MctsStrategy))]
+    [XmlInclude(typeof(MinimaxStrategy))]
+    [XmlInclude(typeof(MinimaxABStrategy))]
+    [XmlInclude(typeof(ParallelMinimaxABStrategy))]
+    public abstract class Strategy
     {
-        [XmlAttribute(nameof(Name))]
-        public string _name { get; set; } = AITypes.Human.ToString();
+        [XmlAttribute(nameof(Description))]
+        public string Description { get; set; }
 
-        [XmlAttribute(nameof(Depth))]
-        public int Depth { get; set; } = 2;
+        public abstract IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy();
+    }
 
+    [Serializable]
+    public class HumanStrategy : Strategy
+    {
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [Serializable]
+    public class AStarStrategy : Strategy
+    {
+        [XmlIgnore]
+        private AStar<Movement, IGameEnvironment, IPlayer> _astar;
+
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            return _astar ??= new();
+        }
+    }
+
+    [Serializable]
+    public class RandomStrategy : Strategy
+    {
+
+        [XmlAttribute(nameof(Seed))]
+        public int Seed { get; set; } = 42;
+
+        [XmlIgnore]
+        private RandomStrategy<Movement, IGameEnvironment, IPlayer> _randomStrategy;
+
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            return _randomStrategy ??= new(Seed);
+        }
+    }
+
+    [Serializable]
+    public class MctsStrategy : Strategy
+    {
         [XmlAttribute(nameof(C))]
         public double C { get; set; } = 1.41;
 
         [XmlAttribute(nameof(Simulations))]
         public int Simulations { get; set; } = 1000;
 
+        [XmlElement(nameof(Strategy))]
+        public Strategy MoveStrategy { get; set; }
+
         [XmlIgnore]
-        public AITypes Name => EnumHelper.ParseEnum<AITypes>(_name);
+        private MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer> _mctsStrategy;
+
+        [XmlIgnore]
+        private UCT<Movement, IPlayer, IGameEnvironment> _uctSelection;
+
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            if (_uctSelection == null) _uctSelection = new(C);
+            return _mctsStrategy ??= new(Simulations, _uctSelection, MoveStrategy.GetStrategy());
+        }
+    }
+
+    [Serializable]
+    public class MinimaxStrategy : Strategy
+    {
+        [XmlAttribute(nameof(Depth))]
+        public int Depth { get; set; } = 2;
+
+        [XmlIgnore]
+        private Minimax<IPlayer, Movement, IGameEnvironment> _minimax;
+
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            return _minimax ??= new(Depth);
+        }
+    }
+
+    [Serializable]
+    public class MinimaxABStrategy : MinimaxStrategy
+    {
+        [XmlIgnore]
+        private MinimaxABPruning<IPlayer, Movement, IGameEnvironment> _minimaxAB;
+
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            return _minimaxAB ??= new(Depth);
+        }
+    }
+
+    [Serializable]
+    public class ParallelMinimaxABStrategy : MinimaxStrategy
+    {
+        [XmlIgnore]
+        private ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment> _parallelMinimaxAB;
+
+        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
+        {
+            return _parallelMinimaxAB ??= new(Depth);
+        }
     }
 }

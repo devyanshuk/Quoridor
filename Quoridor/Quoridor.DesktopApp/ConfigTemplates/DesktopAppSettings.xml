@@ -25,8 +25,8 @@
 		<Players>2</Players>
 		<Walls>8</Walls>
 		<Strategies>
-			<Strategy Name="Human"/>
-			<Strategy Name="MinimaxAB" Depth="2"/>
+			<HumanStrategy Description="Human"/>
+			<MinimaxABStrategy Description="Minimax Alpha Beta Pruning" Depth="2"/>
 		</Strategies>
 		<Moves>
 			<WallMove X="5" Y="5" Placement="North"/>
