@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <DesktopAppSettings>
-	<FormSettings>
+	<FormSettings Description ="values (in pixels) used in the game form">
 		<Title>Quoridor</Title>
 		<ScreenWidth>500</ScreenWidth>
-		<ScreenHeight>540</ScreenHeight>
+		<ScreenHeight>560</ScreenHeight>
 		<OffsetX>5</OffsetX>
-		<OffsetY>40</OffsetY>
+		<OffsetY>50</OffsetY>
+		<WallWidth>5</WallWidth>
 	</FormSettings>
 	<FontSettings>
 		<PlayerFont>Arial</PlayerFont>
@@ -14,11 +15,23 @@
 		<BackgroundColor>LightGray</BackgroundColor>
 		<OddTileColor>LightSkyBlue</OddTileColor>
 		<EvenTileColor>WhiteSmoke</EvenTileColor>
+		<PlayerStatsColor>Black</PlayerStatsColor>
 		<PlayerColor>Black</PlayerColor>
 		<WallColor>Black</WallColor>
 		<Opacity>200</Opacity>
 	</ColorSettings>
 	<GameSettings>
-		<WallWidth>5</WallWidth>
+		<Dimension>9</Dimension>
+		<Players>2</Players>
+		<Walls>8</Walls>
+		<Strategies>
+			<Strategy Name="Human"/>
+			<Strategy Name="MinimaxAB" Depth="2"/>
+		</Strategies>
+		<Moves>
+			<WallMove X="5" Y="5" Placement="North"/>
+			<PlayerMove X="4" Y="7"/>
+			<WallMove X="5" Y="5" Placement="South"/>
+		</Moves>
 	</GameSettings>
 </DesktopAppSettings>

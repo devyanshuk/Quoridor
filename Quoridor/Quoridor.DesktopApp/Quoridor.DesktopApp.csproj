@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <None Update="ConfigTemplates\DesktopAppSettings.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

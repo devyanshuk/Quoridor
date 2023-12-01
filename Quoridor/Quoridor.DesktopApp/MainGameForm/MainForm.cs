@@ -23,8 +23,6 @@ namespace Quoridor.DesktopApp
         private readonly FontSettings _fontSettings;
         private IGameEnvironment _game;
 
-        private int _cellSize;
-
         private WindowType _windowType = WindowType.MainMenu;
 
         public MainForm(IWindsorContainer container)
@@ -47,13 +45,17 @@ namespace Quoridor.DesktopApp
 
         public void Initialize()
         {
-            _board.SetDimension(9);
-            _game = _gameFactory.CreateGameEnvironment(2, 8);
-            _cellSize = GetCellSize();
-            _game.AddWall(_game.CurrentPlayer, new Vector2(5, 5), Direction.North);
-            _game.AddWall(_game.CurrentPlayer, new Vector2(5, 5), Direction.South);
-            _game.AddWall(_game.CurrentPlayer, new Vector2(5, 5), Direction.West);
-            _game.AddWall(_game.CurrentPlayer, new Vector2(6, 5), Direction.East);
+            _board.SetDimension(_gameSettings.Dimension);
+            _game = _gameFactory.CreateGameEnvironment(_gameSettings.Players, _gameSettings.Walls);
+            PerformSavedMoves();
+        }
+
+        private void PerformSavedMoves()
+        {
+            foreach(var move in _gameSettings.Moves)
+            {
+                _game.Move(move.GetMovement());
+            }
         }
 
         protected override void OnPaint(PaintEventArgs args)
@@ -61,10 +63,14 @@ namespace Quoridor.DesktopApp
             DrawBackground(args.Graphics);
             DrawPlayers(args.Graphics);
             DrawWalls(args.Graphics);
+            DrawCurrentPlayerStats(args.Graphics);
         }
+
 
         private void DrawBackground(Graphics graphics)
         {
+            var cellSize = _configProvider.AppSettings.CellSize;
+
             for (int i = 0; i < _board.Dimension; i++)
             {
                 for (int j = 0; j < _board.Dimension; j++)
@@ -72,7 +78,7 @@ namespace Quoridor.DesktopApp
                     var color = (j % 2 == i % 2) ? _colorSettings.EvenTileColor : _colorSettings.OddTileColor;
                     var start_i = GetAdjustedPos(i, _formSettings.OffsetX);
                     var start_j = GetAdjustedPos(j, _formSettings.OffsetY);
-                    var rectangle = new Rectangle(start_i, start_j, _cellSize, _cellSize);
+                    var rectangle = new Rectangle(start_i, start_j, cellSize, cellSize);
                     DrawFilledSquare(graphics, color, rectangle);
                 }
             }
@@ -80,7 +86,6 @@ namespace Quoridor.DesktopApp
 
         private void DrawWalls(Graphics graphics)
         {
-
             foreach(var wall in _game.Walls)
             {
                 var rectangle = CreateWallRectangle(wall);
@@ -88,10 +93,20 @@ namespace Quoridor.DesktopApp
             }
         }
 
+        private void DrawCurrentPlayerStats(Graphics graphics)
+        {
+            var fontSize = _formSettings.OffsetY / 4;
+            using var font = new Font(_fontSettings.PlayerFont, fontSize);
+            using var brush = new SolidBrush(_colorSettings.PlayerStatsColor);
+            var text = $"Player {_game.CurrentPlayer}'s turn. {_game.CurrentPlayer.NumWalls} walls left";
+            graphics.DrawString(text, font, brush, new PointF(5, 10));
+        }
+
         private Rectangle CreateWallRectangle(IWall wall)
         {
-            var width = _gameSettings.WallWidth;
-            var height = _cellSize * 2 + _gameSettings.WallWidth;
+            var cellSize = _configProvider.AppSettings.CellSize;
+            var width = _formSettings.WallWidth;
+            var height = _configProvider.AppSettings.WallHeight;
 
             var x = GetAdjustedPos(wall.From.X, _formSettings.OffsetX) - width;
             var y = GetAdjustedPos(wall.From.Y, _formSettings.OffsetY) - width;
@@ -99,8 +114,8 @@ namespace Quoridor.DesktopApp
             return wall.Placement switch
             {
                 Direction.North => new Rectangle(x + width, y, height, width),
-                Direction.South => new Rectangle(x + width, y + _cellSize + width, height, width),
-                Direction.East => new Rectangle(x + _cellSize + width, y + width, width, height),
+                Direction.South => new Rectangle(x + width, y + cellSize + width, height, width),
+                Direction.East => new Rectangle(x + cellSize + width, y + width, width, height),
                 _ => new Rectangle(x, y + width, width, height)
 
             };
@@ -108,23 +123,23 @@ namespace Quoridor.DesktopApp
 
         private void DrawPlayers(Graphics graphics)
         {
-            var fontSize = _cellSize / 5;
-            var adjustedMidCellPos = (float)_cellSize / 2;
+            var fontSize = _configProvider.AppSettings.CellSize / 5;
+            var adjustedMidCellPos = (float)_configProvider.AppSettings.CellSize / 2;
 
             using var font = new Font(_fontSettings.PlayerFont, fontSize);
             using var brush = new SolidBrush(_colorSettings.PlayerColor);
 
             foreach(var player in _game.Players)
             {
-                var x = GetAdjustedPos(player.CurrX, _formSettings.OffsetX) + adjustedMidCellPos - _gameSettings.WallWidth;
-                var y = GetAdjustedPos(player.CurrY, _formSettings.OffsetY) + adjustedMidCellPos - _gameSettings.WallWidth;
+                var x = GetAdjustedPos(player.CurrX, _formSettings.OffsetX) + adjustedMidCellPos - fontSize / 2;
+                var y = GetAdjustedPos(player.CurrY, _formSettings.OffsetY) + adjustedMidCellPos - fontSize / 2;
                 graphics.DrawString(player.ToString(), font, brush, new PointF(x, y));
             }
         }
 
         private int GetAdjustedPos(int pos, int offset)
         {
-            return offset + pos * (_cellSize + _gameSettings.WallWidth);
+            return offset + pos * (_configProvider.AppSettings.CellSize + _formSettings.WallWidth);
         }
 
         private void DrawFilledSquare(Graphics graphics, Color color, Rectangle rect)
@@ -133,11 +148,11 @@ namespace Quoridor.DesktopApp
             graphics.FillRectangle(brush, rect);
         }
 
-        private int GetCellSize()
+        protected override void OnMouseDown(MouseEventArgs e)
         {
-            var totalWallWidth = _gameSettings.WallWidth * (_board.Dimension - 2);
-            var cellSize = (_formSettings.ScreenWidth - 2 * _formSettings.OffsetX - totalWallWidth) / _board.Dimension;
-            return cellSize;
+            var a = 1;
         }
+
+
     }
 }
