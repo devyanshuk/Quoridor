@@ -3,6 +3,7 @@
     public enum AITypes
     {
         Random,
+        Greedy,
         Minimax,
         MinimaxAB,
         ParallelMinimaxAB,

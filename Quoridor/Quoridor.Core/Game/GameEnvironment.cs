@@ -571,5 +571,10 @@ namespace Quoridor.Core.Game
             if (param is null)
                 throw new ArgumentNullException(paramName);
         }
+
+        public IEnumerable<Movement> NonPlayerMovableMoves()
+        {
+            return GetAllUnplacedWalls();
+        }
     }
 }

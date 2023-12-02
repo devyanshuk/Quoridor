@@ -9,6 +9,7 @@ using Quoridor.Core;
 using Quoridor.AI.MCTS;
 using Quoridor.AI.Random;
 using Quoridor.Core.Game;
+using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
 using Quoridor.Common.Helpers;
@@ -103,7 +104,13 @@ namespace Quoridor.ConsoleApp
             [Description("Simulation limit for MCTS")]
             [DefaultValue(1000)]
             [Aliases("mctsims")]
-            int MctsSim
+            int MctsSim,
+
+            [Description("Agent to perform MCTS simulation")]
+            [DefaultValue("Greedy")]
+            [StrategyValidation]
+            [Aliases("agent")]
+            string MctsAgent
             )
         {
             // for large tree, logs might be very big, so we disable it.
@@ -122,8 +129,9 @@ namespace Quoridor.ConsoleApp
             };
 
             //add selected ai/human strategy
-            settings.Strategies.Add(GetStrategy(EnumHelper.ParseEnum<AITypes>(Strategy1), Depth, Seed, C, MctsSim));
-            settings.Strategies.Add(GetStrategy(EnumHelper.ParseEnum<AITypes>(Strategy2), Depth, Seed, C, MctsSim));
+            var mctsAgent = EnumHelper.ParseEnum<AITypes>(MctsAgent);
+            settings.Strategies.Add(GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy1), mctsAgent, Depth, Seed, C, MctsSim));
+            settings.Strategies.Add(GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy2), mctsAgent, Depth, Seed, C, MctsSim));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
@@ -132,30 +140,36 @@ namespace Quoridor.ConsoleApp
             _gameManagerFactory.CreateManager(settings, gameEnv).Start();
         }
 
-        private StrategyInfo GetStrategy(AITypes aiType, int depth, int seed, double c, int mctSim)
+        private StrategyInfo GetStrategyInfo(AITypes aiType, AITypes sim, int depth, int seed, double c, int mctSim)
         {
             switch (aiType)
             {
-                case AITypes.AStar:
-                    return new StrategyInfo { Strategy = new AStar<Movement, IGameEnvironment, IPlayer>() };
-                case AITypes.Random:
-                    return new StrategyInfo { Strategy = new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed) }; 
-                case AITypes.Human:
-                    return new StrategyInfo { Strategy = new HumanAgentConsole(_stdIn, _stdOut, _container.Resolve<ICommandParser>()) };
-                case AITypes.MinimaxAB:
-                    return new StrategyInfo { Strategy = new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
-                case AITypes.ParallelMinimaxAB:
-                    return new StrategyInfo { Strategy = new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth) };
                 case AITypes.MonteCarlo:
                     {
                         var selectionStrategy = new UCT<Movement, IPlayer, IGameEnvironment>(c);
-                        var moveStrategy = new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed);
+                        var moveStrategy = GetStrategy(sim, depth, seed);
                         return new StrategyInfo {
                             Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(mctSim, selectionStrategy, moveStrategy)};
                     }
                 default:
-                    return new StrategyInfo { Strategy = new Minimax<IPlayer, Movement, IGameEnvironment>(depth) };
+                    return new StrategyInfo { Strategy = GetStrategy(aiType, depth, seed) };
             }
+        }
+
+        private IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy(AITypes aitype, int depth, int seed)
+        {
+            return aitype switch
+            {
+                AITypes.AStar => new AStar<Movement, IGameEnvironment, IPlayer>(),
+                AITypes.Random => new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed),
+                AITypes.Greedy => new GreedyStrategy<IGameEnvironment, Movement, IPlayer>(seed),
+                AITypes.Human => new HumanAgentConsole(_stdIn, _stdOut, _container.Resolve<ICommandParser>()),
+                AITypes.Minimax => new Minimax<IPlayer, Movement, IGameEnvironment>(depth),
+                AITypes.MinimaxAB => new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth),
+                AITypes.ParallelMinimaxAB => new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth),
+                _ => new Minimax<IPlayer, Movement, IGameEnvironment>(depth)
+            };
+
         }
     }
 }
