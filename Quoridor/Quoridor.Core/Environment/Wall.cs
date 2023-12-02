@@ -1,15 +1,14 @@
 ﻿using System;
 
 using Quoridor.Core.Utils;
-using Quoridor.AI.Interfaces;
 using Quoridor.Core.Extensions;
 
 namespace Quoridor.Core.Environment
 {
     public class Wall : Movement, IWall, IEquatable<Wall>
     {
-        public Direction Placement { get; private set; }
-        public Vector2 From { get; private set; }
+        public Direction Placement { get; set; }
+        public Vector2 From { get; set; }
 
         public Wall(Direction placement, Vector2 from)
         {

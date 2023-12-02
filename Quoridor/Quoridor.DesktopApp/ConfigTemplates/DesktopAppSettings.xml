@@ -4,7 +4,6 @@
 		<Title>Quoridor</Title>
 		<ScreenWidth>500</ScreenWidth>
 		<ScreenHeight>560</ScreenHeight>
-		<OffsetX>5</OffsetX>
 		<OffsetY>50</OffsetY>
 		<WallWidth>5</WallWidth>
 	</FormSettings>
@@ -16,9 +15,13 @@
 		<OddTileColor>LightSkyBlue</OddTileColor>
 		<EvenTileColor>WhiteSmoke</EvenTileColor>
 		<PlayerStatsColor>Black</PlayerStatsColor>
+		<CurrentPlayerCellColor>Green</CurrentPlayerCellColor>
+		<PossibleCellMoveColor>Green</PossibleCellMoveColor>
+		<PossibleWallColor>Red</PossibleWallColor>
 		<PlayerColor>Black</PlayerColor>
 		<WallColor>Black</WallColor>
 		<Opacity>200</Opacity>
+		<OpacityAnimationVelocity>5</OpacityAnimationVelocity>
 	</ColorSettings>
 	<GameSettings>
 		<Dimension>9</Dimension>
@@ -28,10 +31,10 @@
 			<HumanStrategy Description="Human"/>
 			<MinimaxABStrategy Description="Minimax Alpha Beta Pruning" Depth="2"/>
 		</Strategies>
-		<Moves>
+		<!--<Moves>
 			<WallMove X="5" Y="5" Placement="North"/>
 			<PlayerMove X="4" Y="7"/>
 			<WallMove X="5" Y="5" Placement="South"/>
-		</Moves>
+		</Moves>-->
 	</GameSettings>
 </DesktopAppSettings>

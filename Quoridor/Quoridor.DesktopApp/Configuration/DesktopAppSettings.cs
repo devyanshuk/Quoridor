@@ -37,19 +37,48 @@ namespace Quoridor.DesktopApp.Configuration
         {
             get
             {
-                var totalWallWidth = FormSettings.WallWidth * (GameSettings.Dimension - 2);
-                var totalCellSize = (FormSettings.ScreenWidth - 2 * FormSettings.OffsetX - totalWallWidth);
+                var totalWallWidth = FormSettings.WallWidth * (GameSettings.Dimension - 1);
+                var totalCellSize = FormSettings.ScreenWidth - totalWallWidth;
                 var cellSize = totalCellSize / GameSettings.Dimension;
                 return cellSize;
             }
         }
 
         public int WallHeight => CellSize * 2 + FormSettings.WallWidth;
+
+        public bool WithinCellBounds(Point pos, out Vector2 cellPos)
+        {
+            cellPos = default;
+
+            if (!FormSettings.WithinBoardBounds(pos))
+                return false;
+
+            var posY = pos.Y - FormSettings.OffsetY;
+            var cellSize = CellSize;
+            var wallWidth = FormSettings.WallWidth;
+            var x = pos.X / (cellSize + wallWidth);
+            var y = posY / (cellSize + wallWidth);
+
+            var left = x * (cellSize + wallWidth);
+            var right = left + cellSize;
+            var up = y * (cellSize + wallWidth);
+            var down = up + cellSize;
+
+            if (!(pos.X >= left && pos.X <= right && posY >= up && posY <= down))
+                return false;
+
+            cellPos = new(x, y);
+            return true;
+
+        }
     }
 
     [Serializable]
     public class FormSettings
     {
+        [XmlIgnore]
+        const int MIN_OFFSET_Y = 30;
+
         [XmlAttribute(nameof(Description))]
         public string Description { get; set; }
 
@@ -62,11 +91,8 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlElement(nameof(ScreenHeight))]
         public int _screenHeight { get; set; }
 
-        [XmlElement(nameof(OffsetX))]
-        public int OffsetX { get; set; }
-
         [XmlIgnore]
-        private int _offsetY { get; set; } = 30;
+        private int _offsetY { get; set; } = MIN_OFFSET_Y;
 
         [XmlElement(nameof(OffsetY))]
         public int OffsetY
@@ -74,8 +100,8 @@ namespace Quoridor.DesktopApp.Configuration
             get { return _offsetY; }
             set
             {
-                if (value < _offsetY)
-                    throw new Exception($"{nameof(OffsetY)} must be atleast {_offsetY}");
+                if (value < MIN_OFFSET_Y)
+                    throw new Exception($"{nameof(OffsetY)} must be atleast {MIN_OFFSET_Y}");
                 _offsetY = value;
             }
         }
@@ -96,11 +122,19 @@ namespace Quoridor.DesktopApp.Configuration
 
             return screenprop;
         }
+
+        //board size (square) is the screen width
+        public bool WithinBoardBounds(Point point)
+        {
+            return point.X >= 0 && point.X <= ScreenWidth && point.Y >= OffsetY && point.Y <= OffsetY + ScreenWidth;
+        }
     }
 
     [Serializable]
     public class ColorSettings
     {
+        public const int MAX_OPACITY = 255;
+
         [XmlElement(nameof(BackgroundColor))]
         public string _backgroundColor { get; set; }
 
@@ -116,11 +150,38 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlElement(nameof(PlayerColor))]
         public string _playerColor { get; set; }
 
+        [XmlElement(nameof(CurrentPlayerCellColor))]
+        public string _currentPlayerCellColor { get; set; }
+
+        [XmlElement(nameof(PossibleCellMoveColor))]
+        public string _possibleCellMoveColor { get; set; }
+
+        [XmlElement(nameof(PossibleWallColor))]
+        public string _possibleWallColor { get; set; }
+
         [XmlElement(nameof(WallColor))]
         public string _wallColor { get; set; }
 
         [XmlElement(nameof(Opacity))]
         public int Opacity { get; set; }
+
+        [XmlIgnore]
+        public int AnimatableOpacity { get; set; } = 0;
+
+        [XmlIgnore]
+        public Direction OpacityUpdateDirection { get; set; } = Direction.North;
+
+        [XmlElement(nameof(OpacityAnimationVelocity))]
+        public int OpacityAnimationVelocity { get; set; }
+
+        [XmlIgnore]
+        public Color PossibleWallColor => Color.FromArgb(AnimatableOpacity, Color.FromName(_possibleWallColor));
+
+        [XmlIgnore]
+        public Color PossibleCellMoveColor => Color.FromArgb(AnimatableOpacity, Color.FromName(_possibleCellMoveColor));
+
+        [XmlIgnore]
+        public Color CurrentPlayerCellColor => Color.FromName(_currentPlayerCellColor);
 
         [XmlIgnore]
         public Color WallColor => Color.FromName(_wallColor);
@@ -139,6 +200,27 @@ namespace Quoridor.DesktopApp.Configuration
 
         [XmlIgnore]
         public Color EvenTileColor => Color.FromArgb(Opacity, Color.FromName(_evenTileColor));
+
+        public void UpdateOpacity()
+        {
+            if (OpacityUpdateDirection.Equals(Direction.North))
+            {
+                AnimatableOpacity += OpacityAnimationVelocity;
+                if (AnimatableOpacity >= MAX_OPACITY)
+                {
+                    OpacityUpdateDirection = Direction.South;
+                }
+            }
+            else
+            {
+                AnimatableOpacity -= OpacityAnimationVelocity;
+                if (AnimatableOpacity <= 0)
+                {
+                    OpacityUpdateDirection = Direction.North;
+                }
+            }
+        }
+
     }
 
     [Serializable]
@@ -172,6 +254,9 @@ namespace Quoridor.DesktopApp.Configuration
 
         [XmlIgnore]
         public int Turn { get; set; } = 0;
+
+        [XmlIgnore]
+        public Strategy CurrentStrategy => Strategies[Turn];
 
         [XmlArray(nameof(Moves))]
         [XmlArrayItem(nameof(WallMove), typeof(WallMove))]
@@ -239,16 +324,12 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlAttribute(nameof(Description))]
         public string Description { get; set; }
 
-        public abstract IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy();
+        public virtual IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy() => null;
     }
 
     [Serializable]
     public class HumanStrategy : Strategy
     {
-        public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     [Serializable]
