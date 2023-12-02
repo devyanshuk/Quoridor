@@ -209,6 +209,7 @@ namespace Quoridor.DesktopApp.Configuration
                 if (AnimatableOpacity >= MAX_OPACITY)
                 {
                     OpacityUpdateDirection = Direction.South;
+                    AnimatableOpacity = MAX_OPACITY;
                 }
             }
             else
@@ -217,6 +218,7 @@ namespace Quoridor.DesktopApp.Configuration
                 if (AnimatableOpacity <= 0)
                 {
                     OpacityUpdateDirection = Direction.North;
+                    AnimatableOpacity = 0;
                 }
             }
         }

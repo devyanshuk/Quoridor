@@ -21,7 +21,7 @@
 		<PlayerColor>Black</PlayerColor>
 		<WallColor>Black</WallColor>
 		<Opacity>200</Opacity>
-		<OpacityAnimationVelocity>5</OpacityAnimationVelocity>
+		<OpacityAnimationVelocity>25</OpacityAnimationVelocity>
 	</ColorSettings>
 	<GameSettings>
 		<Dimension>9</Dimension>

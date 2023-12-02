@@ -25,7 +25,7 @@ namespace Quoridor.DesktopApp
         private readonly GameSettings _gameSettings;
         private readonly FontSettings _fontSettings;
         
-        private Timer _timer;
+        private System.Timers.Timer _timer;
         private IGameEnvironment _game;
         private bool PlayerSelected;
         private Wall SelectedWall;
@@ -43,7 +43,8 @@ namespace Quoridor.DesktopApp
             _gameSettings = _configProvider.AppSettings.GameSettings;
             _fontSettings = _configProvider.AppSettings.FontSettings;
             _board = _container.Resolve<IBoard>();
-            _timer = new(new System.ComponentModel.Container()) { Interval = 60 };
+            _timer = new() { Interval = 60 };
+            _timer.Elapsed += OnTimerTick;
 
             BackColor = _colorSettings.BackgroundColor;
             Initialize();
@@ -188,19 +189,19 @@ namespace Quoridor.DesktopApp
 
             if (_configProvider.AppSettings.WithinCellBounds(e.Location, out Vector2 cellPos))
             {
-                if (_game.CurrentPlayer.CurrX == cellPos.X && _game.CurrentPlayer.CurrY == cellPos.Y)
+                if (_game.CurrentPlayer.CurrentPos.Equals(cellPos))
                 {
                     PlayerSelected = true;
                 }
-                else if (SelectedWall is null)
+                else if (!SelectedWall?.From.Equals(cellPos) ?? true)
                 {
                     SelectedWall = new (Direction.North, new(cellPos.X, cellPos.Y));
+                    StartUpdatingOpacity();
                 }
-                else if (SelectedWall.From.Equals(cellPos))
+                else
                 {
                     SetNextNonIntersectingWall();
                 }
-                StartUpdatingOpacity();
             }
             else
             {
@@ -211,20 +212,14 @@ namespace Quoridor.DesktopApp
 
         private void StopUpdatingOpacity()
         {
-            _timer.Tick -= OnTimerTick;
-            Invoke((MethodInvoker)delegate {
-                _timer.Stop();
-            });
+            _timer.Enabled = false;
         }
 
         private void StartUpdatingOpacity()
         {
             _colorSettings.OpacityUpdateDirection = Direction.North;
             _colorSettings.AnimatableOpacity = 0;
-            _timer.Tick += OnTimerTick;
-            Invoke((MethodInvoker) delegate { 
-                _timer.Start();
-            });
+            _timer.Enabled = true;
         }
 
         private void SetNextNonIntersectingWall()
