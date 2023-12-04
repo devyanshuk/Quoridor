@@ -1,4 +1,4 @@
-﻿namespace Quoridor.DesktopApp.WelcomeWindowForm
+﻿namespace Quoridor.DesktopApp.Forms.WelcomeWindowForm
 {
     partial class WelcomeForm
     {

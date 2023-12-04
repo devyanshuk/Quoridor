@@ -8,11 +8,10 @@ using System.Collections.Generic;
 using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
 using Quoridor.Core.Environment;
-using Quoridor.DesktopApp.MainGameForm;
 using Quoridor.DesktopApp.Configuration;
 using Quoridor.Core.Utils.CustomExceptions;
 
-namespace Quoridor.DesktopApp
+namespace Quoridor.DesktopApp.Forms.MainGameForm
 {
     public partial class MainForm : Form
     {
@@ -129,7 +128,14 @@ namespace Quoridor.DesktopApp
             var strat = _gameSettings.CurrentStrategy;
             var p = _game.CurrentPlayer;
             var walls = p.NumWalls;
-            lbInfoPlayer.Text = $"Player {p}'s turn. {walls} walls left. Using {strat} strategy";
+            if (!_game.HasFinished)
+            {
+                lbInfoPlayer.Text = $"Player {p}'s turn. {walls} walls left. Using {strat} strategy";
+            }
+            else
+            {
+                lbInfoPlayer.Text = $"Game Over. Player {_game.Winner} wins";
+            }
         }
 
         private Rectangle CreateWallRectangle(IWall wall)
@@ -194,6 +200,11 @@ namespace Quoridor.DesktopApp
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
+            if (_game.HasFinished)
+            {
+                return true;
+            }
+
             if (_gameSettings.CurrentStrategy is not HumanStrategy && keyData == Keys.M)
             {
                 var strategy = _gameSettings.CurrentStrategy.GetStrategy();
@@ -202,6 +213,29 @@ namespace Quoridor.DesktopApp
                 Invalidate();
                 return true;
             }
+            if (_gameSettings.CurrentStrategy is HumanStrategy)
+            {
+                AgentMove move = null;
+
+                if (keyData == Keys.W || keyData == Keys.Up)
+                    move = new(Direction.North);
+                else if (keyData == Keys.S || keyData == Keys.Down)
+                    move = new(Direction.South);
+                else if (keyData == Keys.A || keyData == Keys.Left)
+                    move = new(Direction.West);
+                else if (keyData == Keys.D || keyData == Keys.Right)
+                    move = new(Direction.East);
+
+                if (move is not null)
+                {
+                    try
+                    {
+                        _game.Move(move);
+                    }
+                    catch(Exception) { }
+                }
+            }
+
             return base.ProcessCmdKey(ref msg, keyData);
         }
 

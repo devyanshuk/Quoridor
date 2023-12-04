@@ -2,8 +2,8 @@ using System;
 using Castle.Windsor;
 using System.Windows.Forms;
 
-using Quoridor.DesktopApp.WelcomeWindowForm;
 using Quoridor.DesktopApp.StartupInfrastructure;
+using Quoridor.DesktopApp.Forms.WelcomeWindowForm;
 
 namespace Quoridor.DesktopApp
 {

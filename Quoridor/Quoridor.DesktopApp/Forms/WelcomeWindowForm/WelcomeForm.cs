@@ -1,12 +1,12 @@
 ﻿using System;
 using Castle.Windsor;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 using Quoridor.DesktopApp.Configuration;
-using Quoridor.DesktopApp.StrategySetupWindowForm;
+using Quoridor.DesktopApp.Forms.MainGameForm;
+using Quoridor.DesktopApp.Forms.StrategySetupWindowForm;
 
-namespace Quoridor.DesktopApp.WelcomeWindowForm
+namespace Quoridor.DesktopApp.Forms.WelcomeWindowForm
 {
     public partial class WelcomeForm : Form
     {
@@ -14,8 +14,8 @@ namespace Quoridor.DesktopApp.WelcomeWindowForm
         private readonly FormSettings _formSettings;
         private readonly GameSettings _gameSettings;
 
-        private StrategySetupForm _strategySetupForm;
         private MainForm _mainForm;
+        private StrategySetupForm _strategySetupForm;
 
         private bool _btnOneClickedLast;
 

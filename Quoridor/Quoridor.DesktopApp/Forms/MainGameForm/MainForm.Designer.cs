@@ -1,4 +1,4 @@
-﻿namespace Quoridor.DesktopApp
+﻿namespace Quoridor.DesktopApp.Forms.MainGameForm
 {
     partial class MainForm
     {

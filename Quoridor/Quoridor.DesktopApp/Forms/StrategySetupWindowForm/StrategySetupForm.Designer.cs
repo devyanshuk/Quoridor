@@ -1,4 +1,4 @@
-﻿namespace Quoridor.DesktopApp.StrategySetupWindowForm
+﻿namespace Quoridor.DesktopApp.Forms.StrategySetupWindowForm
 {
     partial class StrategySetupForm
     {

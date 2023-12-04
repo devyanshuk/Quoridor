@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 using Quoridor.DesktopApp.Configuration;
 
-namespace Quoridor.DesktopApp.StrategySetupWindowForm
+namespace Quoridor.DesktopApp.Forms.StrategySetupWindowForm
 {
     public partial class StrategySetupForm : Form
     {
