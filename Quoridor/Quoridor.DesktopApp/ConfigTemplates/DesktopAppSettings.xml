@@ -24,7 +24,7 @@
 		<OpacityAnimationVelocity>25</OpacityAnimationVelocity>
 	</ColorSettings>
 	<GameSettings>
-		<Dimension>9</Dimension>
+		<Dimension>5</Dimension>
 		<Players>2</Players>
 		<Walls>8</Walls>
 		<SelectedStrategies>

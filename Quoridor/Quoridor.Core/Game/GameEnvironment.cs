@@ -394,7 +394,10 @@ namespace Quoridor.Core.Game
             ValidateNotNull(move, nameof(move));
 
             if (move is AgentMove agentMove)
+            {
+                agentMove.CurrentPos = CurrentPlayer.CurrentPos;
                 MovePlayer(CurrentPlayer, agentMove.Dir);
+            }
 
             else if (move is Wall wallMove)
                 AddWall(CurrentPlayer, wallMove.From, wallMove.Placement);
@@ -424,7 +427,7 @@ namespace Quoridor.Core.Game
                 Turn = PreviousTurn();
 
             if (move is AgentMove agentMove)
-                MovePlayer(CurrentPlayer, agentMove.Dir.Opposite());
+                CurrentPlayer.CurrentPos = agentMove.CurrentPos;
 
             else if (move is Wall wallMove)
                 RemoveWall(CurrentPlayer, wallMove.From, wallMove.Placement);

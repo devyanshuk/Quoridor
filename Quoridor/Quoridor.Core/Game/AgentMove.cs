@@ -1,13 +1,12 @@
 ﻿using System;
 using Quoridor.Core.Utils;
 
-using Quoridor.AI.Interfaces;
-
 namespace Quoridor.Core.Game
 {
     public sealed class AgentMove : Movement, IEquatable<AgentMove>
     {
         public Direction Dir { get; private set; }
+        public Vector2 CurrentPos { get; internal set; }
 
         public AgentMove(Direction dir) {
             Dir = dir;
@@ -16,7 +15,7 @@ namespace Quoridor.Core.Game
         public bool Equals(AgentMove other)
         {
             if (other is null) return false;
-            return Dir.Equals(other.Dir);
+            return Dir.Equals(other.Dir) && CurrentPos.Equals(other.CurrentPos);
         }
 
         public override string ToString()
