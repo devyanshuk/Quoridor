@@ -3,12 +3,14 @@ using System.Linq;
 using System.Drawing;
 using Castle.Windsor;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 using Quoridor.Core.Game;
 using Quoridor.Core.Utils;
 using Quoridor.Core.Environment;
 using Quoridor.DesktopApp.MainGameForm;
 using Quoridor.DesktopApp.Configuration;
+using Quoridor.Core.Utils.CustomExceptions;
 
 namespace Quoridor.DesktopApp
 {
@@ -27,7 +29,8 @@ namespace Quoridor.DesktopApp
         private System.Timers.Timer _timer;
         private IGameEnvironment _game;
         private bool PlayerSelected;
-        private Wall SelectedWall;
+        private List<Wall> SelectedWalls = new List<Wall>();
+        private int SelectedWallTurn = -1;
 
         public MainForm(IWindsorContainer container)
         {
@@ -114,16 +117,19 @@ namespace Quoridor.DesktopApp
                 var rectangle = CreateWallRectangle(wall);
                 DrawFilledSquare(graphics, _colorSettings.WallColor, rectangle);
             }
-            if (SelectedWall is not null)
+            if (SelectedWalls.Count > 0)
             {
-                var rectangle = CreateWallRectangle(SelectedWall);
+                var rectangle = CreateWallRectangle(SelectedWalls[SelectedWallTurn]);
                 DrawFilledSquare(graphics, _colorSettings.PossibleWallColor, rectangle);
             }
         }
 
         private void DrawCurrentPlayerStats()
         {
-            lbInfoPlayer.Text = $"Player {_game.CurrentPlayer}'s turn. {_game.CurrentPlayer.NumWalls} walls left. Using {_gameSettings.CurrentStrategy} strategy";
+            var strat = _gameSettings.CurrentStrategy;
+            var p = _game.CurrentPlayer;
+            var walls = p.NumWalls;
+            lbInfoPlayer.Text = $"Player {p}'s turn. {walls} walls left. Using {strat} strategy";
         }
 
         private Rectangle CreateWallRectangle(IWall wall)
@@ -180,8 +186,10 @@ namespace Quoridor.DesktopApp
 
         private void OnGameMove(object sender, EventArgs e)
         {
-            Invalidate();
             _gameSettings.NextTurn();
+            StopUpdatingOpacity();
+
+            Invalidate();
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -205,25 +213,37 @@ namespace Quoridor.DesktopApp
                 return;
             }
 
+            var leftClick = e.Button == MouseButtons.Left;
+            var rightClick = e.Button == MouseButtons.Right;
+
             if (_configProvider.AppSettings.WithinCellBounds(e.Location, out Vector2 cellPos))
             {
-                if (_game.CurrentPlayer.CurrentPos.Equals(cellPos))
+                if (leftClick)
                 {
-                    PlayerSelected = true;
+                    if (_game.CurrentPlayer.CurrentPos.Equals(cellPos))
+                    {
+                        PlayerSelected = true;
+                    }
+                    else if (SelectedWalls.Count == 0 || !SelectedWalls[SelectedWallTurn].From.Equals(cellPos))
+                    {
+                        SetAvailableWallsInOrder(cellPos);
+                        if (SelectedWalls.Count >= 0) StartUpdatingOpacity();
+                    }
+                    else
+                    {
+                        SelectedWallTurn = (SelectedWallTurn + 1) % SelectedWalls.Count;
+                    }
                 }
-                else if (!SelectedWall?.From.Equals(cellPos) ?? true)
+                else if (rightClick)
                 {
-                    SelectedWall = new(Direction.North, new(cellPos.X, cellPos.Y));
-                    StartUpdatingOpacity();
-                }
-                else
-                {
-                    SetNextNonIntersectingWall();
+                    if (SelectedWalls.Count > 0)
+                    {
+                        _game.Move(SelectedWalls[SelectedWallTurn]);
+                    }
                 }
             }
             else
             {
-                SelectedWall = null;
                 StopUpdatingOpacity();
             }
         }
@@ -231,6 +251,8 @@ namespace Quoridor.DesktopApp
         private void StopUpdatingOpacity()
         {
             _timer.Enabled = false;
+            SelectedWalls.Clear();
+            SelectedWallTurn = -1;
         }
 
         private void StartUpdatingOpacity()
@@ -240,19 +262,25 @@ namespace Quoridor.DesktopApp
             _timer.Enabled = true;
         }
 
-        private void SetNextNonIntersectingWall()
+        private void SetAvailableWallsInOrder(Vector2 currFrom)
         {
-            var currentDir = (int)SelectedWall.Placement;
-            var nextDir = (currentDir + 1) % 4;
+            SelectedWalls.Clear();
+            SelectedWallTurn = -1;
 
-            while (nextDir != currentDir)
+            for (int i = 0; i < 4; i++)
             {
-                SelectedWall.Placement = (Direction)nextDir;
-                if (_game.Walls.All(w => !w.Intersects(SelectedWall)))
-                    return;
-                nextDir = (nextDir + 1) % 4;
+                var currDir = (Direction)i;
+                try
+                {
+                    _game.AddWall(_game.CurrentPlayer, currFrom, currDir);
+                    _game.RemoveWall(_game.CurrentPlayer, currFrom, currDir);
+                    SelectedWalls.Add(new(currDir, currFrom));
+                    SelectedWallTurn = 0;
+                }
+                catch(WallException)
+                {
+                }
             }
-            SelectedWall = null;
         }
 
         private void btnMainMenu_Click(object sender, EventArgs e)

@@ -1,6 +1,7 @@
 ﻿using System;
 using Castle.Windsor;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 using Quoridor.DesktopApp.Configuration;
 using Quoridor.DesktopApp.StrategySetupWindowForm;
@@ -144,9 +145,17 @@ namespace Quoridor.DesktopApp.WelcomeWindowForm
             this.Hide();
         }
 
+        private void AddNHumanStrategies(int n)
+        {
+            _gameSettings.SelectedStrategies?.Clear();
+            for(int i = 0; i < n; i++)
+                _gameSettings.SelectedStrategies.Add(new HumanStrategy { Description = "Human" });
+        }
+
         private void btnThreePlayers_Click(object sender, EventArgs e)
         {
             _gameSettings.Players = 3;
+            AddNHumanStrategies(3);
             ShowGameBoard();
         }
 
@@ -159,6 +168,7 @@ namespace Quoridor.DesktopApp.WelcomeWindowForm
         private void btnFourPlayers_Click(object sender, EventArgs e)
         {
             _gameSettings.Players = 4;
+            AddNHumanStrategies(4);
             ShowGameBoard();
         }
     }

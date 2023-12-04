@@ -7,7 +7,7 @@ namespace Quoridor.Common.Logging
     {
         private readonly ILog _log;
         private readonly string _name;
-        public static bool Disable { get; set; }
+        public static bool Disable { get; set; } = true;
 
         public Logger(string loggerName)
         {

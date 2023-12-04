@@ -3,8 +3,8 @@
 	<FormSettings Description ="values (in pixels) used in the game form">
 		<Title>Quoridor</Title>
 		<ScreenWidth>600</ScreenWidth>
-		<ScreenHeight>660</ScreenHeight>
-		<OffsetY>50</OffsetY>
+		<ScreenHeight>700</ScreenHeight>
+		<OffsetY>70</OffsetY>
 		<WallWidth>5</WallWidth>
 	</FormSettings>
 	<FontSettings>
@@ -43,10 +43,10 @@
 				<GreedyStrategy Description="Greedy" Seed="42" />
 			</MctsStrategy>
 		</Strategies>
-		<Moves>
+		<!--<Moves>
 			<WallMove X="5" Y="5" Placement="North"/>
 			<PlayerMove X="4" Y="7"/>
 			<WallMove X="5" Y="5" Placement="South"/>
-		</Moves>
+		</Moves>-->
 	</GameSettings>
 </DesktopAppSettings>
