@@ -20,6 +20,7 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlElement(nameof(FontSettings))]
         public FontSettings FontSettings { get; set; }
 
+        [XmlIgnore]
         public int CellSize
         {
             get
@@ -31,6 +32,7 @@ namespace Quoridor.DesktopApp.Configuration
             }
         }
 
+        [XmlIgnore]
         public int WallHeight => CellSize * 2 + FormSettings.WallWidth;
 
         public bool WithinCellBounds(Point pos, out Vector2 cellPos)
