@@ -16,7 +16,6 @@ namespace Quoridor.DesktopApp
     {
         public EventHandler OnMainMenuPressed;
 
-
         private readonly IConfigProvider _configProvider;
         private readonly IGameFactory _gameFactory;
         private readonly IBoard _board;
@@ -29,8 +28,6 @@ namespace Quoridor.DesktopApp
         private IGameEnvironment _game;
         private bool PlayerSelected;
         private Wall SelectedWall;
-
-        private WindowType _windowType = WindowType.MainMenu;
 
         public MainForm(IWindsorContainer container)
         {
@@ -55,8 +52,16 @@ namespace Quoridor.DesktopApp
         public void Initialize()
         {
             _board.SetDimension(_gameSettings.Dimension);
-            if (_game != null) _gameFactory.Release(_game);
-            _game = _gameFactory.CreateGameEnvironment(_gameSettings.Players, _gameSettings.Walls);
+
+            if (_game == null)
+            {
+                _game = _gameFactory.CreateGameEnvironment(_gameSettings.Players, _gameSettings.Walls);
+                _game.OnMoveDone += OnGameMove;
+            }
+            else
+            {
+                _game.InitAndAddPlayers(_gameSettings.Players, _gameSettings.Walls);
+            }
             PerformSavedMoves();
         }
 
@@ -92,8 +97,10 @@ namespace Quoridor.DesktopApp
                     if (_game.CurrentPlayer.CurrX == i && _game.CurrentPlayer.CurrY == j)
                     {
                         DrawFilledSquare(graphics, _colorSettings.CurrentPlayerCellColor, rectangle);
-                        rectangle.Width -= 5;
-                        rectangle.Height -= 5;
+                        rectangle.Width -= 10;
+                        rectangle.Height -= 10;
+                        rectangle.X += 5;
+                        rectangle.Y += 5;
                     }
                     DrawFilledSquare(graphics, color, rectangle);
                 }
@@ -116,7 +123,7 @@ namespace Quoridor.DesktopApp
 
         private void DrawCurrentPlayerStats()
         {
-            lbInfoPlayer.Text = $"Player {_game.CurrentPlayer}'s turn. {_game.CurrentPlayer.NumWalls} walls left.";
+            lbInfoPlayer.Text = $"Player {_game.CurrentPlayer}'s turn. {_game.CurrentPlayer.NumWalls} walls left. Using {_gameSettings.CurrentStrategy} strategy";
         }
 
         private Rectangle CreateWallRectangle(IWall wall)
@@ -171,9 +178,23 @@ namespace Quoridor.DesktopApp
             Invalidate();
         }
 
-        protected override void OnKeyUp(KeyEventArgs e)
+        private void OnGameMove(object sender, EventArgs e)
         {
-            base.OnKeyUp(e);
+            Invalidate();
+            _gameSettings.NextTurn();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (_gameSettings.CurrentStrategy is not HumanStrategy && keyData == Keys.M)
+            {
+                var strategy = _gameSettings.CurrentStrategy.GetStrategy();
+                var bestMove = strategy.BestMove(_game, _game.CurrentPlayer).BestMove;
+                _game.Move(bestMove);
+                Invalidate();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)

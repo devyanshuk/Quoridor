@@ -100,7 +100,7 @@ namespace Quoridor.DesktopApp.WelcomeWindowForm
             ShowGameBoard();
         }
 
-        private void OnSuccessfulStrategySelection(object sender, EventArgs args)
+        private void OnSuccessfulStrategySelection(object sender, Strategy strategy)
         {
             this.Location = _strategySetupForm.Location;
 
@@ -109,17 +109,17 @@ namespace Quoridor.DesktopApp.WelcomeWindowForm
             _strategySetupForm.Hide();
 
             // Update strategy info
-            UpdateStrategyButtonController((StrategyEventArgs)args);
+            UpdateStrategyButtonController(strategy);
         }
 
-        private void UpdateStrategyButtonController(StrategyEventArgs args)
+        private void UpdateStrategyButtonController(Strategy strategy)
         {
             var button = _btnOneClickedLast ? btnPlayerOne : btnPlayerTwo;
             var index = _btnOneClickedLast ? 0 : 1;
 
-            button.Text = $"{args.Strategy}\n{args.Strategy.GetParams()}";
+            button.Text = $"{strategy}\n{strategy.GetParams()}";
 
-            _gameSettings.SelectedStrategies[index] = args.Strategy;
+            _gameSettings.SelectedStrategies[index] = strategy;
         }
 
         private void btnPlayerOne_Click(object sender, EventArgs e)

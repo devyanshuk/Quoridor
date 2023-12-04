@@ -14,7 +14,7 @@ namespace Quoridor.DesktopApp.StrategySetupWindowForm
         private readonly FormSettings _formSettings;
         private readonly GameSettings _gameSettings;
 
-        public EventHandler OnOkButtonPress;
+        public EventHandler<Strategy> OnOkButtonPress;
         public StrategySetupForm(IWindsorContainer container)
         {
             var configProvider = container.Resolve<IConfigProvider>();
@@ -116,30 +116,23 @@ namespace Quoridor.DesktopApp.StrategySetupWindowForm
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            var selectedStategy = new StrategyEventArgs();
-            selectedStategy.Strategy = (Strategy)cbStrategy.Items[cbStrategy.SelectedIndex];
+            var selectedStategy = (Strategy)cbStrategy.Items[cbStrategy.SelectedIndex];
 
-            if (selectedStategy.Strategy is MCTSAgent agent)
+            if (selectedStategy is MCTSAgent agent)
             {
                 agent.Seed = (int)numSeed.Value;
             }
-            else if (selectedStategy.Strategy is MinimaxStrategy minimaxAgent)
+            else if (selectedStategy is MinimaxStrategy minimaxAgent)
             {
                 minimaxAgent.Depth = int.Parse(cbMinimaxDepth.Text);
             }
-            else if (selectedStategy.Strategy is MctsStrategy mctsStrategy)
+            else if (selectedStategy is MctsStrategy mctsStrategy)
             {
                 mctsStrategy.C = double.Parse(cbC.Text);
                 mctsStrategy.Simulations = int.Parse(cbSimulations.Text);
                 mctsStrategy.SimulationStrategy = (MCTSAgent)cbAgent.Items[cbAgent.SelectedIndex];
             }
-
             OnOkButtonPress?.Invoke(this, selectedStategy);
         }
-    }
-
-    public class StrategyEventArgs : EventArgs
-    {
-        public Strategy Strategy { get; set; }
     }
 }

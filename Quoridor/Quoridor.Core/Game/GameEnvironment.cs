@@ -15,6 +15,8 @@ namespace Quoridor.Core.Game
 {
     public class GameEnvironment : IGameEnvironment
     {
+        public EventHandler OnMoveDone { get; set; }
+
         private readonly int _numPlayers;
         private readonly int _numWalls;
         private readonly IBoard _board;
@@ -25,7 +27,6 @@ namespace Quoridor.Core.Game
         public int Turn { get; private set; }
         public List<IPlayer> Players { get; private set; }
         public ConcurrentHashSet<IWall> Walls { get; private set; }
-
 
         public GameEnvironment(
             int numPlayers,
@@ -50,8 +51,11 @@ namespace Quoridor.Core.Game
             Players.ForEach(p => p.Initialize());
         }
 
-        private void InitAndAddPlayers(int numPlayers, int numWalls)
+        public void InitAndAddPlayers(int numPlayers, int numWalls)
         {
+            Players.Clear();
+            Initialize();
+
             var startXs = new int[4] { _board.Dimension / 2, _board.Dimension / 2, 0, _board.Dimension - 1 };
             var startYs = new int[4] { 0, _board.Dimension - 1, _board.Dimension / 2, _board.Dimension / 2 };
             var goalConditions = new IsGoal<Vector2>[] {
@@ -403,6 +407,7 @@ namespace Quoridor.Core.Game
             else throw new Exception($"move type {move.GetType().Name} not supported");
 
             ChangeTurn();
+            OnMoveDone?.Invoke(this, null);
         }
 
         private int PreviousTurn()

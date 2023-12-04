@@ -51,7 +51,7 @@ namespace Quoridor.DesktopApp.Configuration
 
         public void NextTurn()
         {
-            Turn = (Turn + 1) % Strategies.Count;
+            Turn = (Turn + 1) % SelectedStrategies.Count;
         }
     }
 }

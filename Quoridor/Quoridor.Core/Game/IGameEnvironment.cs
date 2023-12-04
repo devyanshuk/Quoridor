@@ -7,6 +7,7 @@ using Quoridor.AI.Interfaces;
 using Quoridor.Core.Entities;
 using Quoridor.Core.Environment;
 using Quoridor.AI.MinimaxAlgorithm;
+using System;
 
 namespace Quoridor.Core.Game
 {
@@ -18,6 +19,8 @@ namespace Quoridor.Core.Game
         INeighbors<Movement>,
         IDeepCopy<IGameEnvironment>
     {
+        EventHandler OnMoveDone { get; set; }
+
         List<IPlayer> Players { get; }
         ConcurrentHashSet<IWall> Walls { get; }
         int Turn { get; }
@@ -26,6 +29,7 @@ namespace Quoridor.Core.Game
 
         void AddPlayer(IPlayer player);
         void MovePlayer(IPlayer player, Direction dir);
+        void InitAndAddPlayers(int numPlayers, int numWalls);
         void ChangeTurn();
 
         void AddWall(IPlayer player, Vector2 from, Direction placement);
