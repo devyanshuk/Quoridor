@@ -2,6 +2,7 @@ using System;
 using Castle.Windsor;
 using System.Windows.Forms;
 
+using Quoridor.DesktopApp.WelcomeWindowForm;
 using Quoridor.DesktopApp.StartupInfrastructure;
 
 namespace Quoridor.DesktopApp
@@ -18,7 +19,7 @@ namespace Quoridor.DesktopApp
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             var container = new WindsorContainer().Install(new QuoridorDesktopAppDependencyInstaller());
-            Application.Run(new MainForm(container));
+            Application.Run(new WelcomeForm(container));
         }
     }
 }

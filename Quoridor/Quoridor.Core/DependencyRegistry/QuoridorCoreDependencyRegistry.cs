@@ -14,10 +14,10 @@ namespace Quoridor.Core.DependencyRegistry
             [
                 //LifestyleSingleton
                 Component.For<IBoard>().ImplementedBy<Board>().LifestyleSingleton(),
-                Component.For<IGameEnvironment>().ImplementedBy<GameEnvironment>().LifestyleSingleton(),
 
                 //LifestyleTransient
                 Component.For<IWall>().ImplementedBy<Wall>().LifestyleTransient(),
+                Component.For<IGameEnvironment>().ImplementedBy<GameEnvironment>().LifestyleTransient(),
 
                 //Factory
                 Component.For<IGameFactory>().AsFactory().LifestyleTransient(),

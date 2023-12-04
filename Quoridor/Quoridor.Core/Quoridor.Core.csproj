@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin 2\**" />
+    <EmbeddedResource Remove="bin 2\**" />
+    <None Remove="bin 2\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Castle.Core" />
     <None Remove="Castle.Windsor" />
     <None Remove="DependencyRegistry\" />

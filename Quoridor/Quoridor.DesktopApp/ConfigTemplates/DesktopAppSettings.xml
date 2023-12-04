@@ -2,8 +2,8 @@
 <DesktopAppSettings>
 	<FormSettings Description ="values (in pixels) used in the game form">
 		<Title>Quoridor</Title>
-		<ScreenWidth>500</ScreenWidth>
-		<ScreenHeight>560</ScreenHeight>
+		<ScreenWidth>600</ScreenWidth>
+		<ScreenHeight>660</ScreenHeight>
 		<OffsetY>50</OffsetY>
 		<WallWidth>5</WallWidth>
 	</FormSettings>
@@ -27,14 +27,26 @@
 		<Dimension>9</Dimension>
 		<Players>2</Players>
 		<Walls>8</Walls>
+		<SelectedStrategies>
+			<HumanStrategy Description="Human"/>
+			<MinimaxABStrategy Description="Minimax AB" Depth="2"/>
+		</SelectedStrategies>
 		<Strategies>
 			<HumanStrategy Description="Human"/>
-			<MinimaxABStrategy Description="Minimax Alpha Beta Pruning" Depth="2"/>
+			<AStarStrategy Description="A*"/>
+			<RandomStrategy Description="Random" Seed="42"/>
+			<GreedyStrategy Description="Greedy" Seed="42" />
+			<MinimaxABStrategy Description="Minimax AB" Depth="2"/>
+			<MinimaxStrategy Description="Minimax" Depth="2" />
+			<ParallelMinimaxABStrategy Description="Parallel Minimax" Depth="2" />
+			<MctsStrategy Description="MCTS" C="1.41" Simulations="1000">
+				<GreedyStrategy Description="Greedy" Seed="42" />
+			</MctsStrategy>
 		</Strategies>
-		<!--<Moves>
+		<Moves>
 			<WallMove X="5" Y="5" Placement="North"/>
 			<PlayerMove X="4" Y="7"/>
 			<WallMove X="5" Y="5" Placement="South"/>
-		</Moves>-->
+		</Moves>
 	</GameSettings>
 </DesktopAppSettings>
