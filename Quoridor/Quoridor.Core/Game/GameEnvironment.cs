@@ -6,7 +6,6 @@ using Quoridor.Core.Utils;
 using ConcurrentCollections;
 using Quoridor.Core.Entities;
 using Quoridor.Common.Logging;
-using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.AI.AStarAlgorithm;
 using Quoridor.Core.Utils.CustomExceptions;

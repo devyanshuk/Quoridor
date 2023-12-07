@@ -137,7 +137,8 @@ namespace Quoridor.ConsoleApp
                 .Resolve<IGameFactory>()
                 .CreateGameEnvironment(2, NumWalls);
 
-            _gameManagerFactory.CreateManager(settings, gameEnv).Start();
+            var manager = _gameManagerFactory.CreateConsoleGameManager(settings, gameEnv);
+            manager.Start();
         }
 
         private StrategyInfo GetStrategyInfo(AITypes aiType, AITypes sim, int depth, int seed, double c, int mctSim)
