@@ -10,6 +10,7 @@ using Quoridor.Core.Extensions;
 using Quoridor.Core.Environment;
 using Quoridor.Core.Utils.CustomExceptions;
 using static Quoridor.Core.Utils.Direction;
+using System.Threading;
 
 namespace Quoridor.Tests.Game
 {
@@ -540,6 +541,59 @@ namespace Quoridor.Tests.Game
             gameEnv.GetValidMoves().Count().Should().Be(5);
             gameEnv.GetWalkableNeighbors().Count().Should().Be(2);
             gameEnv.GetAllUnplacedWalls().Count().Should().Be(3);
+        }
+
+        [Test]
+        //         |  0  |  1  |  2  |  3  |  4  |
+        //    =====+=====+=====+=====+=====+=====+
+        //      0  |     |     |  A  |     |     |
+        //         |     |     |     |     |     |
+        //    =====+=====+■■■■■■■■■■■+=====+=====+
+        //      1  |     |     |     |     |     |
+        //         |     |     |     |     |     |
+        //    =====+=====+=====+=====+=====+=====+
+        //      2  |     |     |     |     |     |
+        //         |     |     |     |     |     |
+        //    =====+=====+=====+=====+=====+=====+
+        //      3  |     |     |     |     |     |
+        //         |     |     |     |     |     |
+        //    =====+=====+=====+■■■■■■■■■■■+=====+
+        //      4  |     |     |  B  |     |     |
+        //         |     |     |     |     |     |
+        //    =====+=====+=====+=====+=====+=====+
+        //
+        // This game state, when cloned was producing incorrect results for
+        // possible movable locations for player A, returning south.
+        // This test specifically focuses on recreating this scenario and asserting
+        // if southern direction is blocked for 'A'
+        public void Should_Clone_All_GameEnvironment_Elements_Correctly()
+        {
+            //Arrange
+            var board = new Board();
+            board.SetDimension(5);
+            var gameEnv = new GameEnvironment(2, 5, board);
+            
+            //Act
+            gameEnv.Move(new Wall(North, new(2, 4)));
+            gameEnv.Move(new Wall(North, new(1, 1)));
+            var walkableNeighbors = gameEnv.GetWalkableNeighbors();
+            var copyNeighbors = ((GameEnvironment)gameEnv.DeepCopy()).GetWalkableNeighbors();
+
+            //Assert
+            walkableNeighbors.Count().Should().Be(2);
+            copyNeighbors.Count().Should().Be(2);
+
+            foreach(var move in walkableNeighbors)
+            {
+                var agentMove = move as AgentMove;
+                agentMove.Dir.Should().NotBe(South);
+            }
+
+            foreach(var move in copyNeighbors)
+            {
+                var agentMove = move as AgentMove;
+                agentMove.Dir.Should().NotBe(South);
+            }
         }
 
         private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()

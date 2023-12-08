@@ -15,15 +15,12 @@ namespace Quoridor.Core.Game
     public class GameEnvironment : IGameEnvironment
     {
         public EventHandler OnMoveDone { get; set; }
-
-        private readonly int _numPlayers;
-        private readonly int _numWalls;
-        private readonly IBoard _board;
-        private readonly AStar<Vector2, IBoard, IPlayer> _aStar;
+        private readonly AStar<Vector2, IBoard, IPlayer> _aStar = new();
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public int Turn { get; private set; }
+        public IBoard Board {get; private set;}
         public List<IPlayer> Players { get; private set; }
         public ConcurrentHashSet<IWall> Walls { get; private set; }
 
@@ -32,20 +29,21 @@ namespace Quoridor.Core.Game
             int numWalls,
             IBoard board)
         {
-            _numPlayers = numPlayers;
-            _numWalls = numWalls;
-            _board = board;
-            _aStar = new AStar<Vector2, IBoard, IPlayer>();
+            Board = board;
             Players = new List<IPlayer>();
             Walls = new ConcurrentHashSet<IWall>();
             InitAndAddPlayers(numPlayers, numWalls);
+        }
+
+        public GameEnvironment() {
+
         }
 
         public void Initialize()
         {
             lock(_lock)
                 Turn = 0;
-            _board.Initialize();
+            Board.Initialize();
             Walls.Clear();
             Players.ForEach(p => p.Initialize());
         }
@@ -55,19 +53,19 @@ namespace Quoridor.Core.Game
             Players.Clear();
             Initialize();
 
-            var startXs = new int[4] { _board.Dimension / 2, _board.Dimension / 2, 0, _board.Dimension - 1 };
-            var startYs = new int[4] { 0, _board.Dimension - 1, _board.Dimension / 2, _board.Dimension / 2 };
+            var startXs = new int[4] { Board.Dimension / 2, Board.Dimension / 2, 0, Board.Dimension - 1 };
+            var startYs = new int[4] { 0, Board.Dimension - 1, Board.Dimension / 2, Board.Dimension / 2 };
             var goalConditions = new IsGoal<Vector2>[] {
-                (pos) => pos.Y == _board.Dimension - 1,
+                (pos) => pos.Y == Board.Dimension - 1,
                 (pos) => pos.Y == 0,
-                (pos) => pos.X == _board.Dimension - 1,
+                (pos) => pos.X == Board.Dimension - 1,
                 (pos) => pos.X == 0
             };
             var heuristics = new H_n<Vector2>[]
             {
-                (pos) => Math.Abs(_board.Dimension - 1 - pos.Y),
+                (pos) => Math.Abs(Board.Dimension - 1 - pos.Y),
                 (pos) => pos.Y,
-                (pos) => Math.Abs(_board.Dimension - 1 - pos.X),
+                (pos) => Math.Abs(Board.Dimension - 1 - pos.X),
                 (pos) => pos.X
             };
 
@@ -170,7 +168,7 @@ namespace Quoridor.Core.Game
             //check if all players can move to their goal, and if not, unblock the path and throw
             if (ShouldCheckForBlockage())
             {
-                var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(_board, player) is null);
+                var blockedPlayer = Players.FirstOrDefault(player => _aStar.BestMove(Board, player) is null);
                 if (blockedPlayer != default(IPlayer))
                 {
                     UnblockAccess(affectedCells);
@@ -189,16 +187,16 @@ namespace Quoridor.Core.Game
         {
             //case 1: there are 3 walls and player is at edge or 1 step away from edge
             //because player may have no possible path to goal
-            return Walls.Count >= 2 && Players.Any(IsInCorners) || Walls.Count >= ((_board.Dimension / 2) - 1);
+            return Walls.Count >= 2 && Players.Any(IsInCorners) || Walls.Count >= ((Board.Dimension / 2) - 1);
         }
 
         private bool IsInCorners(IPlayer player)
         {
             return
                 player.CurrentPos.X <= 1 ||
-                player.CurrentPos.X >= _board.Dimension - 3 ||
+                player.CurrentPos.X >= Board.Dimension - 3 ||
                 player.CurrentPos.Y <= 1 ||
-                player.CurrentPos.Y >= _board.Dimension - 3;
+                player.CurrentPos.Y >= Board.Dimension - 3;
         }
 
         private void BlockAccess(IEnumerable<AffectedCell> affectedCells)
@@ -244,23 +242,23 @@ namespace Quoridor.Core.Game
         //each wall blocks one direction from exactly 4 cell
         public IEnumerable<AffectedCell> GetCellsAffectedByWall(IWall wall)
         {
-            yield return new AffectedCell(_board.GetCell(wall.From), wall.Placement);
+            yield return new AffectedCell(Board.GetCell(wall.From), wall.Placement);
 
             var newPos = wall.From.Copy();
             if (wall.IsHorizontal()) newPos.X++;
             else newPos.Y++;
 
-            yield return new AffectedCell(_board.GetCell(newPos), wall.Placement);
+            yield return new AffectedCell(Board.GetCell(newPos), wall.Placement);
 
             var oppositeWall = wall.Opposite();
 
-            yield return new AffectedCell(_board.GetCell(oppositeWall.From), oppositeWall.Placement);
-            yield return new AffectedCell(_board.GetCellAt(newPos, wall.Placement), oppositeWall.Placement);
+            yield return new AffectedCell(Board.GetCell(oppositeWall.From), oppositeWall.Placement);
+            yield return new AffectedCell(Board.GetCellAt(newPos, wall.Placement), oppositeWall.Placement);
         }
 
         public IWall CreateAndValidateWall(Vector2 from, Direction dir)
         {
-            if (!_board.WithinBounds(from))
+            if (!Board.WithinBounds(from))
             {
                 var errorMessage = $"{dir}ern wall from '{from}' could not be removed. Invalid dimension";
                 _log.Error(errorMessage);
@@ -271,10 +269,10 @@ namespace Quoridor.Core.Game
 
             if ((wall.From.X == 0 && wall.Placement.Equals(Direction.West))
                 || (wall.From.Y == 0 && wall.Placement.Equals(Direction.North))
-                || (wall.From.X == _board.Dimension - 1 && wall.Placement.Equals(Direction.East))
-                || (wall.From.Y == _board.Dimension - 1 && wall.Placement.Equals(Direction.South))
-                || (wall.From.X >= _board.Dimension - 1 && wall.IsHorizontal())
-                || (wall.From.Y >= _board.Dimension - 1 && wall.IsVertical()))
+                || (wall.From.X == Board.Dimension - 1 && wall.Placement.Equals(Direction.East))
+                || (wall.From.Y == Board.Dimension - 1 && wall.Placement.Equals(Direction.South))
+                || (wall.From.X >= Board.Dimension - 1 && wall.IsHorizontal())
+                || (wall.From.Y >= Board.Dimension - 1 && wall.IsVertical()))
             {
                 var errorMessage = $"{dir}ern wall from '{from} not possible.'";
                 _log.Error(errorMessage);
@@ -285,7 +283,7 @@ namespace Quoridor.Core.Game
 
         private void CheckIfPlayerCanGoToNewPos(Vector2 currentPos, Vector2 newPos)
         {
-            if (!_board.WithinBounds(newPos))
+            if (!Board.WithinBounds(newPos))
             {
                 var errorMessage = $"player '{CurrentPlayer.Id}' cannot move to '{newPos}'. Invalid move position";
                 _log.Error(errorMessage);
@@ -293,7 +291,7 @@ namespace Quoridor.Core.Game
             }
 
             //if newPos can't be reached from currentPos, then there's a wall blocking access between those cells
-            if (!_board.GetCell(currentPos).IsAccessible(currentPos.GetDirFor(newPos)))
+            if (!Board.GetCell(currentPos).IsAccessible(currentPos.GetDirFor(newPos)))
             {
                 var errorMessage = $"player '{CurrentPlayer.Id}' cannot move to '{newPos}' since it's blocked by a wall";
                 _log.Error(errorMessage);
@@ -378,10 +376,10 @@ namespace Quoridor.Core.Game
             var temp = CurrentPlayer.CurrentPos;
 
             CurrentPlayer.CurrentPos = leftSideWaypos;
-            var distFromLeft = _aStar.BestMove(_board, CurrentPlayer).Value;
+            var distFromLeft = _aStar.BestMove(Board, CurrentPlayer).Value;
 
             CurrentPlayer.CurrentPos = rightSideWaypos;
-            var distFromRight = _aStar.BestMove(_board, CurrentPlayer).Value;
+            var distFromRight = _aStar.BestMove(Board, CurrentPlayer).Value;
 
             CurrentPlayer.CurrentPos = temp;
             return distFromLeft < distFromRight ? leftSideWaypos : rightSideWaypos;
@@ -446,7 +444,7 @@ namespace Quoridor.Core.Game
                 yield break;
 
             //we do this to ensure any possible jumps won't be blocked by a wall
-            foreach(var validDir in _board.NeighborDirs(CurrentPlayer.CurrentPos))
+            foreach(var validDir in Board.NeighborDirs(CurrentPlayer.CurrentPos))
             {
                 try
                 {
@@ -471,9 +469,9 @@ namespace Quoridor.Core.Game
 
             return
             //horizontal walls
-            GetValidWallsInDir(0, _board.Dimension - 2, 1, _board.Dimension - 1, Direction.North)
+            GetValidWallsInDir(0, Board.Dimension - 2, 1, Board.Dimension - 1, Direction.North)
             //vertical walls
-            .Concat(GetValidWallsInDir(1, _board.Dimension - 1, 0, _board.Dimension - 2, Direction.West));
+            .Concat(GetValidWallsInDir(1, Board.Dimension - 1, 0, Board.Dimension - 2, Direction.West));
         }
 
         private IEnumerable<Movement> GetValidWallsInDir(int x0, int x1, int y0, int y1, Direction dir)
@@ -505,11 +503,11 @@ namespace Quoridor.Core.Game
 
         public double Evaluate(bool currentMaximizer)
         {
-            var result = _aStar.BestMove(_board, CurrentPlayer);
+            var result = _aStar.BestMove(Board, CurrentPlayer);
             var goalDistance = result.Value;
             var wallsLeft = CurrentPlayer.NumWalls;
 
-            var result2 = _aStar.BestMove(_board, Opponent);
+            var result2 = _aStar.BestMove(Board, Opponent);
             var goalDistance2 = result2.Value;
             var wallsLeft2 = Opponent.NumWalls;
 
@@ -551,7 +549,7 @@ namespace Quoridor.Core.Game
 
         public IEnumerable<Vector2> Neighbors(Vector2 pos)
         {
-            return _board.Neighbors(pos);
+            return Board.Neighbors(pos);
         }
 
         public IEnumerable<Movement> Neighbors(Movement pos)
@@ -562,11 +560,12 @@ namespace Quoridor.Core.Game
 
         public IGameEnvironment DeepCopy()
         {
-            var boardCopy = _board.DeepCopy();
+            var boardCopy = Board.DeepCopy();
             var playerCopy = new List<IPlayer>(Players.Select(p => p.DeepCopy()));
             var wallCopy = new ConcurrentHashSet<IWall>(Walls.Select(wall => wall.DeepCopy()));
-            return new GameEnvironment(_numPlayers, _numWalls, boardCopy)
+            return new GameEnvironment
             {
+                Board = boardCopy,
                 Players = playerCopy,
                 Walls = wallCopy,
                 Turn = Turn
