@@ -42,7 +42,7 @@ namespace Quoridor.ConsoleApp
             _gameManagerFactory = _container.Resolve<IConsoleGameManagerFactory>();
         }
 
-        [Verb(IsDefault = true)]
+        [Verb]
         public void Play(
             [Description("Game Board Dimension")]
             [DefaultValue(5), MoreOrEqualTo(3)]
