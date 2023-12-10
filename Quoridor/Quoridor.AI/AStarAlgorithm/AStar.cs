@@ -76,7 +76,7 @@ namespace Quoridor.AI.AStarAlgorithm
                 currNode = currNode.Parent;
             }
 
-            return new AIStrategyResult<TMove> { Value = pathLen, BestMove = currNode.CurrMove };
+            return new() { Value = pathLen, BestMove = currNode.CurrMove };
         }
 
         private static void ValidateParams(
@@ -91,7 +91,5 @@ namespace Quoridor.AI.AStarAlgorithm
             if (param == null)
                 throw new ArgumentNullException($"{paramName} : {typeof(T).Name}");
         }
-
-        
     }
 }

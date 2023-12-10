@@ -3,29 +3,21 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.MinimaxAlgorithm
 {
-    public class Minimax<TPlayer, TMove, TGame> : IAIStrategy<TMove, TGame, TPlayer>
+    public class Minimax<TPlayer, TMove, TGame>(int Depth) : IAIStrategy<TMove, TGame, TPlayer>
         where TGame : IMinimaxGame<TPlayer, TMove>
     {
-        private readonly int _depth;
-
-        public Minimax(int depth)
-        {
-            if (depth <= 0)
-                throw new Exception($"invalid depth '{depth}'");
-
-            _depth = depth;
-        }
-
         public string Name => nameof(MinimaxAlgorithm);
 
         public AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
+            if (Depth <= 0)
+                throw new Exception($"invalid depth '{Depth}'");
             if (game.HasFinished)
                 throw new Exception($"Game already over. Cannot perform minimax");
             if (player == null)
                 throw new Exception($"No agent to get scores from");
 
-            var bestMove = MinimaxStep(game, _depth, player.Equals(game.CurrentPlayer));
+            var bestMove = MinimaxStep(game, Depth, player.Equals(game.CurrentPlayer));
             return bestMove;
         }
 
@@ -47,7 +39,6 @@ namespace Quoridor.AI.MinimaxAlgorithm
                     bestMove.BestMove = move;
                     bestMove.Value = result.Value;
                 }
-
                 game.UndoMove(move);
             }
             return bestMove;

@@ -38,6 +38,9 @@ namespace Quoridor.DesktopApp.Configuration
         [XmlElement(nameof(WallColor))]
         public string _wallColor { get; set; }
 
+        [XmlElement(nameof(GoalTileColor))]
+        public string _goalTileColor { get; set; }
+
         [XmlElement(nameof(Opacity))]
         public int Opacity { get; set; }
 
@@ -58,6 +61,9 @@ namespace Quoridor.DesktopApp.Configuration
 
         [XmlIgnore]
         public Color CurrentPlayerCellColor => Color.FromName(_currentPlayerCellColor);
+
+        [XmlIgnore]
+        public Color GoalTileColor => Color.FromName(_goalTileColor);
 
         [XmlIgnore]
         public Color WallColor => Color.FromName(_wallColor);

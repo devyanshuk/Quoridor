@@ -6,27 +6,23 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.MinimaxAlgorithm
 {
-    public class ParallelMinimaxABPruning<TPlayer, TMove, TGame> : IAIStrategy<TMove, TGame, TPlayer>
+    public class ParallelMinimaxABPruning<TPlayer, TMove, TGame>(int Depth) : IAIStrategy<TMove, TGame, TPlayer>
         where TGame : IMinimaxGame<TPlayer, TMove>, IDeepCopy<TGame>
     {
-        private readonly int _depth;
-        private readonly object _lock = new object();
-
-        public ParallelMinimaxABPruning(int depth)
-        {
-            _depth = depth;
-        }
+        private readonly object _lock = new();
 
         public string Name => $"Parallel {nameof(MinimaxAlgorithm)}ABPruning";
 
         public AIStrategyResult<TMove> BestMove(TGame game, TPlayer player)
         {
+            if (Depth <= 0)
+                throw new Exception($"invalid depth '{Depth}'");
             if (game.HasFinished)
                 throw new Exception($"Game already over. Cannot perform minimax");
             if (player == null)
                 throw new Exception($"No agent to get scores from");
 
-            var bestMove = ParallelMinimaxStep(game, double.MinValue, double.MaxValue, _depth, player.Equals(game.CurrentPlayer));
+            var bestMove = ParallelMinimaxStep(game, double.MinValue, double.MaxValue, Depth, player.Equals(game.CurrentPlayer));
             return bestMove;
         }
 
@@ -80,7 +76,6 @@ namespace Quoridor.AI.MinimaxAlgorithm
                     }
                 }
             });
-
             return bestMove;
         }
     }

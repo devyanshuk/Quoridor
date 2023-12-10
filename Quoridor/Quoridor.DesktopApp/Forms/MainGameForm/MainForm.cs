@@ -96,7 +96,9 @@ namespace Quoridor.DesktopApp.Forms.MainGameForm
                     var start_i = GetAdjustedPos(i);
                     var start_j = GetAdjustedPos(j, _formSettings.OffsetY);
                     var rectangle = new Rectangle(start_i, start_j, cellSize, cellSize);
-                    if (_game.CurrentPlayer.CurrX == i && _game.CurrentPlayer.CurrY == j)
+                    var currTile = new Vector2(i, j);
+
+                    if (_game.CurrentPlayer.CurrentPos.Equals(currTile))
                     {
                         DrawFilledSquare(graphics, _colorSettings.CurrentPlayerCellColor, rectangle);
                         rectangle.Width -= 10;
@@ -104,7 +106,14 @@ namespace Quoridor.DesktopApp.Forms.MainGameForm
                         rectangle.X += 5;
                         rectangle.Y += 5;
                     }
-                    DrawFilledSquare(graphics, color, rectangle);
+                    if (_game.CurrentPlayer.IsGoalMove(currTile))
+                    {
+                        DrawFilledSquare(graphics, _colorSettings.GoalTileColor, rectangle);
+                    }
+                    else
+                    {
+                        DrawFilledSquare(graphics, color, rectangle);
+                    }
                 }
             }
         }

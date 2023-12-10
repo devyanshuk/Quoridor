@@ -4,17 +4,10 @@ using Quoridor.AI.Interfaces;
 
 namespace Quoridor.AI.Random
 {
-    public class RandomStrategy<TMove, TGame, TPlayer>  : IAIStrategy<TMove, TGame, TPlayer>
+    public class RandomStrategy<TMove, TGame, TPlayer>(int seed)  : IAIStrategy<TMove, TGame, TPlayer>
         where TGame : IValidMoves<TMove>
     {
-        private readonly System.Random _random;
-        private readonly int _seed;
-
-        public RandomStrategy(int seed)
-        {
-            _seed = seed;
-            _random = new System.Random(seed);
-        }
+        private readonly System.Random _random = new(seed);
 
         public string Name => nameof(Random);
 
@@ -22,7 +15,7 @@ namespace Quoridor.AI.Random
         {
             var validMoves = game.GetValidMoves();
             var randIndex = _random.Next(0, validMoves.Count());
-            return new AIStrategyResult<TMove> { BestMove = validMoves.ElementAt(randIndex), Value = _seed };
+            return new() { BestMove = validMoves.ElementAt(randIndex), Value = seed };
         }
     }
 }
