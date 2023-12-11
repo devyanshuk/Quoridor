@@ -10,6 +10,7 @@ using Quoridor.Core.Utils;
 using Quoridor.Core.Environment;
 using Quoridor.DesktopApp.Configuration;
 using Quoridor.Core.Utils.CustomExceptions;
+using Quoridor.Core;
 
 namespace Quoridor.DesktopApp.Forms.MainGameForm
 {
@@ -28,7 +29,8 @@ namespace Quoridor.DesktopApp.Forms.MainGameForm
         private System.Timers.Timer _timer;
         private IGameEnvironment _game;
         private bool PlayerSelected;
-        private List<Wall> SelectedWalls = new List<Wall>();
+        private List<Wall> SelectedWalls = new();
+        private List<AgentMove> SelectedPlayerPossiblePos = new();
         private int SelectedWallTurn = -1;
 
         public MainForm(IWindsorContainer container)
@@ -108,12 +110,13 @@ namespace Quoridor.DesktopApp.Forms.MainGameForm
                     }
                     if (_game.CurrentPlayer.IsGoalMove(currTile))
                     {
-                        DrawFilledSquare(graphics, _colorSettings.GoalTileColor, rectangle);
+                        color = _colorSettings.GoalTileColor;
                     }
-                    else
+                    if (SelectedPlayerPossiblePos.Any(s => s.NewPos.Equals(currTile)))
                     {
-                        DrawFilledSquare(graphics, color, rectangle);
+                        color = _colorSettings.PossibleCellMoveColor;
                     }
+                    DrawFilledSquare(graphics, color, rectangle);
                 }
             }
         }
@@ -222,29 +225,6 @@ namespace Quoridor.DesktopApp.Forms.MainGameForm
                 Invalidate();
                 return true;
             }
-            if (_gameSettings.CurrentStrategy is HumanStrategy)
-            {
-                AgentMove move = null;
-
-                if (keyData == Keys.W || keyData == Keys.Up)
-                    move = new(Direction.North);
-                else if (keyData == Keys.S || keyData == Keys.Down)
-                    move = new(Direction.South);
-                else if (keyData == Keys.A || keyData == Keys.Left)
-                    move = new(Direction.West);
-                else if (keyData == Keys.D || keyData == Keys.Right)
-                    move = new(Direction.East);
-
-                if (move is not null)
-                {
-                    try
-                    {
-                        _game.Move(move);
-                    }
-                    catch(Exception) { }
-                }
-            }
-
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
@@ -265,16 +245,35 @@ namespace Quoridor.DesktopApp.Forms.MainGameForm
                 {
                     if (_game.CurrentPlayer.CurrentPos.Equals(cellPos))
                     {
-                        PlayerSelected = true;
+                        if (!PlayerSelected)
+                        {
+                            PlayerSelected = true;
+                            SelectedPlayerPossiblePos = _game.GetWalkableNeighbors(_game.CurrentPlayer).Cast<AgentMove>().ToList();
+                            Invalidate();
+                        }
+                        else
+                        {
+                            PlayerSelected = false;
+                            SelectedPlayerPossiblePos.Clear();
+                            Invalidate();
+                        }
                     }
-                    else if (SelectedWalls.Count == 0 || !SelectedWalls[SelectedWallTurn].From.Equals(cellPos))
-                    {
-                        SetAvailableWallsInOrder(cellPos);
-                        if (SelectedWalls.Count >= 0) StartUpdatingOpacity();
-                    }
-                    else
-                    {
-                        SelectedWallTurn = (SelectedWallTurn + 1) % SelectedWalls.Count;
+                    else {
+                        if (SelectedPlayerPossiblePos.Any(s => s.NewPos.Equals(cellPos)))
+                        {
+                            _game.Move(SelectedPlayerPossiblePos.Single(s => s.NewPos.Equals(cellPos)));
+                            Invalidate();
+                        }
+                        else if (SelectedWalls.Count == 0 || !SelectedWalls[SelectedWallTurn].From.Equals(cellPos))
+                        {
+                            SetAvailableWallsInOrder(cellPos);
+                            if (SelectedWalls.Count >= 0) StartUpdatingOpacity();
+                        }
+                        else
+                        {
+                            SelectedWallTurn = (SelectedWallTurn + 1) % SelectedWalls.Count;
+                        }
+                        SelectedPlayerPossiblePos.Clear();
                     }
                 }
                 else if (rightClick)

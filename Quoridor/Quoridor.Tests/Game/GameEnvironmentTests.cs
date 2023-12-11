@@ -533,13 +533,13 @@ namespace Quoridor.Tests.Game
             //Act
             //Assert
             gameEnv.GetValidMoves().Count().Should().Be(11);
-            gameEnv.GetWalkableNeighbors().Count().Should().Be(3);
+            gameEnv.GetWalkableNeighbors(gameEnv.CurrentPlayer).Count().Should().Be(3);
             gameEnv.GetAllUnplacedWalls().Count().Should().Be(8);
 
             gameEnv.AddWall(player, new Vector2(1, 0), West);
 
             gameEnv.GetValidMoves().Count().Should().Be(5);
-            gameEnv.GetWalkableNeighbors().Count().Should().Be(2);
+            gameEnv.GetWalkableNeighbors(gameEnv.CurrentPlayer).Count().Should().Be(2);
             gameEnv.GetAllUnplacedWalls().Count().Should().Be(3);
         }
 
@@ -576,8 +576,8 @@ namespace Quoridor.Tests.Game
             //Act
             gameEnv.Move(new Wall(North, new(2, 4)));
             gameEnv.Move(new Wall(North, new(1, 1)));
-            var walkableNeighbors = gameEnv.GetWalkableNeighbors();
-            var copyNeighbors = ((GameEnvironment)gameEnv.DeepCopy()).GetWalkableNeighbors();
+            var walkableNeighbors = gameEnv.GetWalkableNeighbors(gameEnv.CurrentPlayer);
+            var copyNeighbors = ((GameEnvironment)gameEnv.DeepCopy()).GetWalkableNeighbors(gameEnv.CurrentPlayer);
 
             //Assert
             walkableNeighbors.Count().Should().Be(2);
@@ -594,6 +594,75 @@ namespace Quoridor.Tests.Game
                 var agentMove = move as AgentMove;
                 agentMove.Dir.Should().NotBe(South);
             }
+        }
+
+        [Test]
+        public void Player_Should_Move_To_Specified_Location_Or_Throw()
+        {
+            //Arrange
+            var gameEnv = CreateDoubleJumpGameEnv();
+            var gameEnv2 = CreateDoubleJumpGameEnv();
+            var gameEnv3 = CreateDoubleJumpGameEnv();
+            var gameEnv4 = CreateDoubleJumpGameEnv();
+            var wantPos = new Vector2(3, 1);
+            var wantPos2 = new Vector2(1, 1);
+            var impossiblePos = new Vector2(3, 2);
+
+            //Act
+            Action a = () => gameEnv.MovePlayer(gameEnv.Players[gameEnv.Turn], wantPos);
+            Action b = () => gameEnv2.MovePlayer(gameEnv2.Players[gameEnv2.Turn], wantPos2);
+            Action c = () => gameEnv3.MovePlayer(gameEnv3.Players[gameEnv3.Turn], impossiblePos);
+            Action d = () => gameEnv4.MovePlayer(gameEnv4.Players[gameEnv4.Turn], North);
+
+            //Assert
+            a.Should().NotThrow();
+            b.Should().NotThrow();
+            c.Should().Throw<Exception>();
+            d.Should().NotThrow();
+
+            gameEnv.Players[gameEnv.Turn].CurrentPos.Should().Be(wantPos);
+            gameEnv2.Players[gameEnv2.Turn].CurrentPos.Should().Be(wantPos2);
+            gameEnv4.Players[gameEnv4.Turn].CurrentPos.Should().Be(wantPos);
+        }
+
+
+
+        /*
+         *        |  0  |  1  |  2  |  3  |  4  |
+         *   =====+=====+=====+=====+=====+=====+
+         *     0  |     |     |     |     |     |
+         *        |     |     |     |     |     |
+         *   =====+■■■■■■■■■■■+■■■■■■■■■■■+=====+
+         *     1  |     |     |  A  |     |     |
+         *        |     |     |     |     |     |
+         *   =====+=====+=====+=====+=====+=====+
+         *     2  |     |     █  B  █     |     |
+         *        |     |     █     █     |     |
+         *   =====+=====+=====█=====█=====+=====+
+         *     3  |     |     █     █     |     |
+         *        |     |     █     █     |     |
+         *   =====+=====+=====+=====+=====+=====+
+         *     4  |     |     |     |     |     |
+         *        |     |     |     |     |     |
+         *   =====+=====+=====+=====+=====+=====+
+         */
+        //this method returns the above game state with B's turn to play
+        public GameEnvironment CreateDoubleJumpGameEnv()
+        {
+            var board = new Board();
+            board.SetDimension(5);
+            var gameEnv = new GameEnvironment(2, 4, board);
+            gameEnv.Move(new AgentMove(South, null)); // A
+            gameEnv.Move(new AgentMove(North, null)); // B
+            gameEnv.Move(new Wall(East, new(2, 2))); // A
+            gameEnv.Move(new Wall(West, new(2, 2))); // B
+            gameEnv.Move(new Wall(North, new(2, 1))); // A
+            gameEnv.Move(new Wall(North, new(0, 1))); //B
+            gameEnv.Move(new AgentMove(East, null)); //A
+            gameEnv.Move(new AgentMove(North, null)); //B
+            gameEnv.Move(new AgentMove(West, null)); // A
+
+            return gameEnv;
         }
 
         private Tuple<IBoard, GameEnvironment, IPlayer> CreateGameEnvironment()

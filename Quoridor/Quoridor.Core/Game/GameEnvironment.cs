@@ -15,6 +15,7 @@ namespace Quoridor.Core.Game
     public class GameEnvironment : IGameEnvironment
     {
         public EventHandler OnMoveDone { get; set; }
+
         private readonly AStar<Vector2, IBoard, IPlayer> _aStar = new();
         private readonly ILogger _log = Logger.InstanceFor<GameEnvironment>();
         private readonly object _lock = new();
@@ -134,9 +135,50 @@ namespace Quoridor.Core.Game
 
             _log.Info($"Moving player '{player}' '{dir}'...");
 
-            var newPos = TryMove(player, player.CurrentPos, dir);
-            player.Move(newPos);
+            var possibleNewPositions = TryMove(player, new() { player.CurrentPos }, dir);
+            var move = possibleNewPositions.First();
 
+            if (possibleNewPositions.Count > 1)
+            {
+                var bestPath = double.MaxValue;
+                Vector2 bestMove = null;
+                foreach(var pos in possibleNewPositions)
+                {
+                    var temp = player.CurrentPos;
+                    player.CurrentPos = pos;
+                    var stats = _aStar.BestMove(Board, player);
+                    if (stats.Value < bestPath)
+                    {
+                        bestPath = stats.Value;
+                        bestMove = pos;
+                    }
+                    player.CurrentPos = temp;
+                }
+                move = bestMove;
+            }
+
+            player.Move(move);
+
+            _log.Info($"Moved player '{player}' to '{move}'");
+        }
+
+        public void MovePlayer(IPlayer player, Vector2 newPos)
+        {
+            if (Players == null)
+                throw new Exception(@$"player '{player}' not registered. Call the {nameof(AddPlayer)} method to register");
+
+            _log.Info($"Moving player '{player}' '{newPos}'...");
+
+            var possiblePlayerPositions = GetWalkableNeighbors(player).Cast<AgentMove>();
+            // if wanted pos is in the list of available move pos, then move
+            if (possiblePlayerPositions.Any(p => p.NewPos.Equals(newPos)))
+            {
+                player.Move(newPos);
+            }
+            else
+            {
+                throw new Exception($"Player at pos {player.CurrentPos} cannot move to {newPos}");
+            }
             _log.Info($"Moved player '{player}' to '{newPos}'");
         }
 
@@ -313,29 +355,40 @@ namespace Quoridor.Core.Game
         }
 
 
-        private Vector2 TryMove(IPlayer player, Vector2 currentPos, Direction dir, bool jump=false)
+        private List<Vector2> TryMove(IPlayer player, List<Vector2> currentPos, Direction dir, bool jump=false)
         {
-            var newPos = currentPos.GetPosFor(dir);
+            var newPos = currentPos.Select(c => c.GetPosFor(dir)).ToList();
 
             _log.Info($@"Trying to check if it's possible to move player '{player.Id}' currently at '{
                 player.CurrentPos}' '{dir}' to '{newPos}' from '{currentPos}'");
 
-            try
-            {
-                CheckIfPlayerCanGoToNewPos(currentPos, newPos);
-            }
-            catch(Exception ex) when (ex is InvalidAgentMoveException || ex is NewMoveBlockedByWallException) {
-                if (jump) newPos = GetShortestSidewaysJumpPos(currentPos, dir);
-                else throw;
-            }
 
-            if (player.IsGoalMove(newPos))
+            var newPosCopy = new List<Vector2>();
+            for (int i = 0; i < newPos.Count(); i++)
+            {
+                try
+                {
+                    CheckIfPlayerCanGoToNewPos(currentPos[i], newPos[i]);
+                    newPosCopy.Add(newPos[i]);
+                }
+                catch (Exception ex) when (ex is InvalidAgentMoveException || ex is NewMoveBlockedByWallException)
+                {
+                    if (jump)
+                    {
+                        newPosCopy.AddRange(GetSidewaysJumpPos(currentPos[i], dir));
+                    }
+                    else throw;
+                }
+            }
+            newPos = newPosCopy;
+          
+            if (newPos.Any(n => player.IsGoalMove(n)))
             {
                 _log.Info($"Player reached the goal position");
                 return newPos;
             }
 
-            var playerInNewPos = Players.FirstOrDefault(p => p.CurrentPos.Equals(newPos));
+            var playerInNewPos = Players.FirstOrDefault(p => newPos.Contains(p.CurrentPos));
 
             if (playerInNewPos != null)
             {
@@ -346,7 +399,7 @@ namespace Quoridor.Core.Game
             return newPos;
         }
 
-        private Vector2 GetShortestSidewaysJumpPos(Vector2 currentPos, Direction dir)
+        private IEnumerable<Vector2> GetSidewaysJumpPos(Vector2 currentPos, Direction dir)
         {
             Vector2 leftSideWaypos;
             Vector2 rightSideWaypos;
@@ -367,23 +420,11 @@ namespace Quoridor.Core.Game
             if (!leftPossible && !rightPossible)
                 throw new PlayerCannotJumpSidewaysException($"{CurrentPlayer} cannot jump sideways, hence cannot move to {dir}ern direction");
 
-            if (!leftPossible)
-                return rightSideWaypos;
+            if (leftPossible)
+                yield return leftSideWaypos;
 
-            if (!rightPossible)
-                return leftSideWaypos;
-
-            var temp = CurrentPlayer.CurrentPos;
-
-            CurrentPlayer.CurrentPos = leftSideWaypos;
-            var distFromLeft = _aStar.BestMove(Board, CurrentPlayer).Value;
-
-            CurrentPlayer.CurrentPos = rightSideWaypos;
-            var distFromRight = _aStar.BestMove(Board, CurrentPlayer).Value;
-
-            CurrentPlayer.CurrentPos = temp;
-            return distFromLeft < distFromRight ? leftSideWaypos : rightSideWaypos;
-
+            if (rightPossible)
+                yield return rightSideWaypos;
         }
 
         public void Move(Movement move)
@@ -434,26 +475,28 @@ namespace Quoridor.Core.Game
 
         public IEnumerable<Movement> GetValidMoves()
         {
-            return GetWalkableNeighbors().Concat(GetAllUnplacedWalls());
+            return GetWalkableNeighbors(CurrentPlayer).Concat(GetAllUnplacedWalls());
         }
 
-        public IEnumerable<Movement> GetWalkableNeighbors()
+        public IEnumerable<Movement> GetWalkableNeighbors(IPlayer player)
         {
             //if player already at goal, no need to return neighbors
-            if (CurrentPlayer.IsGoal(CurrentPlayer.CurrentPos))
+            if (player.IsGoal(player.CurrentPos))
                 yield break;
 
             //we do this to ensure any possible jumps won't be blocked by a wall
-            foreach(var validDir in Board.NeighborDirs(CurrentPlayer.CurrentPos))
+            foreach(var validDir in Board.NeighborDirs(player.CurrentPos))
             {
+                List<Vector2> moves;
                 try
                 {
-                    TryMove(CurrentPlayer, CurrentPlayer.CurrentPos, validDir);
+                    moves = TryMove(player, new() { player.CurrentPos }, validDir);
                 }
                 catch(MoveException) {
                     continue;
                 }
-                yield return new AgentMove(validDir);
+                foreach (var move in moves)
+                    yield return new AgentMove(validDir, move);
             }
         }
 

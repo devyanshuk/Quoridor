@@ -53,7 +53,7 @@ namespace Quoridor.ConsoleApp.GameManager.Command
             _log.Info($"Parsed direction '{dirEnum}' from '{line}'");
 
             if (dir.Success && move.Success)
-                return new AgentMove(dirEnum);
+                return new AgentMove(dirEnum, null);
 
             var x = int.Parse(coordinate.Groups["X"].Value);
             var y = int.Parse(coordinate.Groups["Y"].Value);

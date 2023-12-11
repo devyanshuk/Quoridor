@@ -34,5 +34,7 @@ namespace Quoridor.Core.Game
 
         void AddWall(IPlayer player, Vector2 from, Direction placement);
         void RemoveWall(IPlayer player, Vector2 from, Direction placement);
+
+        IEnumerable<Movement> GetWalkableNeighbors(IPlayer player);
     }
 }

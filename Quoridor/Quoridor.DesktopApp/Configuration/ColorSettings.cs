@@ -57,10 +57,10 @@ namespace Quoridor.DesktopApp.Configuration
         public Color PossibleWallColor => Color.FromArgb(AnimatableOpacity, Color.FromName(_possibleWallColor));
 
         [XmlIgnore]
-        public Color PossibleCellMoveColor => Color.FromArgb(AnimatableOpacity, Color.FromName(_possibleCellMoveColor));
+        public Color PossibleCellMoveColor => Color.FromArgb(Opacity, Color.FromName(_possibleCellMoveColor));
 
         [XmlIgnore]
-        public Color CurrentPlayerCellColor => Color.FromName(_currentPlayerCellColor);
+        public Color CurrentPlayerCellColor => Color.FromArgb(Opacity, Color.FromName(_currentPlayerCellColor));
 
         [XmlIgnore]
         public Color GoalTileColor => Color.FromName(_goalTileColor);
