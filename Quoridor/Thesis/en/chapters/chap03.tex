@@ -1,0 +1,23 @@
+\section{Minimax}
+
+The Minimax algorithm is a decision-making algorithm commonly used in two-player, zero-sum games, such as chess, checkers, and tic-tac-toe. Its primary objective is to determine the best move for a player in a given game state by considering the potential outcomes of each move and selecting the one that minimizes the maximum possible gain for the opponent.
+
+
+\textbf{A high-level overview of the Minimax algorithm} ((ADD PICTURES))
+
+\begin{itemize}
+    \item \textbf{Game Tree} \\
+    The algorithm constructs a game tree, where each node represents a possible game state, and the edges represent possible moves. The tree extends to various depths, representing different future moves and their consequences.
+
+    \item \textbf{Evaluation Function} \\
+    It can be computationally expensive for games with a large number of possible moves and deep game trees. For this reason, after a certain depth, a static evaluation function is used to determine the value of that game state. This function assigns a score to the game state, reflecting how favorable it is for the player whose turn it is.
+
+    \item \textbf{Alternating Players} \\
+    The algorithm alternates between two players, maximizing and minimizing. The player who is currently maximizing (MAX) aims to choose moves that maximize their own score, while the player minimizing (MIN) aims to choose moves that minimize the score of the maximizing player.
+
+    \item \textbf{Backtracking} \\
+    As the algorithm traverses the tree, it backtracks and carries information about the values of the nodes up to the root node. The root node's children are the possible moves, and the algorithm selects the move that leads to the highest value for the maximizing player.
+
+    \item \textbf{Pruning} \\
+    To optimize the search process and reduce the number of nodes to evaluate, various pruning techniques are often applied, such as the Alpha-Beta Pruning, which eliminates branches of the tree that are guaranteed not to affect the final decision.
+\end{itemize}

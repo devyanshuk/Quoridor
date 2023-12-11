@@ -1,0 +1,58 @@
+\chapter{Architecture Overview}
+
+In this section, we discuss about the technologies and frameworks used, and give a brief high-level overview on the architecture used to model the game and the AI algorithms.
+
+\section{Programming Language}
+The C\# language was used as a primary tool for development. I chose the .NET Core framework because it is open source and is a cross-platform library. The console version of the application was thoroughly tested on Windows, MacOs and Linux operating systems.
+
+\section{Project Structure}
+The whole solution has been divided into multiple standalone sub-units (individual C\# projects) that can be referenced to make a single unit. The individual fragments are as follows:
+
+\begin{itemize}
+    \item \textbf{Quoridor.Core} \\
+    A C\# library that contains the core logic of the game.
+    
+    \item \textbf{Quoridor.Tests} \\
+    A C\# executable that tests all the components of the solution43
+    
+    \item \textbf{Quoridor.AI}
+    A C\# library that contains all the AI algorithms
+    
+    \item \textbf{Quoridor.ConsoleApp}
+    A C\# executable that serves as a ground for console simulation, play against opponents/AI.
+    
+    \item \textbf{Quoridor.Common}
+    A C\# library that contains all useful utilities like logging, xml deserialization, etc.
+    
+\end{itemize}
+
+\section{Dependency Injection}
+Dependency Injection (DI) is a fundamental design principle in software development, particularly in C\#, that promotes loose coupling between components, enhances code maintainability, and facilitates unit testing. It achieves this by inverting the control of dependencies, allowing objects to request their dependencies from an external source, rather than creating them directly within the class. Castle Windsor is a popular library for implementing DI in C\#, making it easier to manage and resolve dependencies in a flexible and configurable manner.
+
+In with Castle Windsor, DI is typically achieved by defining interfaces for services and registering their implementations with the container. For example, from in the core library, we defined an \textit{IGameEnvironment} interface that has the following signature:
+
+\begin{lstlisting}
+public interface IGameEnvironment
+{
+    int Turn { get; }
+    List<IPlayer> Players { get; }
+
+    void Initialize();
+
+    void AddPlayer(IPlayer player);
+    void MovePlayer(Direction dir);
+    void ChangeTurn();
+
+    IPlayer CurrentPlayer { get; }
+
+    void AddWall(Vector2 from, Direction placement);
+    void RemoveWall(Vector2 from, Direction placement);
+}
+\end{lstlisting}
+
+and a \textit{GameEnvironment} class that implements this interface.
+Then, using Castle Windsor, we register \textit{GameEnvironment} as the implementation for \textit{IGameEnvironment} interface in the application's composition root as a singleton implementation.
+
+One of the significant advantages of using Castle Windsor for Dependency Injection in C\# is its ability to handle complex dependency graphs and manage the lifetime of objects effectively. We can configure the container to control the lifetime scope of objects, whether they are transient, singleton, or per-request. This flexibility is essential for managing resources efficiently and ensuring that objects are created and disposed of appropriately. By embracing DI with Castle Windsor in C\#, we can improve code testability and maintainability, ultimately leading to more robust and scalable software applications.
+
+\textbf{[[ADD UML DIAGRAM AT THE END]]}
