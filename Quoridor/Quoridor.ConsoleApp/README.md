@@ -54,12 +54,12 @@ $dotnet run play
 Running with custom args:
 
 ```bash
-$dotnet run -dimension=5 -numwalls=20
+$dotnet run play -dimension=5 -numwalls=20
 ```
 
 Or you can use the short-form of these arguments aforementioned above
 ```bash
-$dotnet run -d=5 -n=20
+$dotnet run play -d=5 -n=20
 ```
 
 ---
