@@ -434,7 +434,10 @@ namespace Quoridor.Core.Game
             if (move is AgentMove agentMove)
             {
                 agentMove.CurrentPos = CurrentPlayer.CurrentPos;
-                MovePlayer(CurrentPlayer, agentMove.Dir);
+                if (agentMove.NewPos is not null)
+                    MovePlayer(CurrentPlayer, agentMove.NewPos);
+                else
+                    MovePlayer(CurrentPlayer, agentMove.Dir);
             }
 
             else if (move is Wall wallMove)
