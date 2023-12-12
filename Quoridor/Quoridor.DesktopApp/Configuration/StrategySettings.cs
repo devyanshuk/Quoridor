@@ -16,7 +16,7 @@ namespace Quoridor.DesktopApp.Configuration
     [XmlInclude(typeof(HumanStrategy))]
     [XmlInclude(typeof(AStarStrategy))]
     [XmlInclude(typeof(RandomStrategy))]
-    [XmlInclude(typeof(GreedyStrategy))]
+    [XmlInclude(typeof(SemiRandomStrategy))]
     [XmlInclude(typeof(MinimaxStrategy))]
     [XmlInclude(typeof(MinimaxABStrategy))]
     [XmlInclude(typeof(ParallelMinimaxABStrategy))]
@@ -50,7 +50,7 @@ namespace Quoridor.DesktopApp.Configuration
     }
 
     [XmlInclude(typeof(RandomStrategy))]
-    [XmlInclude(typeof(GreedyStrategy))]
+    [XmlInclude(typeof(SemiRandomStrategy))]
     public abstract class MCTSAgent : Strategy
     {
         [XmlAttribute(nameof(Seed))]
@@ -75,14 +75,14 @@ namespace Quoridor.DesktopApp.Configuration
     }
 
     [Serializable]
-    public class GreedyStrategy : MCTSAgent
+    public class SemiRandomStrategy : MCTSAgent
     {
         [XmlIgnore]
-        private GreedyStrategy<IGameEnvironment, Movement, IPlayer> _greedyStrategy;
+        private SemiRandomStrategy<IGameEnvironment, Movement, IPlayer> _semiRandomStrategy;
 
         public override IAIStrategy<Movement, IGameEnvironment, IPlayer> GetStrategy()
         {
-            return _greedyStrategy ??= new(Seed);
+            return _semiRandomStrategy ??= new(Seed, new AStar<Movement, IGameEnvironment, IPlayer>());
         }
 
         public override string GetParams()
@@ -101,7 +101,7 @@ namespace Quoridor.DesktopApp.Configuration
         public int Simulations { get; set; }
 
         [XmlElement(nameof(RandomStrategy), typeof(RandomStrategy))]
-        [XmlElement(nameof(GreedyStrategy), typeof(GreedyStrategy))]
+        [XmlElement(nameof(SemiRandomStrategy), typeof(SemiRandomStrategy))]
         public MCTSAgent SimulationStrategy { get; set; }
 
         [XmlIgnore]

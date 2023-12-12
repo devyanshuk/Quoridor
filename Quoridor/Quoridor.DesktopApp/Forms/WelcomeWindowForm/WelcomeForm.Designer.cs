@@ -169,7 +169,7 @@
             // 
             btnFourPlayers.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             btnFourPlayers.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F);
-            btnFourPlayers.Location = new System.Drawing.Point(412, 90);
+            btnFourPlayers.Location = new System.Drawing.Point(401, 90);
             btnFourPlayers.Name = "btnFourPlayers";
             btnFourPlayers.Size = new System.Drawing.Size(103, 47);
             btnFourPlayers.TabIndex = 6;

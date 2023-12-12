@@ -624,7 +624,7 @@ namespace Quoridor.Core.Game
                 throw new ArgumentNullException(paramName);
         }
 
-        public IEnumerable<Movement> NonPlayerMovableMoves()
+        public IEnumerable<Movement> RandomizableMoves()
         {
             return GetAllUnplacedWalls();
         }

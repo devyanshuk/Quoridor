@@ -8,7 +8,8 @@ namespace Quoridor.ConsoleApp.Utils
 {
     public class StrategyValidationAttribute : ValidationAttribute
     {
-        public override string Description => $"Strategy is one of {String.Join(", ", Enum.GetNames(typeof(AITypes)))}";
+        public override string Description => @$"Strategy should be one of {
+            String.Join(", ", Enum.GetNames(typeof(AITypes)))}. Case Insensitive.";
 
         public override IValueValidator GetValidator()
         {
@@ -22,13 +23,13 @@ namespace Quoridor.ConsoleApp.Utils
         {
             try
             {
-                var strategyType = EnumHelper.ParseEnum<AITypes>((string)info.Value);
+                EnumHelper.ParseEnum<AITypes>(((string)info.Value).ToUpper());
             }
             catch(Exception)
             {
-                throw new ValidationException($"Strategy should be one of {String.Join(", ", Enum.GetNames(typeof(AITypes)))}");
+                throw new ValidationException(@$"Strategy should be one of {
+                    String.Join(", ", Enum.GetNames(typeof(AITypes)))}. Case Insensitive.");
             }
-
         }
     }
 }

@@ -36,12 +36,12 @@
 			<HumanStrategy Description="Human"/>
 			<AStarStrategy Description="A*"/>
 			<RandomStrategy Description="Random" Seed="42"/>
-			<GreedyStrategy Description="Greedy" Seed="42" />
+			<SemiRandomStrategy Description="Semi-Random" Seed="42" />
 			<MinimaxABStrategy Description="Minimax AB" Depth="2"/>
 			<MinimaxStrategy Description="Minimax" Depth="2" />
 			<ParallelMinimaxABStrategy Description="Parallel Minimax" Depth="2" />
 			<MctsStrategy Description="MCTS" C="1.41" Simulations="1000">
-				<GreedyStrategy Description="Greedy" Seed="42" />
+				<SemiRandomStrategy Description="Semi-Random" Seed="42" />
 			</MctsStrategy>
 		</Strategies>
 		<!--<Moves>

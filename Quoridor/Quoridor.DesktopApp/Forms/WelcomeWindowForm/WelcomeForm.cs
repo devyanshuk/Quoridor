@@ -58,6 +58,7 @@ namespace Quoridor.DesktopApp.Forms.WelcomeWindowForm
             ToggleNumPlayerButtons(false);
             ToggleStrategySelectionButtons(false);
 
+            _gameSettings.Turn = 0;
             _mainForm.Location = this.Location;
             _mainForm.Initialize();
             _mainForm.Show();
@@ -72,8 +73,6 @@ namespace Quoridor.DesktopApp.Forms.WelcomeWindowForm
             Initialize();
             this.Show();
         }
-
-
 
         private void ToggleNumPlayerButtons(bool switchVal)
         {

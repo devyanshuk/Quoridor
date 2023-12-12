@@ -14,7 +14,7 @@ namespace Quoridor.Core.Game
     public interface IGameEnvironment :
         IMinimaxGame<IPlayer, Movement>,
         IMCTSGame<IGameEnvironment, Movement, IPlayer>,
-        INonPlayerMovableMove<Movement>,
+        IRandomizableMoves<Movement>,
         INeighbors<Vector2>,
         INeighbors<Movement>,
         IDeepCopy<IGameEnvironment>

@@ -107,7 +107,7 @@ namespace Quoridor.ConsoleApp
             int MctsSim,
 
             [Description("Agent to perform MCTS simulation")]
-            [DefaultValue("Greedy")]
+            [DefaultValue("semirandom")]
             [StrategyValidation]
             [Aliases("agent")]
             string MctsAgent,
@@ -137,9 +137,11 @@ namespace Quoridor.ConsoleApp
             };
 
             //add selected ai/human strategy
-            var mctsAgent = EnumHelper.ParseEnum<AITypes>(MctsAgent);
-            settings.Strategies.Add(GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy1), mctsAgent, Depth, Seed, C, MctsSim));
-            settings.Strategies.Add(GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy2), mctsAgent, Depth, Seed, C, MctsSim));
+            var mctsAgent = EnumHelper.ParseEnum<AITypes>(MctsAgent.ToUpper());
+            settings.Strategies.Add(
+                GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy1.ToUpper()), mctsAgent, Depth, Seed, C, MctsSim));
+            settings.Strategies.Add(
+                GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy2.ToUpper()), mctsAgent, Depth, Seed, C, MctsSim));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
@@ -153,12 +155,13 @@ namespace Quoridor.ConsoleApp
         {
             switch (aiType)
             {
-                case AITypes.MonteCarlo:
+                case AITypes.MCTS:
                     {
                         var selectionStrategy = new UCT<Movement, IPlayer, IGameEnvironment>(c);
                         var moveStrategy = GetStrategy(sim, depth, seed);
                         return new StrategyInfo {
-                            Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(mctSim, selectionStrategy, moveStrategy)};
+                            Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(
+                                mctSim, selectionStrategy, moveStrategy)};
                     }
                 default:
                     return new StrategyInfo { Strategy = GetStrategy(aiType, depth, seed) };
@@ -169,13 +172,14 @@ namespace Quoridor.ConsoleApp
         {
             return aitype switch
             {
-                AITypes.AStar => new AStar<Movement, IGameEnvironment, IPlayer>(),
-                AITypes.Random => new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed),
-                AITypes.Greedy => new GreedyStrategy<IGameEnvironment, Movement, IPlayer>(seed),
-                AITypes.Human => new HumanAgentConsole(_stdIn, _stdOut, _container.Resolve<ICommandParser>()),
-                AITypes.Minimax => new Minimax<IPlayer, Movement, IGameEnvironment>(depth),
-                AITypes.MinimaxAB => new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth),
-                AITypes.ParallelMinimaxAB => new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth),
+                AITypes.ASTAR => new AStar<Movement, IGameEnvironment, IPlayer>(),
+                AITypes.RANDOM => new RandomStrategy<Movement, IGameEnvironment, IPlayer>(seed),
+                AITypes.SEMIRANDOM => new SemiRandomStrategy<IGameEnvironment, Movement, IPlayer>(
+                    seed, new AStar<Movement, IGameEnvironment, IPlayer>()),
+                AITypes.HUMAN => new HumanAgentConsole(_stdIn, _stdOut, _container.Resolve<ICommandParser>()),
+                AITypes.MINIMAX => new Minimax<IPlayer, Movement, IGameEnvironment>(depth),
+                AITypes.MINIMAXAB => new MinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth),
+                AITypes.PARALLELMINIMAXAB => new ParallelMinimaxABPruning<IPlayer, Movement, IGameEnvironment>(depth),
                 _ => new Minimax<IPlayer, Movement, IGameEnvironment>(depth)
             };
 

@@ -15,8 +15,6 @@
   <ItemGroup>
     <Folder Include="MCTS\" />
     <Folder Include="MinimaxAlgorithm\" />
-    <Folder Include="Interfaces\" />
     <Folder Include="AStarAlgorithm\" />
-    <Folder Include="Random\" />
   </ItemGroup>
 </Project>

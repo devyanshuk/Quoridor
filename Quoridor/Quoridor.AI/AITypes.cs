@@ -2,13 +2,13 @@
 {
     public enum AITypes
     {
-        Random,
-        Greedy,
-        Minimax,
-        MinimaxAB,
-        ParallelMinimaxAB,
-        AStar,
-        MonteCarlo,
-        Human
+        RANDOM,
+        SEMIRANDOM,
+        MINIMAX,
+        MINIMAXAB,
+        PARALLELMINIMAXAB,
+        ASTAR,
+        MCTS,
+        HUMAN
     }
 }
