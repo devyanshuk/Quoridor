@@ -110,11 +110,18 @@ namespace Quoridor.ConsoleApp
             [DefaultValue("Greedy")]
             [StrategyValidation]
             [Aliases("agent")]
-            string MctsAgent
+            string MctsAgent,
+
+            [Description("Compute the average branching factor for a specified dimension")]
+            [DefaultValue(false)]
+            [Aliases("b")]
+            bool BranchingFactor
             )
         {
             // for large tree, logs might be very big, so we disable it.
             Logger.Disable = true;
+
+            if (BranchingFactor) Simulate = true;
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
 
@@ -122,6 +129,7 @@ namespace Quoridor.ConsoleApp
             {
                 Verbose = Verbose,
                 Simulate = Simulate,
+                BranchingFactor = BranchingFactor,
                 NumberOfSimulations = NumSimulate,
                 WaitForInput = WaitForInput,
                 OutputDest = _stdOut,

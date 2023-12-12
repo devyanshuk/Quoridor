@@ -7,6 +7,7 @@ namespace Quoridor.ConsoleApp.GameManager
     {
         public bool Verbose { get; set; }
         public bool Simulate { get; set; }
+        public bool BranchingFactor { get; set; }
         public int NumberOfSimulations { get; set; }
         public bool WaitForInput { get; set; }
         public TextWriter OutputDest { get; set; }

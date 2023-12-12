@@ -16,6 +16,8 @@ namespace Quoridor.ConsoleApp.GameManager
         private readonly IBoardVisualizer _boardVisualizer;
         private readonly IGameEnvironment _gameEnvironment;
 
+        private float _totalAverageBranchingFactor = 0;
+
         private readonly ILogger _log = Logger.InstanceFor<ConsoleGameManager>();
 
         public ConsoleGameManager(
@@ -49,10 +51,10 @@ namespace Quoridor.ConsoleApp.GameManager
                 var player = _gameEnvironment.CurrentPlayer;
 
                 if (!_settings.Simulate)
-                    _settings.OutputDest.WriteLine(@$"Player '{player}''s Turn. {
+                    _settings.OutputDest.WriteLine(@$"Player '{player}''s Turn. {info.SingleGameMoves} moves made. {
                         player.NumWalls} wall(s) left. Using {info.Strategy.Name} strategy");
 
-                GetAndDoMove(info.Strategy);
+                GetAndDoMove(info);
 
                 if (!_settings.Simulate)
                     _boardVisualizer.DrawBoard(_settings.OutputDest);
@@ -88,43 +90,72 @@ namespace Quoridor.ConsoleApp.GameManager
                         info.GamesWon}/{_settings.NumberOfSimulations} games. Win rate : {winRate.ToString("0.##")}%");
                 }
             }
+            if (_settings.BranchingFactor)
+            {
+                _settings.OutputDest.WriteLine(@$"Average branching factor : {
+                    _totalAverageBranchingFactor / _settings.NumberOfSimulations}");
+            }
         }
 
-        public void DisplayGameStats(int simulations, StrategyInfo info)
+        public void DisplayGameStats(int simulations, StrategyInfo winningStrategy)
         {
             var gameInfo = _settings.Simulate ? simulations.ToString() : String.Empty;
             var winningPlayer = _gameEnvironment.Players.Single(p => p.Won());
             var losingPlayer = _gameEnvironment.Players.Single(p => !p.Won());
             var losingStrategy = _settings.Strategies[_gameEnvironment.Turn];
 
-            _settings.OutputDest.WriteLine(@$"Game {gameInfo} over. Player {winningPlayer} : {
-                info.Strategy.Name} won. Player {losingPlayer} : {losingStrategy.Strategy.Name} lost");
+            _settings.OutputDest.WriteLine(@$"Game {gameInfo} over. Player {
+                winningPlayer} : {winningStrategy.Strategy.Name} won in {winningStrategy.SingleGameMoves} moves. Player {
+                losingPlayer} : {losingStrategy.Strategy.Name} lost. {losingStrategy.SingleGameMoves} moves made");
+
+            if (_settings.BranchingFactor) {
+                var totalGameStates = winningStrategy.SingleGameStates + losingStrategy.SingleGameStates;
+                var totalGameMoves = winningStrategy.SingleGameMoves + losingStrategy.SingleGameMoves;
+                var branchingFactor = totalGameStates / totalGameMoves;
+                _totalAverageBranchingFactor += branchingFactor;
+
+                _settings.OutputDest.WriteLine($"total game states : {totalGameStates}");
+                _settings.OutputDest.WriteLine($"total moves : {totalGameMoves}");
+                _settings.OutputDest.WriteLine($"average branching factor : {branchingFactor}");
+            }
+
+            winningStrategy.SingleGameStates = 0;
+            winningStrategy.SingleGameMoves = 0;
+            losingStrategy.SingleGameMoves = 0;
+            losingStrategy.SingleGameStates = 0;
         }
 
-        public void GetAndDoMove(IAIStrategy<Movement, IGameEnvironment, IPlayer> strategy)
+        public void GetAndDoMove(StrategyInfo info)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var result = info.Strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
+            watch.Stop();
+
+            if (!_settings.BranchingFactor && !_settings.Simulate && _settings.Verbose && !(info.Strategy is HumanAgentConsole))
+                _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
+
+            Process(result.BestMove, info);
+        }
+
+
+        public void Process<T>(T command, StrategyInfo info) where T : Movement
+        {
+            _log.Info($"Received '{typeof(T).Name}' command");
+
             try
             {
-                var watch = System.Diagnostics.Stopwatch.StartNew();
-                var result = strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
-                watch.Stop();
+                var possibleMoves = _gameEnvironment.GetValidMoves().Count();
+                
+                _gameEnvironment.Move(command);
 
-                if (_settings.Verbose && !(strategy is HumanAgentConsole))
-                    _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
-
-                Process(result.BestMove);
+                //if move was successful, update the number of moves and game states
+                info.SingleGameStates += possibleMoves;
+                info.SingleGameMoves++;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 _settings.OutputDest.WriteLine(ex.Message);
             }
-        }
-
-
-        public void Process<T>(T command) where T : Movement
-        {
-            _log.Info($"Received '{typeof(T).Name}' command");
-            _gameEnvironment.Move(command);
         }
     }
 }

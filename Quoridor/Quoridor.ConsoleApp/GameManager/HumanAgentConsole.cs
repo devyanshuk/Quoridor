@@ -35,7 +35,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 {
                     var line = _inputSrc.ReadLine();
                     var move = _commandParser.Parse(line);
-                    return new AIStrategyResult<Movement> { BestMove = move };
+                    return new() { BestMove = move };
                 }
                 catch(Exception ex)
                 {
