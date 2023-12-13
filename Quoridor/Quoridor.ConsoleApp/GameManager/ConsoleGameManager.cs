@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Globalization;
 
 using Quoridor.Core;
 using Quoridor.Core.Game;
@@ -99,8 +100,8 @@ namespace Quoridor.ConsoleApp.GameManager
             }
             if (_settings.BranchingFactor)
             {
-                var totalAvg = (int)_totalAverageBranchingFactor / _settings.NumberOfSimulations;
-                _settings.OutputDest.WriteLine(@$"Average branching factor : {totalAvg}");
+                var totalAvg = _totalAverageBranchingFactor / _settings.NumberOfSimulations;
+                _settings.OutputDest.WriteLine(@$"Average branching factor : {totalAvg.ToString(CultureInfo.InvariantCulture)}");
             }
         }
 
@@ -130,7 +131,7 @@ namespace Quoridor.ConsoleApp.GameManager
         {
             var totalGameStates = winningStrategy.SingleGameStates + losingStrategy.SingleGameStates;
             var totalGameMoves = winningStrategy.SingleGameMoves + losingStrategy.SingleGameMoves;
-            var branchingFactor = totalGameStates / totalGameMoves;
+            var branchingFactor = (float)totalGameStates / totalGameMoves;
             _totalAverageBranchingFactor += branchingFactor;
         }
 
