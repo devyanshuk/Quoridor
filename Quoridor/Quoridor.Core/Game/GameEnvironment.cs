@@ -382,11 +382,11 @@ namespace Quoridor.Core.Game
             }
             newPos = newPosCopy;
           
-            if (newPos.Any(n => player.IsGoalMove(n)))
+            /*if (newPos.Any(n => player.IsGoalMove(n)))
             {
                 _log.Info($"Player reached the goal position");
                 return newPos;
-            }
+            }*/
 
             var playerInNewPos = Players.FirstOrDefault(p => newPos.Contains(p.CurrentPos));
 

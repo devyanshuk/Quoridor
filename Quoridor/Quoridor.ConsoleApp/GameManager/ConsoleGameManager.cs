@@ -3,8 +3,6 @@ using System.Linq;
 
 using Quoridor.Core;
 using Quoridor.Core.Game;
-using Quoridor.Core.Entities;
-using Quoridor.AI.Interfaces;
 using Quoridor.Common.Logging;
 using Quoridor.ConsoleApp.GameManager.Visualizer;
 
@@ -61,14 +59,23 @@ namespace Quoridor.ConsoleApp.GameManager
 
                 if (_gameEnvironment.HasFinished)
                 {
+                    var winningStrategy = info;
+                    var losingStrategy = _settings.Strategies[_gameEnvironment.Turn];
                     info.GamesWon++;
 
+                    if (_settings.BranchingFactor)
+                        UpdateAvgBranchingFactor(winningStrategy, losingStrategy);
+
                     if (!_settings.Simulate || _settings.Simulate && _settings.Verbose)
-                        DisplayGameStats(simulations, info);
+                        DisplayGameStats(simulations, winningStrategy, losingStrategy);
+
+                    winningStrategy.SingleGameStates = 0;
+                    winningStrategy.SingleGameMoves = 0;
+                    losingStrategy.SingleGameMoves = 0;
+                    losingStrategy.SingleGameStates = 0;
 
                     if (_settings.Simulate && ++simulations <= _settings.NumberOfSimulations)
                         Initialize();
-
                     else
                         break;
                 }
@@ -92,37 +99,39 @@ namespace Quoridor.ConsoleApp.GameManager
             }
             if (_settings.BranchingFactor)
             {
-                _settings.OutputDest.WriteLine(@$"Average branching factor : {
-                    _totalAverageBranchingFactor / _settings.NumberOfSimulations}");
+                var totalAvg = (int)_totalAverageBranchingFactor / _settings.NumberOfSimulations;
+                _settings.OutputDest.WriteLine(@$"Average branching factor : {totalAvg}");
             }
         }
 
-        public void DisplayGameStats(int simulations, StrategyInfo winningStrategy)
+        public void DisplayGameStats(int simulations, StrategyInfo winningStrategy, StrategyInfo losingStrategy)
         {
             var gameInfo = _settings.Simulate ? simulations.ToString() : String.Empty;
             var winningPlayer = _gameEnvironment.Players.Single(p => p.Won());
             var losingPlayer = _gameEnvironment.Players.Single(p => !p.Won());
-            var losingStrategy = _settings.Strategies[_gameEnvironment.Turn];
 
             _settings.OutputDest.WriteLine(@$"Game {gameInfo} over. Player {
                 winningPlayer} : {winningStrategy.Strategy.Name} won in {winningStrategy.SingleGameMoves} moves. Player {
                 losingPlayer} : {losingStrategy.Strategy.Name} lost. {losingStrategy.SingleGameMoves} moves made");
 
-            if (_settings.BranchingFactor) {
+            if (_settings.BranchingFactor)
+            {
                 var totalGameStates = winningStrategy.SingleGameStates + losingStrategy.SingleGameStates;
                 var totalGameMoves = winningStrategy.SingleGameMoves + losingStrategy.SingleGameMoves;
-                var branchingFactor = totalGameStates / totalGameMoves;
-                _totalAverageBranchingFactor += branchingFactor;
+                var branchingFactor = (float)totalGameStates / totalGameMoves;
 
-                _settings.OutputDest.WriteLine($"total game states : {totalGameStates}");
-                _settings.OutputDest.WriteLine($"total moves : {totalGameMoves}");
-                _settings.OutputDest.WriteLine($"average branching factor : {branchingFactor}");
+                _settings.OutputDest.WriteLine($"Total game states : {totalGameStates}");
+                _settings.OutputDest.WriteLine($"Total moves : {totalGameMoves}");
+                _settings.OutputDest.WriteLine($"Average branching factor : {branchingFactor.ToString("0.##")}");
             }
+        }
 
-            winningStrategy.SingleGameStates = 0;
-            winningStrategy.SingleGameMoves = 0;
-            losingStrategy.SingleGameMoves = 0;
-            losingStrategy.SingleGameStates = 0;
+        public void UpdateAvgBranchingFactor(StrategyInfo winningStrategy, StrategyInfo losingStrategy)
+        {
+            var totalGameStates = winningStrategy.SingleGameStates + losingStrategy.SingleGameStates;
+            var totalGameMoves = winningStrategy.SingleGameMoves + losingStrategy.SingleGameMoves;
+            var branchingFactor = totalGameStates / totalGameMoves;
+            _totalAverageBranchingFactor += branchingFactor;
         }
 
         public void GetAndDoMove(StrategyInfo info)
@@ -131,7 +140,7 @@ namespace Quoridor.ConsoleApp.GameManager
             var result = info.Strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
             watch.Stop();
 
-            if (!_settings.BranchingFactor && !_settings.Simulate && _settings.Verbose && !(info.Strategy is HumanAgentConsole))
+            if (!_settings.BranchingFactor && !_settings.Simulate && _settings.Verbose && info.Strategy is not HumanAgentConsole)
                 _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
 
             Process(result.BestMove, info);
@@ -141,7 +150,6 @@ namespace Quoridor.ConsoleApp.GameManager
         public void Process<T>(T command, StrategyInfo info) where T : Movement
         {
             _log.Info($"Received '{typeof(T).Name}' command");
-
             try
             {
                 var possibleMoves = _gameEnvironment.GetValidMoves().Count();

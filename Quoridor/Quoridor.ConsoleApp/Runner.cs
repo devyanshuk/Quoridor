@@ -77,7 +77,7 @@ namespace Quoridor.ConsoleApp
             bool Simulate,
 
             [Description("Display all results of the simulation")]
-            [DefaultValue(true)]
+            [DefaultValue(false)]
             [Aliases("v")]
             bool Verbose,
 
