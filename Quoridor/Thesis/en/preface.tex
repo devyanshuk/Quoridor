@@ -1,18 +1,23 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-Artificial Intelligence has brought a revolutionary transformation to the gaming world, pushing the boundaries
-of what's achievable in both single and multiplayer gaming experiences. In recent years, AI has taken center
+\ac{AI}, over the past decade, is becoming an integral part of many elements of modern world. In fact, in the recent years, it has become an the main point of evolution and revolution in many of the technologies and industries. From assisted or autonomous driving \citep{Ma2020Artificial}, chat bots \cite{Wu2023ABrief} to gaming \cite{Skinner2010Artificial}, \ac{AI} has been a major revelation in evolving the existing technologies to generating new industry space with the plethora of new use cases.   
+
+\ac{AI} has brought a revolutionary transformation to the gaming world, pushing the boundaries
+of what's achievable in both single and multiplayer gaming experiences. In recent years, \ac{AI} has taken center
 stage with its remarkable accomplishments in mastering age-old games such as Chess, Go, and many others.
-AI-driven games now offer users the opportunity to hone and enhance their skills, providing varying difficulty
+\ac{AI}-driven games now offer users the opportunity to hone and enhance their skills, providing varying difficulty
 levels and offering optimal moves to guide players through each step if desired.
 
-Designed by Mirko Marchesi, Quoridor stands out as an engaging and strategic board game that pits two or four
-players against each other in a thrilling race to traverse a maze-like board and reach the opposite side.
-Played on a chess-like board, this game introduces a fascinating twist with walls that players strategically
-place to obstruct their opponents' paths, compelling them to navigate longer alternate routes. Despite its
-seemingly simple rules, Quoridor demands a unique blend of strategic foresight and the ability to anticipate
-the moves of opponents. It's a dynamic and thought-provoking game that challenges the mind.
+Strategy games are a genre of gaming that require planning, often involving various tactics, decision making and execution while under various constraints (e.g., resources). Some of the examples of popular strategy games are Chess, Go, Shogi, Starcraft, etc. Strategy games are unique compared to many other genres of games in the sense that it requires a selection of an optimal move among a subset of sub-optimal moves based on  a plan. In many scenarios, the size of the subset of sub-optimal moves depends on exploration of the game space, simulation and prediction of sequence of the player's and the opponent's moves all while managing certain resources efficiently.
+
+\ac{AI}, due to its suitability towards solving problems involving complex decision making, taking into account sequences of the player's and the opponents possible moves (e.g., game space), outcome prediction or position evaluation all while considering the available resources, have been deemed particularly effective in playing the strategy games. The history of the use of \ac{AI} in strategy games goes back to the last few decades. One of the initial marked impact of \ac{AI} in the strategy gaming came in 1997 when IBM's Deep Blue \cite{Campbell2002Deep} defeated World Chess Champion Garry Kasparov. The influence of \ac{AI} in stratey games was more prominent with the rise and involvement of \ac{AI} into the \ac{RTS} games such as Warcraft and StarCraft \cite{Robertson2014Review} and implementation of \ac{MCTS} in the strategy games such as Go \cite{Huang2011Monte}. Recently, DeepMind's Alpha Go for Go, Alpha Zero for Chess \cite{Silver2017Mastering} and AlphaStar for StarCraft \cite{Team2019Alphastar} have widened the gap between the \ac{AI} and human intelligence even further.
+
+
+Designed by Mirko Marchesi, Quoridor stands out as an engaging strategic board game that is played between two or four players. The game is playes on a square grid board where the objective of this game is for each player to move their pawn to the opposite side of the board. This game introduces a fascinating twist where a player, in addition to trying to move their pawn through the square grid, additionally have an option to place walls on the grid locations strategically to obstruct the opponent's path. This strategy compels the player to think of their traversal strategy while predicting the opponents strategy as well. Despite its
+seemingly simple rules, Quoridor demands a unique blend of strategic foresight and the ability to anticipate the moves of opponents and outmaneuver the opponent.
+
+Compared to some other strategy games such as Chess and Go, Quoridor has not been extensively studied in the literature. In \cite{Glendenning2002MasteringQ}, the author developed an agent for playing Quoridor using genetic algorithm to optimize the weights. The authors in \cite{Mertens2006Quoridor} study the complexity of the algorithm also develop a Quoridor playing agent based on Minimax algorithm. The authors conclude that Quoridor has a similar state-space and game tree complexity as that of the games such as Chess. Likewise, the authors in \cite{Brenner2015Artificial} developed an \ac{MCTS} approach for Quoridor. Recently, in \cite{Iwanaga2022Analysis}, the authors performed an analysis of the game for a miniature 5 by 5 board.
 
 The primary objective of this thesis is to construct a well-structured framework and user-friendly interfaces
 that seamlessly integrate AI algorithms into the Quoridor game. The development of AI algorithms customized to

@@ -52,6 +52,9 @@
 \usepackage{xcolor}         % typesetting in color
 \usepackage{listings}
 \usepackage{subcaption}
+\usepackage[acronym,toc,shortcuts,nonumberlist]{glossaries}
+\makeglossaries
+
 
 %%% Basic information on the thesis
 
@@ -109,6 +112,11 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 % Definitions of macros (see description inside)
 \include{macros}
 
+\newacronym{AI}{AI}{Artificial Intelligence}
+\newacronym{XR}{XR}{extended reality}
+\newacronym{RTS}{RTS}{real-time strategy}
+\newacronym{MCTS}{MCTS}{Monte-Carlo tree search}
+
 % Title page and various mandatory informational pages
 \begin{document}
 \include{title}
@@ -138,6 +146,8 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
 \chapwithtoc{List of Abbreviations}
+\printglossaries
+
 
 %%% Attachments to the bachelor thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments
