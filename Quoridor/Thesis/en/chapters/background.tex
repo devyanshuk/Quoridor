@@ -1,0 +1,84 @@
+\chapter{Background}
+\label{background}
+
+In this chapter, we give a brief overview of different \ac{AI} techniques that have been considered for implementing the agent for Quoridor including the minimax algorithm.
+
+\section{Zero-sum game}
+A zero-sum game is defined as a game where an advantage to one side means an equal loss to the opponent, resulting in the sum of zero. In zero sum games such as chess, tic-tac-toe, an advantage or a win for a team would mean a disadvantage or a loss for another team. 
+
+An example of a zero sum game is poker where, for example, 5 people buy in with a total of 50 euros each, making the table total of 250 euros. In the end, despite some winners or losers in the game, the total will be distributed among the players. In this game, there will be a zero net gain resulting in a zero sum game.
+
+Similarly, in chess, the evaluation of a given position on the board may be slightly advantageous to white. This will always imply that the position is slightly disadvantageous for the player playing the black pieces. A loss of a rook for black would mean, in some cases, an equivalent loss worth 5 pawns. This would imply an equivalent 5 pawn gain for the opponent playing with the white pieces.
+
+
+\section{Minimax algorithm}
+
+Minimax algorithm, first proven by John von Neumann in 1928 in his paper \textit{Zur Theorie Der Gesellschaftsspiele}, is a very popular algorithm employed in many decision-making scenarios for e.g., in decision theory, game theory and even philosophy. As suggested by the name minimax, the idea of the algorithm is to minimize the player's loss when the opponent makes a decision that gives the player the maximum loss. This algorithm has been implemented in many two-player zero-sum strategy games such as chess and tic-tac-toe
+
+Mathematically, a minimax algorithm can be defined as the following:
+\begin{equation}
+    \bar{v}_i = \min_{a_{-i}} \max_{a_{i}} v_i (a_i, a_{-i})
+\end{equation}
+where,
+\begin{align}
+    &i = \text{index of the player of interest} \\
+    &-i = \text{index of the opponent(s)} \\
+    &a_i= \text{action of the player of interest)} \\
+    &a_{-i}= \text{action of the opponents)} \\
+    &v_i = \text{value function of player i} \\
+    &\bar{v}_i = \text{minimax value of the player of interest}
+\end{align}
+
+ The value represented by $v_i (a_i, a_{-i})$ defines the  initial set of values or outcomes of the game depending on various actions of the player $i$ and player $-i$. We first marginalize away the set of actions of the the player (e.g., $a_{i}$) from the set of possible outcomes by maximizing the value $v_i$ over the set of every possible action of the player. The implication here is that we are evaluating all the possible actions of the player and selecting the one that maximizes the value function.  We then choose an action $a_{-i}$ from the set of all possible actions of the opponent that minimizes the maximum value function. 
+
+ In a two-player zero sum game, this concept translates to the following interpretation. Given a two person zero sum game with finite actions of the players, there exists a value $V$ such that given an opponent's strategy, the value to the player of interest is $V$. This implies that given the player of interest's chooses the strategy, the opponent's value is $-V$ making the sum zero.
+
+ Below in an example of a minimax algorithm in zero sum game:
+
+ \begin{itemize}
+     \item Consider two players A and B.
+     \item The players simultaneously choose a number (an integer) between 1 and 5.
+     \item The payoff is the difference between the two chosen numbers. For example, if Player A chooses $5$ and player B chooses $1$, Player B has to give $5-1=4$ to Player A.
+     \item This can be exemplified with the payoff matrix below:
+     \begin{table}[!ht]
+         \centering
+         \begin{tabular}{|c|c|c|c|c|c|}\hline
+               & B chooses 1 & B chooses 2 & B chooses 3 & B chooses 4 & B chooses 5  \\ \hline 
+              A chooses 1 & 0 & -1& -2& -3&  -4 \\ \hline
+              A chooses 2 & 1 & 0 & -1 & -2 & -3   \\ \hline
+              A chooses 3 & 2 & 1 & 0 & -1 & -2  \\ \hline
+              A chooses 4 & 3 & 2 & 1 & 0 &  -1 \\ \hline
+              A chooses 5 & 4 & 3 & 2 & 1 & 0  \\ \hline
+         \end{tabular}
+         \caption{Payoff matrix for the described game from the perspective of player A}
+         \label{tab:my_label}
+     \end{table}
+ \end{itemize}
+For the $\max_{a_{-i}} v_i (a_i, a_{-i})$ part, the player A first marginalizes away the actions of the opponent $a_{-i}$. This results in the following table:
+
+     \begin{table}[!ht]
+         \centering
+         \begin{tabular}{|c|c|c|c|c|c|}\hline
+               & B chooses 1 & B chooses 2 & B chooses 3 & B chooses 4 & B chooses 5  \\ \hline 
+              $\max_{a_i} v_i(a_i, a_{-i})$ & 4 & 3& 2& 1&  0 \\ \hline
+         \end{tabular}
+         \caption{Marginalied value of the payoff matrix after maximizing over the player's actions}
+         \label{tab:my_label}
+     \end{table}
+
+ We first marginalize away the set of actions of the player (e.g., $a_{i}$) from the set of possible outcomes by maximizing the value $v_i$ over the set of every possible action of the player. 
+ 
+ We then determine the $\min_{a_{-i}}$ over the set of chosen values and determine that $0$ is the minimum when B chooses 5.
+
+ We determine that for player A, no matter what B chooses, the optimal strategy to maximize the value to the player $i$ is choosing $5$. this is the dominant strategy. This is also known as the dominant strategy when the value of the minimax can be determined only based on player A's actions without depending on the actions of player B. 
+ 
+
+ 
+
+
+
+
+
+
+
+

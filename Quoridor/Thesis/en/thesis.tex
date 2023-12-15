@@ -14,6 +14,7 @@
 % \openright makes the following text appear on a right-hand page
 \let\openright=\clearpage
 
+
 %% Settings for two-sided (duplex) printing
 % \documentclass[12pt,a4paper,twoside,openright]{report}
 % \setlength\textwidth{145mm}
@@ -55,6 +56,7 @@
 \usepackage[ruled]{algorithm2e}
 \usepackage[acronym,toc,shortcuts,nonumberlist]{glossaries}
 \makeglossaries
+\usepackage{amsmath}
 
 
 %%% Basic information on the thesis
@@ -128,9 +130,9 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 
 %%% Each chapter is kept in a separate file
 \include{preface}
+\include{chapters/background}
 \include{chapters/chap01}
 \include{chapters/chap02}
-\include{chapters/chap03}
 
 \include{epilog}
 

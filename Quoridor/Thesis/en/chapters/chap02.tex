@@ -82,10 +82,10 @@ As an example, the figure below represents a game states with the maximum and mi
 
 As depicted by Figure \ref{fig:MaxBranchingFactor}, player A has 5 possible places to move their pawn to. No walls have been placed so far, so player A can also place one of their walls in any place.
 \par
-For a board of size NxN with no wall(s) placed, $(N-1)$ walls can be placed in each row (since each wall occupies \textbf{2} cell lengths), and there are $(N-1)$ rows for correct horizontal wall placements. Hence, there are $(N-1)^2$ slots for horizontal wall placements, and since the board is NxN, the total  slots for both horizontal and vertical wall placements is given by the equation:
+For a board of size NxN with no wall(s) placed, $N-1$ walls can be placed in each row (since each wall occupies 2 cell lengths), and there are $N-1$ rows for correct horizontal wall placements. Hence, there are $(N-1)^2$ slots for horizontal wall placements, and since the board is NxN, the total  slots for both horizontal and vertical wall placements is given by the equation:
 \begin{equation}
 \label{eq:WallPlacements}
-    2*(N-1)^2
+    2(N-1)^2
 \end{equation}
 
 \par
