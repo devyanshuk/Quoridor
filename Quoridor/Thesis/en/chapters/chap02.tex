@@ -150,3 +150,48 @@ We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Sem
 From figure \ref{fig:BranchingFactor}, like with the maximum branching factor, we can see a similar exponential trend of the average branching factors in order of N. Furthermore, based on only the four dimensions and their averages and maximum branching factors, the average branching factor seems to be almost half the maximum branching factor
 
 The average branching factor for board of dimension 9x9 was about \textbf{62}, which is very close to the value proposed by \cite{Glendenning2002MasteringQ}
+
+\section{State space complexity}
+
+The state space complexity in Quoridor refers to the total number of possible game states that can be reached from the initial game state. This includes all the possible positions of both players' pawns on the board and all the possible configurations of walls.
+It is extremely difficult to find an exact value because we also need to account for wall placement rules \ref{WallRules} and pawn movement rules \ref{PlayerMoveRules}.
+Because of this, we loosen the regulations to come up with an upper-bound.
+
+For a board of Dimension NxN, the first pawn can be placed in $N^2$ possible locations. After the first pawn is placed in the board, the second pawn now has $N^2-1$ possible locations to be placed into. So, the total number of ways for pawn placement, $S_p$ is given by: \cite{Mertens2006Quoridor}
+\begin{equation}
+    S_p = N^2(N^2 - 1)
+\end{equation}
+
+As for walls, from equation \ref{eq:WallPlacements}, we know that there are $2(N-1)^2$ ways of placing walls on the board, both horizontally and vertically. Since we know that each wall occupies 2 cells, we will assume that placing the wall anywhere in the board takes away the possibility of placing walls at 4 different places, even though this is not particularly true at the edges. So, the total number of wall placement, $S_w$ is given by: \cite{Mertens2006Quoridor}
+\begin{equation}
+    S_w = \sum_{i=0}^{20}\prod_{j=0}^{i}(N^2 - 4i)
+\end{equation}
+
+And thus, the total state space complexity is given by $S = S_w * S_p$, which, for the standard quoridor board size 9x9 is \textbf{$3.9905 * 10^{42}$} \cite{Mertens2006Quoridor}
+
+\section{Game tree complexity}
+
+The game tree complexity refers to the number of possible games that can be played, i.e the total number of states in the game tree.
+For example, the root node for game tree for the tic-tac-toe game has a branching factor of 9, or, in other words, the first player has 0 possible places to put the 'X' into. The branching factor decreases by 1 as the game progresses, and hence, the game complexity of tic-tac-toe is $9 * 8 * ... * 1 = 9!$.
+
+In complex games like Quoridor, the game-tree complexity can be estimated by raising the branching factor to a power of the total number of moves by the players, which is given by \cite{Mertens2006Quoridor}
+\begin{equation}
+    G =1.7884 * 10^{162}
+\end{equation}
+
+\pagebreak
+
+\section{Comparison with other games}
+
+\begin{table}[ht]
+     \centering
+     \begin{tabular}{|c|c|c|c|}\hline
+          & log(state space complexity) & log(game tree complexity) & Branching factor\\ \hline 
+          Tic-tac-toe  & 3   & 5   & 4    \\ \hline
+          Connect-four & 13  & 21  & 4    \\ \hline
+          Chess        & 44  & 123 & 35   \\ \hline
+          Quoridor     & 42  & 162 & 60  \\ \hline
+          Go           & 170 & 360 & 250 \\ \hline
+     \end{tabular}
+     \caption{State space, game tree and branching factor comparison between well-known games}
+ \end{table}
