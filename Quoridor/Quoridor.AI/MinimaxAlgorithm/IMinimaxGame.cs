@@ -7,7 +7,7 @@ namespace Quoridor.AI.MinimaxAlgorithm
         IMove<TMove>,
         IStaticEvaluation,
         IValidMoves<TMove>,
-        ICurrentPlayer<TPlayer>
+        IPlayer<TPlayer>
     {
     }
 }

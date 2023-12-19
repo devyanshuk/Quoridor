@@ -1,0 +1,55 @@
+\chapter{Implementation}
+
+In this chapter, we delve into the practical aspects of creating \ac{AI} agents capable of tackling abstract strategy games. The focus is on constructing adaptable, game-agnostic systems that can be applied to a variety of games, ranging from the simplicity of Tic-tac-toe to the profound strategic depths of Go, with our primary case study being the game of Quoridor.
+
+\ac{Csharp}, is selected as the language of choice, mainly for its robustness, versatility, and strong support for object-oriented programming paradigms. \ac{Csharp}'s rich feature set makes it an excellent tool for developing sophisticated \ac{AI} frameworks that require a blend of performance, maintainability and readability.
+
+\subsection{Interfaces}
+
+The architecture of our \ac{AI} algorithms leverages interfaces, fundamental constructs in object-oriented design that define contracts for implementing classes. These interfaces specify a set of methods related to game mechanics, which are vital for the operation of \ac{AI} agents. Through the use of generic parameters \textbf{TPlayer}, \textbf{TMove}, and \textbf{TGame}, these interfaces offer a framework that is adaptable to various game entities such as players, moves, and game states. \\ \\
+The fundamental interfaces and their contents include the following:
+
+\begin{itemize}
+    \item \textbf{ICurrentPlayer\textless{}TPlayer\textgreater{}}
+        \begin{itemize}
+            \item \textbf{TPlayer CurrentPlayer \{ get; \}}: Retrieves the active player.
+        \end{itemize}
+
+    \item \textbf{IDeepCopy\textless{}T\textgreater{}}
+        \begin{itemize}
+            \item \textbf{T DeepCopy()}: A method that creates a deep copy (eg. of a game state), allowing for safe simulations and backtracking without altering the actual object.
+        \end{itemize}
+
+    \item \textbf{IMove\textless{}TMove\textgreater{}}: Encapsulates the operations of making and undoing moves.
+        \begin{itemize}
+            \item \textbf{void Move(TMove move)}: Applies a move to the game state.
+            \item \textbf{void UndoMove(TMove move)}: Reverts a move, restoring the game state to its previous condition.
+        \end{itemize}
+
+    \item \textbf{INeighbors\textless{}TMove\textgreater{}}: Defines adjacency relations on the game board.
+        \begin{itemize}
+            \item \textbf{IEnumerable\textless{}TMove\textgreater{} Neighbors(TMove pos)}: Yields the neighboring positions or states from a given position \texttt{pos}, crucial for determining potential player actions.
+        \end{itemize}
+
+    \item \textbf{IOpponent\textless{}TPlayer\textgreater{}}:
+        \begin{itemize}
+            \item \textbf{TPlayer Opponent \{ get; \}}: Provides access to the opposing player.
+        \end{itemize}
+
+    \item \textbf{IStaticEvaluation}: Evaluates the static value of a game state.
+        \begin{itemize}
+            \item \textbf{double Evaluate(bool currentMaximizer)}: Computes a heuristic evaluation of the current game state, indicating the desirability of the state for the player who is currently maximizing or minimizing the game value.
+        \end{itemize}
+
+    \item \textbf{ITerminal}:
+        \begin{itemize}
+            \item \textbf{bool HasFinished \{ get; \}}: A property that checks whether the game has reached a terminal state.
+        \end{itemize}
+
+    \item \textbf{IValidMoves\textless{}TMove\textgreater{}}: Provides a set of legal moves available from the current game state.
+        \begin{itemize}
+            \item \textbf{IEnumerable\textless{}TMove\textgreater{} GetValidMoves()}: Returns all valid moves that can be made from the current state.
+        \end{itemize}
+\end{itemize}
+
+They form the backbone of the implemented \ac{AI} system, ensuring that the agents are versatile and can be adapted to new games with minimal changes to the underlying codebase.

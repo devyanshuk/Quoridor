@@ -9,7 +9,7 @@ namespace Quoridor.AI.MCTS
         IDeepCopy<TGame>,
         IOpponent<TPlayer>,
         IValidMoves<TMove>,
-        ICurrentPlayer<TPlayer>
+        IPlayer<TPlayer>
     {
     }
 }

@@ -71,14 +71,36 @@ For the $\max_{a_{-i}} v_i (a_i, a_{-i})$ part, the player A first marginalizes 
  We then determine the $\min_{a_{-i}}$ over the set of chosen values and determine that $0$ is the minimum when B chooses 5.
 
  We determine that for player A, no matter what B chooses, the optimal strategy to maximize the value to the player $i$ is choosing $5$. this is the dominant strategy. This is also known as the dominant strategy when the value of the minimax can be determined only based on player A's actions without depending on the actions of player B. 
- 
+
+ In the above example, the search size is limited. However, in many games such as chess, the size of the search space is too big. In such cases, it would be impossible to perform an exhaustive search on the game space due to limited computational resources. For example, in chess, for every possible action of the player, there are many responses of the opponent. This search space increases even more if we consider the further moves and hence the possibilities of the player and the opponent. In terms of graph, every action of the player can be considered as a node and the action of the opponent can be considered as a child of the node. The further moves of the player and the opponent can be captured by representing the moves as further child nodes.
+
+One way to limit the search space for implementing the minimax algorithm is consider a depth-limited version of the algorithm. In this version, the algorithm only considers a part game tree with limited depth of the graph. Increasing the depth increases the accuracy of the decision at the cost of computational complexity. In terms of game, this depth may be equivalent to "looking ahead only a few moves". 
+
+Other ways to limit the complexity of the minimax algorithm are alpha-beta pruing and parallel minimax algorithm.
 
  
+\subsection{Alpha-beta pruning}
+
+Alpha-beta pruning is a another way to reduce the number of nodes that are evaluated by the minimax algorithm. In many cases, there may be the actions of the player in the search tree that can be evaluated worse than another action already evaluated. In such cases, where the better move or action has already been determined, it may not be useful to further evaluate the subsequent moves of the player and the opponent. Hence, the alpha-beta pruning moves on to another action instead of further evaluating the worse action.
+
+As its name suggests, the alpha beta algorithm maintains two values, alpha and beta values. The alpha value stores the minimum score the player is assured to get while the beta value records the maximum score the opponent is assured to get. Whenever the evaluation of the minimum score of the player is higher than the maximum score after the subsequent move of the opponent (or in other words alpha > beta), the alpha-beta pruning algorithm stops evaluating the opponents position. This reduces the number of nodes in the search tree and hence reduces the complexity of the minimax algorithm.
 
 
 
+\subsection{Parallel minimax}
 
+ 
+\section{\ac{MCTS}}
 
+\ac{MCTS} \cite{Coulom2006Efficient} is a heuristic tree search algorithm popular in decision-making processes, mostly popular in strategic games such as chess and Go to solve the game tree. This algorithm is mostly popular in scenarios where the game tree space is too large to traverse. 
 
+The basic idea of the \ac{MCTS} algorithm is that is narrows down on certain areas of the game tree, such that the exhaustive traversal and search of the tree is not required. The algorithm achieves this by taking random samples in the tree space and building a search tree based on it.
 
+The \ac{MCTS} algorithm builds upon the following framework:
+\begin{enumerate}
+    \item Selection: This step involves the algorithm choosing a move based on either a good move determined in previous iterations or a exploratory new move.
+    \item Expansion: This step involves the algorithm to add a new node to the game tree determined during the selection process. A node can simply be a valid move starting from the node from where no simulation step has been played out. 
+    \item Simulation: This step involves in playing out the game using policy. One of the policies can simply be a random policy (e.g., choosing a move based on certain distribution).
+    \item Back propagation: Finally, based on the simulation step, this step involves in the algorithm updating the nodes.
+\end{enumerate}
 
