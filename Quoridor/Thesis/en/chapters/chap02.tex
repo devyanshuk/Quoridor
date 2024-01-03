@@ -11,30 +11,21 @@ artificial intelligence application.
 \section{Classification of Quoridor}
 
 Quoridor can be characterized as a discrete, deterministic, zero-sum, sequential, game with perfect
-information (\cite{Glendenning2002MasteringQ}) , and therefore, a combinatorial game (\cite{GameTheoryBook})
+information \citep{Glendenning2002MasteringQ} , and therefore, a combinatorial game \citep{GameTheoryBook}. 
 
 \subsection{Discrete}
-In every turn, each player has a finite number of moves and wall placements. These are limited by the
-game state (already placed walls and moved pawns) and the rules of the game. The game-tree of Quoridor
-has finite number of nodes (e.g \ref{fig:GameTree})
+In every turn of the game, each player has a finite number of moves and wall placements. These are limited by the game state (already placed walls and moved pawns) and the rules of the game. The game-tree of Quoridor has finite number of nodes (e.g figure \ref{fig:GameTree}).
 
 \subsection{Deterministic}
 Quoridor has no random elements or chance involved in the gameplay. Every outcome and situation
 is a direct result of the players' decisions and strategies. There's no dice rolling,
-card drawing, or any other mechanism that introduces randomness.
+card drawing, or any other mechanism that introduces randomness. Hence, this is a deterministic game.
 
 \subsection{Zero-sum}
-In Quoridor, when a player makes a move that brings them closer to winning (like advancing their pawn
-or placing a wall effectively), it inherently puts the opponent at a disadvantage. Therefore, any
-positive progress for a player translates into a negative impact for their opponent. This reciprocal
-relationship of gain and loss between the players is what characterizes Quoridor as a \textbf{zero-sum} game.
+In Quoridor, when a player makes a move that brings them closer to winning (like advancing their pawn or placing a wall effectively), it inherently puts the opponent at a disadvantage. Therefore, any positive progress for a player translates into a negative impact for their opponent. This reciprocal relationship of gain and loss between the players is what characterizes Quoridor as a \textbf{zero-sum} game.
 
 \subsection{Perfect Information}
-Every aspect of its gameplay are completely visible and known to all players at all times. This means
-that the positions of the pawns and the placements of the walls on the board are always in full view,
-allowing players to make strategic decisions based on the entire state of the game.
-
-\newpage
+Every aspect of its gameplay are completely visible and known to all players at all times. This means that the positions of the pawns and the placements of the walls on the board are always in full view, allowing players to make strategic decisions based on the entire state of the game. Hence, this property classifies the game as a game of perfect information.
 
 \section{Game-Tree}
 
@@ -42,8 +33,7 @@ A game tree for an \textbf{abstract strategy game} is a comprehensive graph repr
 edges represent action/move.
 
 Game trees are integral to the framework of \textbf{adversarial search problems}, where they are employed to systematically explore and evaluate the possible outcomes of different strategies, and forecast future states of the game based on current and potential moves.
-\newline
-\newline
+
 The following depicts a (partial) game tree for the Quoridor game with a board of size 3x3:
 
 \begin{figure}[h]
@@ -53,16 +43,18 @@ The following depicts a (partial) game tree for the Quoridor game with a board o
     \label{fig:GameTree}
 \end{figure}
 
+As depicted in the figure \ref{fig:GameTree}, the first level of the game consists in player A located in the cell $C_{1, b}$ making a choice for the first move which may consist in the player either moving to a square or placing a wall to deter the opponent. The second level of the game then consist in player B  
+
+
 \subsection{Branching Factor}
 \label{BranchingFactor}
 
 The branching factor of a \textbf{Game-tree} is the number of child nodes of each node, or in other words, the number of possible moves a player at their turn can make, given the game state.
 
-In figure \ref{fig:GameTree}, player A makes the first move. A has \textbf{3} places to move their pawn to and \textbf{8} places to put one of their walls at. So, the root has a \textbf{branching factor} of \textbf{11}.
-\par
-The branching factor is greatly influenced by the state of the board in Quoridor, i.e the player locations and walls placed.
-\newline
-\newline
+In figure \ref{fig:GameTree}, player A makes the first move. A has \textbf{3} places to move their pawn to and \textbf{8} places to put one of their walls at. So, the root node has a \textbf{branching factor} of \textbf{11}.
+
+The branching factor is greatly influenced by the state of the board in Quoridor, i.e the location of the pawn of the player, the location of the pawn of the opponent and the walls placed on the board.
+
 As an example, the figure below represents a game states with the maximum and minimum branching factors:
 
 \begin{figure}[h]
@@ -75,34 +67,33 @@ As an example, the figure below represents a game states with the maximum and mi
     \begin{subfigure}{0.4\textwidth}
       \includegraphics[width=\textwidth]{../img/GameBoard/minimum_branching_factor.png}
       \caption{Minimum : 1}
+        \label{fig:MinBranchingFactor}
     \end{subfigure}
     \caption{Branching factor differences}
-    \label{fig:MinBranchingFactor}
 \end{figure}
 
 As depicted by Figure \ref{fig:MaxBranchingFactor}, player A has 5 possible places to move their pawn to. No walls have been placed so far, so player A can also place one of their walls in any place.
-\par
+
 For a board of size NxN with no wall(s) placed, $N-1$ walls can be placed in each row (since each wall occupies 2 cell lengths), and there are $N-1$ rows for correct horizontal wall placements. Hence, there are $(N-1)^2$ slots for horizontal wall placements, and since the board is NxN, the total  slots for both horizontal and vertical wall placements is given by the equation:
 \begin{equation}
 \label{eq:WallPlacements}
     2(N-1)^2
 \end{equation}
 
-\par
-Coming back to figure \ref{fig:MaxBranchingFactor}, since the board has no walls placed, we now see that A has $5 + 2*(5-1)^2 = 37$ possible moves they can perform, ergo, the branching factor of the game state represented by Figure \ref{fig:MaxBranchingFactor} is \textbf{37}, which is also the maximum branching factor for board sized 5x5.
+Coming back to figure \ref{fig:MaxBranchingFactor}, since the board has no walls placed, we now see that A has $5 + 2(5-1)^2 = 37$ possible moves they can perform, ergo, the branching factor of the game state represented by Figure \ref{fig:MaxBranchingFactor} is \textbf{37}, which is also the maximum branching factor for board sized 5x5.
 \newline
 \newline
-However, in Figure \ref{fig:MinBranchingFactor}, A has no available slot for wall-placement, and the already present walls block A from moving anywhere except for cell \textbf{c3}. Hence, the branching factor for the game state represented by Figure \ref{fig:MinBranchingFactor} is 1.
+However, in Figure \ref{fig:MinBranchingFactor}, player A has no available slot for wall-placement, and the already present walls block A from moving anywhere except for cell \textbf{$C_{3, c}$}. Hence, the branching factor for the game state represented by Figure \ref{fig:MinBranchingFactor} is 1.
 
 \subsubsection{Average Branching Factor}
 
-In sub-section \ref{BranchingFactor}. we saw that the branching factor is not uniform due factors like wall-placements and positioning of the player greatly influencing it.
-\par
+In sub-section \ref{BranchingFactor}, we saw that the branching factor is not uniform due factors like wall-placements and positioning of the player greatly influencing it.
+
 We, therefore, would like to estimate an average branching factor for boards of different lengths to see if varying board dimension has any affect in the average branching factor.
-\par
+
 We already know from equation \ref{eq:WallPlacements} that the maximum branching factor of the game tree is exponential in order of $N$ and from Figure \ref{fig:MinBranchingFactor}, we can deduce that the minimum branching factor is 1 (since we can replicate a similar game state for any game state).
 
-To find an estimate of the average branching factor, we use the Algorithm \ref{alg:AverageBranchingFactor}
+To find an estimate of the average branching factor $B_avg$, we use the Algorithm \ref{alg:AverageBranchingFactor}
 
 \begin{algorithm}[H]
 \caption{Average branching factor}
@@ -136,9 +127,7 @@ To find an estimate of the average branching factor, we use the Algorithm \ref{a
 }
 \end{algorithm}
 
-\newline
-
-We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Semi-random} agents, each for boards of dimensions 3, 5, 7 and 9, and the results of the average branching factor can be seen in figure \ref{fig:BranchingFactor}
+We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Semi-random} agents [\textcolor{red}{Define semi-random agents}], each for boards of dimensions 3, 5, 7 and 9, and the results of the average branching factor can be seen in figure \ref{fig:BranchingFactor}
 
 \begin{figure}[h]
     \centering
@@ -147,51 +136,86 @@ We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Sem
     \label{fig:BranchingFactor}
 \end{figure}
 
-From figure \ref{fig:BranchingFactor}, like with the maximum branching factor, we can see a similar exponential trend of the average branching factors in order of N. Furthermore, based on only the four dimensions and their averages and maximum branching factors, the average branching factor seems to be almost half the maximum branching factor
+From figure \ref{fig:BranchingFactor}, like with the maximum branching factor, we can see a similar exponential trend of the average branching factors in order of N. Furthermore, based on only the four dimensions and their averages and maximum branching factors, the average branching factor seems to be almost half the maximum branching factor.
 
-The average branching factor for board of dimension 9x9 was about \textbf{62}, which is very close to the value proposed by \cite{Glendenning2002MasteringQ}
+The average branching factor for board of dimension 9x9 was about \textbf{62}, which is very close to the value proposed by \citep{Glendenning2002MasteringQ}
 
 \section{State space complexity}
 
-The state space complexity in Quoridor refers to the total number of possible game states that can be reached from the initial game state. This includes all the possible positions of both players' pawns on the board and all the possible configurations of walls.
-It is extremely difficult to find an exact value because we also need to account for wall placement rules \ref{WallRules} and pawn movement rules \ref{PlayerMoveRules}.
-Because of this, we loosen the regulations to come up with an upper-bound.
+The state space complexity is a measure of a game complexity and refers to the total number of possible game states in a game. For example, for illustration with the game of tic tac toe, there are 9 squares and each square has a possibility of either an X or an O or empty. The state space complexity for tic-tac-toe can be written as $3^9 = 19,638$. Of course, this takes into account the illegal positions as well such as all Xs or all Os and hence can be considered as an upper bound on the state space complexity. However, especially in complex games such as Chess and Quoridor with many possible states, rules and illegal positions, exact state space complexity is difficult to estimate and a way to define the complexity is through an upper bound.  
 
-For a board of Dimension NxN, the first pawn can be placed in $N^2$ possible locations. After the first pawn is placed in the board, the second pawn now has $N^2-1$ possible locations to be placed into. So, the total number of ways for pawn placement, $S_p$ is given by: \cite{Mertens2006Quoridor}
+In Quoridor, this includes all the possible positions of both players' pawns on the board and all the possible configurations of walls. It is extremely difficult to find an exact value because we also need to account for wall placement rules \ref{WallRules} and pawn movement rules \ref{PlayerMoveRules}. Because of this, we loosen the regulations to come up with an upper-bound.
+
+In \citep{Mertens2006Quoridor}, the author has determined the state space complexity for a specific board of dimension 9x9. In this thesis, we generalize the complexity evaluation to a general board of size NxN.
+
+For a board of Dimension NxN, the first pawn can be placed in $N^2$ possible locations. After the first pawn is placed in the board, the second pawn now has $N^2-1$ possible locations to be placed into. So, the total number of ways for pawn placement, $S_p$ is given by
 \begin{equation}
     S_p = N^2(N^2 - 1)
 \end{equation}
 
-As for walls, from equation \ref{eq:WallPlacements}, we know that there are $2(N-1)^2$ ways of placing walls on the board, both horizontally and vertically. Since we know that each wall occupies 2 cells, we will assume that placing the wall anywhere in the board takes away the possibility of placing walls at 4 different places, even though this is not particularly true at the edges. So, the total number of wall placement, $S_w$ is given by: \cite{Mertens2006Quoridor}
+As for walls, from equation \ref{eq:WallPlacements}, we know that there are $2(N-1)^2$ ways of placing walls on the board, both horizontally and vertically. Since we know that each wall occupies 2 cells, we will assume that placing the wall anywhere in the board takes away the possibility of placing walls at 4 different places, even though this is not particularly true at the edges. As each placed wall takes two cells, placing a wall, for e.g., horizontally, means that further walls cannot be placed in the location of the wall, walls starting from the cell left and right to the cell of the wall and a wall placed vertically through the placed wall. Every placed wall hence takes away 4 spaces for wall placement. The same example is also valid for a vertically placed wall. Hence assuming that $j$ walls are placed from a given game state, the total number of branches of the game state for wall placement may be $2(N-1)^2 - 4j$,
+
+Furthermore, for a given board dimension (e.g., NxN), there is a fixed number of walls in the game $N_w$. For example, for the standard 9x9 board with 81 total squares, $N_W = 20$. We can extrapolate the number of walls that may be available for boards of other dimensions too based on the number of squares. For example, for 3x3 board, $N_W = 2$, for 5x5 board $N_w$ = 5, for 7x7 board $N_W = 11$.
+
+In the game tree, there may be a path where a total of $N_W$ walls are used. In such scenario, the total number of branches $L_{N_w}$ in the tree can be defined by the following equation:
 \begin{equation}
-    S_w = \sum_{i=0}^{20}\prod_{j=0}^{i}(N^2 - 4i)
+    L_{N_w} = \prod_{j=0}^{N_w} (2(N-1)^2 - 4j),
+\end{equation}
+where, each component in the product defines the total number of states in the subsequent turn following a wall placement.
+
+However, in the game there all the walls may not be necessarily placed. Hence, in such case, the total number of walls used may be variable and hence the total possibilities for wall placement $S_w$ is defined by the following equation:
+\begin{equation}
+    S_w = \sum_{i=0}^{N_w}\prod_{j=0}^{i}(2(N-1)^2 - 4j).
 \end{equation}
 
-And thus, the total state space complexity is given by $S = S_w * S_p$, which, for the standard quoridor board size 9x9 is \textbf{$3.9905 * 10^{42}$} \cite{Mertens2006Quoridor}
+And thus, since the game tree consists in the possibilities of both the pawn placement and wall placement, the total state space complexity is given by $S = S_w * S_p$.
+
+\begin{equation}
+    S = N^2(N^2 -1) \times \sum_{i=0}^{N_w}\prod_{j=0}^{i}(2(N-1)^2 - 4j).
+\end{equation}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=.9\linewidth]{../img/Complexity.png}
+    \caption{Complexity vs Board Dimension}
+    \label{fig:complexity}
+\end{figure}
+
+In figure \ref{fig:complexity}, we can see the log plot of the state space complexity of wall placement and the game when varied with the dimension of the game (i.e., 3x3, 5x5, 7x7 and 9x9). In the figure, we can see the state space of the game grows exponentially with the increase in the board dimension. Moreover, the state space complexity is dominated by the complexity of the wall placement as seen by the difference between the two curves.
+
 
 \section{Game tree complexity}
 
-The game tree complexity refers to the number of possible games that can be played, i.e the total number of states in the game tree.
-For example, the root node for game tree for the tic-tac-toe game has a branching factor of 9, or, in other words, the first player has 0 possible places to put the 'X' into. The branching factor decreases by 1 as the game progresses, and hence, the game complexity of tic-tac-toe is $9 * 8 * ... * 1 = 9!$.
+The game-tree complexity of a game, as defined in \citep{Allis1994Searching}, is another measure of a game complexity alongside the state-space complexity. The authors define a game tree complexity as "\textit{the number of leaf nodes in the solution search tree of the initial position(s) of the game}".
 
-In complex games like Quoridor, the game-tree complexity can be estimated by raising the branching factor to a power of the total number of moves by the players, which is given by \cite{Mertens2006Quoridor}
+The game tree complexity refers to the number of possible games that can be played. Unlike the state space complexity, which measures the total number of possible states of the game from the starting position, the game tree complexity measures the size of the game tree. The size of the game tree or the game-tree complexity typically is larger than the state space complexity because a game state (counted only once in the state space complexity) can arise through multiple games (counted multiple times in the game tree complexity).
+
+An example of the game tree complexity can be illustrated through the game of tic-tac-toe. In the game tree, player A has 9 positions to put the mark (e.g., X or 0) on. Subsequently, in the second move, player B can put the mark on 8 spaces as one has been taken away in the first move and so on. Hence, the game tree complexity of tic-tac-toe can be defined as $9 \times 8 \times \cdots \times 1 = 9! = 362380$. In comparison to the state space complexity of tic-tac-toe, the game tree complexity is higher as a position arising through different orders of play is counted as one state with the state space complexity and multiple game tree positions with the game tree complexity. 
+
+
+In complex games like Quoridor, the game-tree complexity $G$ can be estimated by raising the average branching factor $B_{avg}$ to a power of the total number of moves by the players $D_{avg}$ \cite{Mertens2006Quoridor}, which is given by the following equation: 
 \begin{equation}
-    G =1.7884 * 10^{162}
+    G = B_{avg}^{D_{avg}}
 \end{equation}
-
-\pagebreak
 
 \section{Comparison with other games}
 
 \begin{table}[ht]
-     \centering
+    \centering
      \begin{tabular}{|c|c|c|c|}\hline
-          & log(state space complexity) & log(game tree complexity) & Branching factor\\ \hline 
+          & $\log(S)$ & $\log(G)$ & $B_{avg}$\\ \hline 
           Tic-tac-toe  & 3   & 5   & 4    \\ \hline
           Connect-four & 13  & 21  & 4    \\ \hline
           Chess        & 44  & 123 & 35   \\ \hline
-          Quoridor     & 42  & 162 & 60  \\ \hline
+          Quoridor 3x3     & 3  &  & 8  \\ \hline
+          Quoridor 5x5     & 10  &  & 18  \\ \hline
+          Quoridor 7x7    & 22  &  & 38  \\ \hline
+          Quoridor 9x9     & 42  & 162 & 62  \\ \hline        
           Go           & 170 & 360 & 250 \\ \hline
      \end{tabular}
      \caption{State space, game tree and branching factor comparison between well-known games}
  \end{table}
+
+ In the above table, we present the logarithm of the state space complexity ($\log(S)$), the game state complexity ($\log(G)$) and the average branching factor ($B_avg$) of some popular games from the literature \citep{Mertens2006Quoridor}.
+
+ As we can see from the above table, the 

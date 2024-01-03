@@ -50,6 +50,250 @@ The fundamental interfaces and their contents include the following:
         \begin{itemize}
             \item \textbf{IEnumerable\textless{}TMove\textgreater{} GetValidMoves()}: Returns all valid moves that can be made from the current state.
         \end{itemize}
+
+    \item \textbf{IRandomizableMoves\textless{}TMove\textgreater{}}): Provides a set of moves that can be used at random.
+        \begin{itemize}
+            \item \textbf{IEnumerable\textless{}TMove\textgreater{} RandomizableMoves()}: Returns all valid moves (that guide the current game state towards the terminal state) that can be made from the current state and can be used by the random agent.
+        \end{itemize}
 \end{itemize}
 
 They form the backbone of the implemented \ac{AI} system, ensuring that the agents are versatile and can be adapted to new games with minimal changes to the underlying codebase.
+
+\section{Agents}
+
+In this section, we discuss the generic \ac{AI} agent implementation, namely Random, Semi-Random, Minimax, A-Star, Monte Carlo Tree search, and describe the aforementioned interfaces used by them.
+
+\subsection{Random Agent}
+
+The random agent uses the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface to get a list of all valid moves, and then picks move at random. This agent can be viewed as a baseline for how well the robust algorithms perform.
+
+\begin{figure}[H]
+\captionsetup{justification=centering}
+\begin{lstlisting}
+public class RandomStrategy<TMove, TGame, TPlayer>(int seed)
+where TGame : IValidMoves<TMove>
+{
+    private readonly System.Random _random = new System.Random(seed);
+    
+    public TMove BestMove(TGame game, TPlayer player)
+    {
+        // IValidMoves<TMove>
+        var validMoves = game.GetValidMoves();
+
+        //pick a random number corresponsing to the index of the move
+        var randIndex = _random.Next(0, validMoves.Count());
+
+        //return the random move
+        return validMoves.ElementAt(randIndex)
+    }
+}
+\end{lstlisting}
+\caption{Pseudocode and class structure of the Random algorithm}
+\label{fig:randomAlgo}
+\end{figure}
+
+\subsection{Semi-Random agent}
+
+There are cases where we want to return a random move, but we don't want the game to continue forever by the random agent possibly returning move that never end in a terminal state. In this case, we want to guide the random agent to produce a random move, but also make sure the game will terminate eventially. This algorithm is especially useful for the Simulation step of the Monte Carlo Tree search algorithm as an approach to shorten the game length to reach the terminal state.
+
+\begin{figure}[H]
+\captionsetup{justification=centering}
+\begin{lstlisting}
+public class SemiRandomStrategy<TGame, TMove, TPlayer>
+    where TPlayer : IAStarPlayer<TMove>
+    where TGame : INeighbors<TMove>, IRandomizableMoves<TMove>
+{
+    public TMove BestMove(TGame game, TPlayer player)
+    {
+        //IRandomizableMoves<TMove>
+        //these moves, when used won't result in a possible infinite game
+        possibleMoves = game.RandomizableMoves();
+
+        //non-randomizable move. This move might create infinite game loop if not 
+        //used strategically, eg. pawn moves in Quoridor.
+        nonRandomizableMove = _strategy.BestMove(game, player);
+
+        //add the non-randomizable move to the list of all moves
+        possibleMoves.Add(nonRandomizableMove);
+
+        //return a random move
+        var randIndex = _random.Next(0, possibleMoves.Count);
+        return possibleMoves[randIndex];
+    }
+|
+\end{lstlisting}
+\caption{Pseudocode and class structure of the Semi-Random algorithm}
+\label{fig:semiRandomAlgo}
+\end{figure}
+
+
+The minimax class then has the following signature:
+
+\begin{figure}[h]
+\captionsetup{justification=centering}
+\begin{lstlisting}
+public class Minimax<TPlayer, TMove, TGame>(int Depth)
+    where TGame : ITerminal,
+                  IMove<TMove>,
+                  IStaticEvaluation,
+                  IValidMoves<TMove>,
+                  IPlayer<TPlayer>
+
+public TMove MinimaxStep(
+    TGame game, int depth, bool maximizingPlayer) {
+    
+    // ITerminal
+    if (depth <= 0 || game.HasFinished) {
+        // IStaticEvaluation
+        return game.Evaluate(maximizingPlayer);
+    }
+
+    // Initialize best score and move
+    bestScore, bestMove = Init();
+
+    // IValidMoves<TMove>
+    foreach(var move in game.GetValidMoves())
+    {
+        // IMove<TMove>
+        game.Move(move);
+
+        //recursively call the MinimaxStep functino and update the
+        //best score and move
+        
+        result = MinimaxStep(game, depth - 1, !maximizingPlayer);
+
+        //update best score and move
+        bestMove, bestScore = Update(result);
+        
+        // IMove<TMove>
+        game.UndoMove(move);
+    }
+    return bestMove;
+}
+\end{lstlisting}
+\caption{Pseudocode and class structure of the Minimax algorithm}
+\label{fig:minimaxAlgo}
+\end{figure}
+
+
+
+\begin{figure}[h]
+\captionsetup{justification=centering}
+\begin{lstlisting}
+
+public TMove MinimaxStep(
+    TGame game, int depth, bool maximizingPlayer, int alpha, int beta) {
+    
+    // return static evaluation if depth reached or game over
+    // IStaticEvaluation
+
+    bestMove = maximizingPlayer ? MinValue : MaxValue;
+    
+    // IValidMoves<TMove>
+    foreach(var move in game.GetValidMoves())
+    {
+        // IMove<TMove>
+        game.Move(move);
+
+        //recursively call the MinimaxStep functino and update the
+        //best score and move
+        result = MinimaxStep(game, depth - 1, !maximizingPlayer);
+        
+        // IMove<TMove>
+        game.UndoMove(move);
+
+        if (maximizingPlayer)
+        {
+            if (result.Value > bestMove.Value)
+            {
+                bestMove.BestMove = move;
+                bestMove.Value = result.Value;
+            }
+            if (bestMove.Value > beta)
+                break;
+
+            alpha = Math.Max(alpha, bestMove.Value);
+        }
+        else
+        {
+            if (result.Value < bestMove.Value)
+            {
+                bestMove.BestMove = move;
+                bestMove.Value = result.Value;
+            }
+            if (bestMove.Value < alpha)
+                break;
+
+            beta = Math.Min(beta, bestMove.Value);
+        }
+    }
+    return bestMove;
+}
+\end{lstlisting}
+\caption{Pseudocode of the Minimax algorithm with alpha beta pruning}
+\label{fig:minimaxABPruning}
+\end{figure}
+
+
+\begin{figure}[h]
+\captionsetup{justification=centering}
+\begin{lstlisting}
+
+public class AStar<TMove, TMaze, TPlayer>
+    where TPlayer : IAStarPlayer<TMove>
+    where TMaze : INeighbors<TMove>
+{
+    public TMove BestMove(TMaze maze, TPlayer player)
+    {
+        var start = new Node<TMove> { CurrMove = player.GetCurrentMove() };
+        var openSet = new HashSet<Node<TMove>>() { start  };
+        var closedSet = new HashSet<Node<TMove>>();
+
+        //set the initial node as the current node
+        var currNode = start;
+
+        while (openSet.Count() > 0)
+        {
+            //get the node from the opoen set with the lowest f-score value
+            var nodeWithLowestFscore = openSet.MinBy(s => s.FValue);
+            currNode = nodeWithLowestFscore;
+
+            //put this node in closed set and remove it from open set
+            closedSet.Add(nodeWithLowestFscore);
+            openSet.Remove(nodeWithLowestFscore);
+
+            //if the closed set contains a goal node, we're done
+            if (closedSet.Any(node => player.IsGoal(node.CurrMove)))
+                return currNode;
+
+            //INeighbors<TMove>
+            foreach (var neighbor in maze.Neighbors(currNode.CurrMove))
+            {
+                var neighborNode = new Node<TMove> { CurrMove = neighbor };
+                //if it's in the closed list, skip it
+                if (closedSet.Contains(neighborNode))
+                    continue;
+
+                var gScore = currNode.GValue + 1;
+
+                //if the neighbor is not in the open set or if the neighbor's G score is
+                //lower than the calculated g-score, update the g score and set the neighbor
+                //as current node's parent.
+                if (!openSet.Contains(neighborNode) || neighborNode.GValue < gScore)
+                {
+                    neighborNode.GValue = gScore;
+                    neighborNode.HValue = player.CalculateHeuristic(neighbor);
+                    neighborNode.FValue = gScore + neighborNode.HValue;
+                    neighborNode.Parent = currNode;
+                    //if neighbor was already present, it won't re-add.
+                    openSet.Add(neighborNode);
+                }
+            }
+        }
+        return null;
+    }
+
+\end{lstlisting}
+\caption{Pseudocode and class structure of the A-Star algorithm}
+\label{fig:minimaxABPruning}
+\end{figure}
