@@ -4,77 +4,118 @@ In this chapter, we delve into the practical aspects of creating \ac{AI} agents 
 
 \ac{Csharp}, is selected as the language of choice, mainly for its robustness, versatility, and strong support for object-oriented programming paradigms. \ac{Csharp}'s rich feature set makes it an excellent tool for developing sophisticated \ac{AI} frameworks that require a blend of performance, maintainability and readability.
 
-\subsection{Interfaces}
+\section{Interfaces}
 
-The architecture of our \ac{AI} algorithms leverages interfaces, fundamental constructs in object-oriented design that define contracts for implementing classes. These interfaces specify a set of methods related to game mechanics, which are vital for the operation of \ac{AI} agents. Through the use of generic parameters \textbf{TPlayer}, \textbf{TMove}, and \textbf{TGame}, these interfaces offer a framework that is adaptable to various game entities such as players, moves, and game states. \\ \\
+The architecture of our implementation leverages interfaces, fundamental constructs in object-oriented design that define contracts for implementing classes. These interfaces specify a set of methods related to game mechanics, which are vital for the operation of \ac{AI} agents. Through the use of generic parameters \textbf{TPlayer}, \textbf{TMove}, and \textbf{TGame}, these interfaces offer a framework that is adaptable to various game entities such as players, moves, and game states.
+
 The fundamental interfaces and their contents include the following:
 
-\begin{itemize}
-    \item \textbf{ICurrentPlayer\textless{}TPlayer\textgreater{}}
-        \begin{itemize}
-            \item \textbf{TPlayer CurrentPlayer \{ get; \}}: Retrieves the active player.
-        \end{itemize}
+\begin{lstlisting}
+interface IPlayer<TPlayer>
+{
+    /*
+     *Retrieves the active player in the game.
+     *Parametrized over TPlayer instance
+     */
+    TPlayer CurrentPlayer { get; }
+}
 
-    \item \textbf{IDeepCopy\textless{}T\textgreater{}}
-        \begin{itemize}
-            \item \textbf{T DeepCopy()}: A method that creates a deep copy (eg. of a game state), allowing for safe simulations and backtracking without altering the actual object.
-        \end{itemize}
+interface IDeepCopy<T>
+{
+    /*
+     *Create a deep copy of an instance, (e.g. of a game
+     *state, allowing for safe simulations and backtracking)
+     *without altering the actual object.
+     */
+    T DeepCopy();
+}
 
-    \item \textbf{IMove\textless{}TMove\textgreater{}}: Encapsulates the operations of making and undoing moves.
-        \begin{itemize}
-            \item \textbf{void Move(TMove move)}: Applies a move to the game state.
-            \item \textbf{void UndoMove(TMove move)}: Reverts a move, restoring the game state to its previous condition.
-        \end{itemize}
+interface IStaticEvaluation
+{
+    /*
+     *Computes a heuristic evaluation of the current game state,
+     *indicating the desirability of the state for the player who
+     *is currently maximizing or minimizing the game value
+    */
+    public double Evaluate(bool currentMaximizer);
+}
 
-    \item \textbf{INeighbors\textless{}TMove\textgreater{}}: Defines adjacency relations on the game board.
-        \begin{itemize}
-            \item \textbf{IEnumerable\textless{}TMove\textgreater{} Neighbors(TMove pos)}: Yields the neighboring positions or states from a given position \texttt{pos}, crucial for determining potential player actions.
-        \end{itemize}
 
-    \item \textbf{IOpponent\textless{}TPlayer\textgreater{}}:
-        \begin{itemize}
-            \item \textbf{TPlayer Opponent \{ get; \}}: Provides access to the opposing player.
-        \end{itemize}
 
-    \item \textbf{IStaticEvaluation}: Evaluates the static value of a game state.
-        \begin{itemize}
-            \item \textbf{double Evaluate(bool currentMaximizer)}: Computes a heuristic evaluation of the current game state, indicating the desirability of the state for the player who is currently maximizing or minimizing the game value.
-        \end{itemize}
+interface ITerminal
+{
+    /*
+    * A property that checks whether the game has
+    * reached a terminal state.
+    */
+    bool HasFinished { get; }
+}
 
-    \item \textbf{ITerminal}:
-        \begin{itemize}
-            \item \textbf{bool HasFinished \{ get; \}}: A property that checks whether the game has reached a terminal state.
-        \end{itemize}
+interface IValidMoves<TMove>
+{
+    /*
+    *Returns all the valid moves that can
+    *be made from the current state.
+    */
+    IEnumerable<TMove> GetValidMoves();
+}
 
-    \item \textbf{IValidMoves\textless{}TMove\textgreater{}}: Provides a set of legal moves available from the current game state.
-        \begin{itemize}
-            \item \textbf{IEnumerable\textless{}TMove\textgreater{} GetValidMoves()}: Returns all valid moves that can be made from the current state.
-        \end{itemize}
+interface IOpponent<TPlayer>
+{
+    /*
+    * Retrieves the active opponent in the game state,
+    * parametrized over TPlayer
+    */
+    TPlayer Opponent { get; }
+}
 
-    \item \textbf{IRandomizableMoves\textless{}TMove\textgreater{}}): Provides a set of moves that can be used at random.
-        \begin{itemize}
-            \item \textbf{IEnumerable\textless{}TMove\textgreater{} RandomizableMoves()}: Returns all valid moves (that guide the current game state towards the terminal state) that can be made from the current state and can be used by the random agent.
-        \end{itemize}
-\end{itemize}
+interface INeighbors<TMove>
+{
+    /*Yields the neighboring positions or states from a given
+    *position pos, crucial for deter-mining potential player actions
+    */
+    IEnumerable<TMove> Neighbors(TMove pos);
+}
+
+interface IMove<TMove>
+{
+    // Applies a move to the game state
+    void Move(TMove move);
+
+    /*
+    *Reverts a move, restoring the
+    *game state to its previous condition
+    */
+    void UndoMove(TMove move);
+}
+
+interface IRandomizableMoves<TMove>
+{
+    /*
+     *Returns all the valid moves (that guide the current game state
+     *towards the terminal state) that can be made from the current
+     *state and can be used by the random agent
+    */
+    public IEnumerable<TMove> RandomizableMoves();
+}
+
+\end{lstlisting}
 
 They form the backbone of the implemented \ac{AI} system, ensuring that the agents are versatile and can be adapted to new games with minimal changes to the underlying codebase.
 
 \section{Agents}
 
-In this section, we discuss the generic \ac{AI} agent implementation, namely Random, Semi-Random, Minimax, A-Star, Monte Carlo Tree search, and describe the aforementioned interfaces used by them.
+In this section, we discuss the generic \ac{AI} agent implementation, namely Random, Semi-Random, Minimax, A-Star, Monte Carlo Tree search, and describe how the aforementioned interfaces are used as building blocks for the algorithm.
 
 \subsection{Random Agent}
+We consider a random agent as a baseline for comparing the performance of the other implemented agents. 
 
-The random agent uses the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface to get a list of all valid moves, and then picks move at random. This agent can be viewed as a baseline for how well the robust algorithms perform.
+The random agent uses the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface to get a list of all valid moves, and then picks move at random. The pseudocode for the random agent along with the interface is given below:
 
-\begin{figure}[H]
-\captionsetup{justification=centering}
 \begin{lstlisting}
 public class RandomStrategy<TMove, TGame, TPlayer>(int seed)
 where TGame : IValidMoves<TMove>
-{
-    private readonly System.Random _random = new System.Random(seed);
-    
+{    
     public TMove BestMove(TGame game, TPlayer player)
     {
         // IValidMoves<TMove>
@@ -88,16 +129,15 @@ where TGame : IValidMoves<TMove>
     }
 }
 \end{lstlisting}
-\caption{Pseudocode and class structure of the Random algorithm}
-\label{fig:randomAlgo}
-\end{figure}
+
+As described above, the Random Agent picks a move from the set of valid moves based on the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface.
 
 \subsection{Semi-Random agent}
 
-There are cases where we want to return a random move, but we don't want the game to continue forever by the random agent possibly returning move that never end in a terminal state. In this case, we want to guide the random agent to produce a random move, but also make sure the game will terminate eventially. This algorithm is especially useful for the Simulation step of the Monte Carlo Tree search algorithm as an approach to shorten the game length to reach the terminal state.
+There are cases where we want to return a random move, but we don't want the game to continue forever by the random agent possibly returning move that never end in a terminal state. In this case, we want to guide the random agent to produce a random move, but also make sure the game will terminate eventually. This algorithm is especially useful for the Simulation step of the \ac{MCTS} algorithm as an approach to shorten the game length to reach the terminal state.
 
-\begin{figure}[H]
-\captionsetup{justification=centering}
+For this purpose, we define the Semi-Random agent defined by the following code. 
+
 \begin{lstlisting}
 public class SemiRandomStrategy<TGame, TMove, TPlayer>
     where TPlayer : IAStarPlayer<TMove>
@@ -122,15 +162,18 @@ public class SemiRandomStrategy<TGame, TMove, TPlayer>
     }
 |
 \end{lstlisting}
-\caption{Pseudocode and class structure of the Semi-Random algorithm}
-\label{fig:semiRandomAlgo}
-\end{figure}
 
+\textcolor{red}{Elaborate a bit more on the semirandom strategy, what is strategy.bestmove, what is randomizable move, what is non randomizable move in the context of the game}
+
+
+\subsection{Minimax Agent}
+
+Minimax agent is another agent that we have implemented in the game that provides the move to the agent based on minimax algorithm. 
+
+\textcolor{red}{Define the evaluation function}
 
 The minimax class then has the following signature:
 
-\begin{figure}[h]
-\captionsetup{justification=centering}
 \begin{lstlisting}
 public class Minimax<TPlayer, TMove, TGame>(int Depth)
     where TGame : ITerminal,
@@ -147,10 +190,8 @@ public TMove MinimaxStep(
         // IStaticEvaluation
         return game.Evaluate(maximizingPlayer);
     }
-
-    // Initialize best score and move
-    bestScore, bestMove = Init();
-
+    (*@{\hspace*{3cm}\vdots}@*)
+    
     // IValidMoves<TMove>
     foreach(var move in game.GetValidMoves())
     {
@@ -171,16 +212,12 @@ public TMove MinimaxStep(
     return bestMove;
 }
 \end{lstlisting}
-\caption{Pseudocode and class structure of the Minimax algorithm}
-\label{fig:minimaxAlgo}
-\end{figure}
 
+In the above implementation, the minimax algorithm is performed for a defined depth indicating how many moves for the player and the opponent is to be evaluated. The evaluation is performed either each time the indicated depth is evaluated or if the game has finished. \textcolor{red}{Define the evaluation function here}.
 
+The evaluation with the minimax alogithm is performed for all the valid moves that indicates all the children node of from the current node in the game tree. For each valid mode, the minimax algorithm (MinimaxStep) \textcolor{red}{method} is recursively called to evaluate the branches of the children node. The minimax \textcolor{red}{method} is defined below:  
 
-\begin{figure}[h]
-\captionsetup{justification=centering}
 \begin{lstlisting}
-
 public TMove MinimaxStep(
     TGame game, int depth, bool maximizingPlayer, int alpha, int beta) {
     
@@ -230,13 +267,11 @@ public TMove MinimaxStep(
     return bestMove;
 }
 \end{lstlisting}
-\caption{Pseudocode of the Minimax algorithm with alpha beta pruning}
-\label{fig:minimaxABPruning}
-\end{figure}
 
+In the above code, the minimax algorithm with alpha-beta pruning method is defined. 
 
-\begin{figure}[h]
-\captionsetup{justification=centering}
+\subsection{A-Star Agent}
+
 \begin{lstlisting}
 
 public class AStar<TMove, TMaze, TPlayer>
@@ -294,6 +329,94 @@ public class AStar<TMove, TMaze, TPlayer>
     }
 
 \end{lstlisting}
-\caption{Pseudocode and class structure of the A-Star algorithm}
-\label{fig:minimaxABPruning}
-\end{figure}
+
+\section{Example: Tic-Tac-Toe}
+
+In this section, we demonstrate how seamless it is to integrate the \ac{AI} agents to games. We will use the tic-tac-toe game for this purpose.
+
+The interfaces above are parametrized over 3 generic types, namely TGame, TMove and TPlayer. For Tic-tac-toe, we will use the \textit{int} type for TMove and TPlayer parameteters. For TGame, we will use the \textbf{TicTacToe} class type.
+
+\begin{lstlisting}
+public class TicTacToe :
+    ITerminal, IValidMoves<int>, IMove<int>, IPlayer<int>, IOpponent<int>, IDeepCopy<TicTacToe>, IWinner<int>, IStaticEvaluation
+    
+{
+    private int[,] Cells = new int[3][3];
+    private int turn = 1; // 1 -> p1, 2 -> p2
+    
+    public bool HasFinished => CheckWin();
+
+    public int Winner => GetWinner();
+
+    public int CurrentPlayer => turn;
+
+    public int Opponent => turn % 2 + 1;
+
+    public IEnumerable<int> GetValidMoves() {
+        for(int i =  0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (Cells[i, j] == 0)
+                    yield return i + 3 * j;
+    }
+
+    public double Evaluate(bool currentMaximizer) {
+        var winner = GetWinner();
+        if (winner == CurrentPlayer) return 1.0;
+        if (winner == Opponent) return -1.0;
+        //other complex unfinished game states
+        return 0.0;      
+    }
+
+    public void Move(int move) {
+        Place(move, turn);
+    }
+
+    public void UndoMove(int move) {
+        Place(move, 0);
+    }
+
+    public TicTacToe DeepCopy() {
+        var t = new TicTacToe();
+        t.Cells = Cells; //copy by value
+        t.turn = turn;
+        return t;
+    }
+
+    private void Place(int move, int item) {
+        int i = move % 3;
+        int j = move % 3;
+        Cells[i, j] = item;
+        turn = turn % 2 + 1;
+    }
+
+    int GetWinner() {
+        //check if someone won the game, and if so, return
+    }
+
+    bool CheckWin() {
+        //check all 3 consecutive adjecent squares (including
+        //diagonals), and return true if they're filled by the
+        //same player.
+    }
+}
+\end{lstlisting}
+
+We can now use the Minimax, Monte Carlo Tree Search, Minimax Alpha-beta pruning, Parallel Minimax Alpha-beta pruning, Random agents to play the game of tic-tac-toe. For example:
+
+\begin{lstlisting}
+var tt = new TicTacToe();
+
+//MinimaxABPruning<TPlayer, TMove, TGame>
+var minimaxABagent = new MinimaxABPruning<int, int, TicTacToe>(...);
+
+//MonteCarloTreeSearch<TMove, TGame, TPlayer>
+var mctsAgent = new MonteCarloTreeSearch<int, TicTacToe, int>(...);
+
+minimaxBestMove = minimaxABAgent.BestMove(tt, tt.turn).BestMove;
+tt.Move(minimaxBestMove);
+
+mctsBestMove(tt, tt.turn).BestMove;
+tt.Move(mctsBestMove);
+\end{lstlisting}
+
+This way, we can play the Tic-Tac-Toe game between 2 smart or trivial agents until the game finishes.

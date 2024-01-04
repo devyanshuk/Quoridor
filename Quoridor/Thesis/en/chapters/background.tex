@@ -63,7 +63,7 @@ For the $\max_{a_{-i}} v_i (a_i, a_{-i})$ part, the player A first marginalizes 
               $\max_{a_i} v_i(a_i, a_{-i})$ & 4 & 3& 2& 1&  0 \\ \hline
          \end{tabular}
          \caption{Marginalied value of the payoff matrix after maximizing over the player's actions}
-         \label{tab:my_label}
+         \label{tab:my_label1}
      \end{table}
 
  We first marginalize away the set of actions of the player (e.g., $a_{i}$) from the set of possible outcomes by maximizing the value $v_i$ over the set of every possible action of the player. 
@@ -116,7 +116,7 @@ For example, in Figure \ref{fig:minimax1}, the player can evaluate the branches 
 
 The above defined methods to reduce the computational complexity of the minimax algorithm can be combined together. For example, the minimax algorithm can be depth limited and/or run with alpha-beta pruning and/or run in parallel.
 
-\section{\ac{MCTS}}
+\section{Monte-Carlo Tree Search}
 
 \begin{figure}[!ht]
     \centering
@@ -147,3 +147,7 @@ The \ac{MCTS} algorithm builds upon the following framework:
 \end{figure}
 
 The advantage of \ac{MCTS} algorithm over the minimax algorithm is that the \ac{MCTS} algorithm does not require any evaluation function as the weights are determined based on multiple simulation runs. On the contrary, the \ac{MCTS} algorithm requires multiple runs through the game to determine the weights.
+
+\section{A-star algorithm}
+
+A star is a popular algorithm \citep{Hart1968AFormal} used mainly for graph search and traversal problems. The main aim of the A-star algorithm is to find a path between a starting node and an destination node with the least cost.

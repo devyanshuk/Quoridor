@@ -36,7 +36,7 @@ Game trees are integral to the framework of \textbf{adversarial search problems}
 
 The following depicts a (partial) game tree for the Quoridor game with a board of size 3x3:
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \centering
     \includegraphics[scale=0.45]{../img/GameBoard/game_tree.png}
     \caption{A partial game tree for a 3x3 game board.}
@@ -127,7 +127,7 @@ To find an estimate of the average branching factor $B_avg$, we use the Algorith
 }
 \end{algorithm}
 
-We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Semi-random} agents [\textcolor{red}{Define semi-random agents}], each for boards of dimensions 3, 5, 7 and 9, and the results of the average branching factor can be seen in figure \ref{fig:BranchingFactor}
+We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Semi-random} agents, each for boards of dimensions 3, 5, 7 and 9, and the results of the average branching factor can be seen in figure \ref{fig:BranchingFactor}.
 
 \begin{figure}[h]
     \centering
