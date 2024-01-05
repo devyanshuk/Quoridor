@@ -1,34 +1,41 @@
 \chapter{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
 
-Over the past decade, \ac{AI} is becoming an integral part of many elements of modern world. In fact, in the recent years, it has become an the main point of evolution and revolution in many of the technologies and industries. From assisted or autonomous driving \citep{Ma2020Artificial}, chat bots \cite{Wu2023ABrief} to gaming \cite{Skinner2010Artificial}, it has been a major revelation in evolving the existing technologies to generating new industry space with the plethora of new use cases.   
+\section{Overview}
+In recent years, \ac{AI} is becoming an integral part of many elements of modern world including gaming \citep{Skinner2010Artificial}, pushing the boundaries of what's achievable in both single and multiplayer gaming experiences. \ac{AI}-driven games now offer users the opportunity to hone and enhance their skills, providing varying difficulty levels and offering optimal moves to guide players through each step if desired. \ac{AI} has also taken a center stage in gaming with its remarkable accomplishments in age-old strategy games such as Chess, Go, and many others. 
 
-\ac{AI} has brought a revolutionary transformation to the gaming world, pushing the boundaries
-of what's achievable in both single and multiplayer gaming experiences. In recent years, \ac{AI} has taken center
-stage with its remarkable accomplishments in mastering age-old games such as Chess, Go, and many others.
-\ac{AI}-driven games now offer users the opportunity to hone and enhance their skills, providing varying difficulty
-levels and offering optimal moves to guide players through each step if desired.
+% . In fact, in the recent years, it has become an the main point of evolution and revolution in many of the technologies and industries. From assisted or autonomous driving \citep{Ma2020Artificial}, chat bots \citep{Wu2023ABrief} to gaming \citep{Skinner2010Artificial}, it has been a major revelation in evolving the existing technologies to generating new industry space with the plethora of new use cases.   
+% 
 
-Strategy games are a genre of gaming that require planning, often involving various tactics, decision making and execution while under various constraints (e.g., resources). Some of the examples of popular strategy games are Chess, Go, Shogi, Starcraft, etc. Strategy games are unique compared to many other genres of games in the sense that it requires a selection of an optimal move among a subset of sub-optimal moves based on  a plan. In many scenarios, the size of the subset of sub-optimal moves depends on exploration of the game space, simulation and prediction of sequence of the player's and the opponent's moves all while managing certain resources efficiently.
+Strategy games are a genre of gaming that require planning, often involving various tactics, decision making and execution under various resource constraints. Some examples of strategy games include Chess, Go, Shogi and Starcraft. They are unique compared to other genres as they require a selection of an optimal move among multiple possible moves based certain strategy. In many scenarios, the size of possible moves depends on the game tree, simulation and prediction of the player's and the opponent's moves all while managing resources efficiently.
 
-\ac{AI}, due to its suitability towards solving problems involving complex decision making, taking into account sequences of the player's and the opponents possible moves (e.g., game space), outcome prediction or position evaluation all while considering the available resources, have been deemed particularly effective in playing the strategy games. The history of the use of \ac{AI} in strategy games goes back to the last few decades. One of the initial marked impact of \ac{AI} in the strategy gaming came in 1997 when IBM's Deep Blue \cite{Campbell2002Deep} defeated World Chess Champion Garry Kasparov. The influence of \ac{AI} in stratey games was more prominent with the rise and involvement of \ac{AI} into the \ac{RTS} games such as Warcraft and StarCraft \cite{Robertson2014Review} and implementation of \ac{MCTS} in the strategy games such as Go \cite{Huang2011Monte}. Recently, DeepMind's Alpha Go for Go, Alpha Zero for Chess \cite{Silver2017Mastering} and AlphaStar for StarCraft \cite{Team2019Alphastar} have widened the gap between the \ac{AI} and human intelligence even further.
+\ac{AI}, due to its suitability of solving complex decision making problems factoring in multiple variable and constraints, has been particularly effective in playing the strategy games. The history of \ac{AI} in strategy gaming dates few decades. One of the initial marked impact of \ac{AI} in the strategy gaming came in 1997 when IBM's Deep Blue \citep{Campbell2002Deep} defeated World Chess Champion Garry Kasparov. The influence was more prominent with the success of \ac{AI} on \ac{RTS} games such as Warcraft and StarCraft \citep{Robertson2014Review} and strategy games such as Go \citep{Huang2011Monte}. Recently, DeepMind's Alpha Go for Go, Alpha Zero for Chess \citep{Silver2017Mastering} and AlphaStar for StarCraft \citep{Team2019Alphastar} have widened the gap between the \ac{AI} and human intelligence even further.
 
 
-Designed by Mirko Marchesi, Quoridor stands out as an engaging strategic board game that is played between two or four players. The game is playes on a square grid board where the objective of this game is for each player to move their pawn to the opposite side of the board. This game introduces a fascinating twist where a player, in addition to trying to move their pawn through the square grid, additionally have an option to place walls on the grid locations strategically to obstruct the opponent's path. This strategy compels the player to think of their traversal strategy while predicting the opponents strategy as well. Despite its
-seemingly simple rules, Quoridor demands a unique blend of strategic foresight and the ability to anticipate the moves of opponents and outmaneuver the opponent.
+\section{Quoridor}
 
-Compared to some other strategy games such as Chess and Go, Quoridor has not been extensively studied in the literature. In \cite{Glendenning2002MasteringQ}, the author developed an agent for playing Quoridor using genetic algorithm to optimize the weights. The authors in \cite{Mertens2006Quoridor} study the complexity of the algorithm also develop a Quoridor playing agent based on Minimax algorithm. The authors conclude that Quoridor has a similar state-space and game tree complexity as that of the games such as Chess. Likewise, the authors in \cite{Brenner2015Artificial} developed an \ac{MCTS} approach for Quoridor. Recently, in \cite{Iwanaga2022Analysis}, the authors performed an analysis of the game for a miniature 5 by 5 board.
+Designed by Mirko Marchesi, Quoridor stands out as an engaging strategic board game that is played between two or four players. The game is played on a square grid board where the objective of this game is for each player to move their pawn to the opposite side of the board. This game introduces a fascinating twist where a player, in addition to trying to move their pawn through the square grid, additionally have an option to place walls on the grid locations strategically to obstruct the opponent's path. This strategy compels the player to think of their traversal strategy while predicting the opponents strategy as well. Despite its seemingly simple rules, Quoridor demands a unique blend of strategic foresight and the ability to anticipate the moves of opponents and outmaneuver the opponent.
 
-The primary objective of this thesis is to construct a well-structured framework and user-friendly interfaces
-that seamlessly integrate AI algorithms into the Quoridor game. The development of AI algorithms customized to
-Quoridor's unique rule set will not only enhance our understanding of the game's intricate nuances but also
-facilitate the creation of an intuitive interface for simulating these AI agents. Furthermore, a comprehensive
-evaluation will be conducted to identify the top-performing AI agent.
 
-In addition to this, the project will encompass the creation of a user-friendly interface that empowers players
-to engage with an AI opponent of their choice, thereby bolstering the game's accessibility and inclusivity.
+\section{AI algorithms overview}
+In this section, we give a brief overview of different \ac{AI} techniques that have been considered in this thesis.
+
+\subsection{Minimax algorithm}
+Minimax algorithm, first proven by John von Neumann in 1928 in his paper \textit{Zur Theorie Der Gesellschaftsspiele} \citep{v1928theorie}, is a very popular algorithm employed in many decision-making scenarios for e.g., in decision theory, game theory and even philosophy. As suggested by the name minimax, the idea of the algorithm is to minimize the player's loss when the opponent makes a decision that gives the player the maximum loss. This algorithm has been implemented in many multi-player strategy games such as tic-tac-toe \citep{savelli2008tic}. 
+
+The minimax algorithm involves in the player performing an exhaustive search on the game tree to determine a sequence of maximizing and minimizing moves. The complexity of such algorithm in large game tree often means such search is often impossible due to limited computational resources. To limit this complexity, further techniques such as depth-limited minimax, alpha-beta pruning and parallel minimax algorithm can be used.
+
+\subsection{Monte-Carlo Tree Search}
+\ac{MCTS} \citep{Coulom2006Efficient} is a heuristic tree search algorithm popular in decision-making processes, mostly popular in strategic games where the game tree space is too large to traverse. One problem with the minimax algorithm is that it requires a robust and accurate evaluation function to evaluate a given position in the game. This problem can be even more relevant when the game tree space is too large making it difficult to find the evaluation of a position. The basic idea of the \ac{MCTS} algorithm is that is narrows down on certain areas of the game tree, such that the exhaustive traversal and search of the tree is not required. The algorithm achieves this by taking random samples in the tree space and building a search tree based on it.
+
+\subsection{A-star algorithm}
+A star is a popular algorithm \citep{Hart1968AFormal} used mainly for graph search and traversal problems. The main aim of the A-star algorithm is to find a path between a starting node and an destination node with the least cost. The algorithm 
+
 
 \section {Acknowledged Works}
+
+Compared to some other strategy games such as Chess and Go, Quoridor has not been extensively studied in the literature. In \citep{Glendenning2002MasteringQ}, the author developed an agent for playing Quoridor using genetic algorithm to optimize the weights. The authors in \citep{Mertens2006Quoridor} study the complexity of the algorithm also develop a Quoridor playing agent based on Minimax algorithm. Likewise, the authors in \citep{Brenner2015Artificial} developed an \ac{MCTS} approach for Quoridor. Recently, in \citep{Iwanaga2022Analysis}, the authors performed an analysis of the game for a miniature 5 by 5 board.
+
 
 Quoridor, being a widely popular game, has attracted a fair number of attention from the research community,
 resulting in successful AI agent developments. Some of the notable works include:
@@ -48,6 +55,20 @@ into the architectural aspects of AI. Our approach emphasizes abstraction to the
 an eye on facilitating seamless integration into a broad spectrum of games. We prioritize creating an
 interface that is adaptable to diverse game environments, setting our research apart from the game-specific
 focus of the prior works.
+
+
+
+
+
+
+The primary objective of this thesis is to construct a well-structured framework and user-friendly interfaces
+that seamlessly integrate AI algorithms into the Quoridor game. The development of AI algorithms customized to
+Quoridor's unique rule set will not only enhance our understanding of the game's intricate nuances but also
+facilitate the creation of an intuitive interface for simulating these AI agents. Furthermore, a comprehensive
+evaluation will be conducted to identify the top-performing AI agent.
+
+In addition to this, the project will encompass the creation of a user-friendly interface that empowers players
+to engage with an AI opponent of their choice, thereby bolstering the game's accessibility and inclusivity.
 
 
 

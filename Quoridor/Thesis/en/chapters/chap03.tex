@@ -338,69 +338,121 @@ The interfaces above are parametrized over 3 generic types, namely TGame, TMove 
 
 \begin{lstlisting}
 public class TicTacToe :
-    ITerminal, IValidMoves<int>, IMove<int>, IPlayer<int>, IOpponent<int>, IDeepCopy<TicTacToe>, IWinner<int>, IStaticEvaluation
-    
-{
-    private int[,] Cells = new int[3][3];
-    private int turn = 1; // 1 -> p1, 2 -> p2
-    
-    public bool HasFinished => CheckWin();
+    ITerminal, //Minimax, MCTS
+    IValidMoves<int>, //Minimax, MCTS
+    IMove<int>, //Minimax, MCTS
+    IPlayer<int>, //Minimax, MCTS
+    IOpponent<int>, //MCTS
+    IDeepCopy<TicTacToe>, //MCTS
+    IWinner<int>, //MCTS
+    IStaticEvaluation //Minimax
+\end{lstlisting}
+\\
+For the Tic-Tac-Toe game, we will need a 3x3 array representing the game board, and a property turn that represents which player's turn it currently is. Turn therefore will have 2 values, 1 and 2 representing player 1 and player 2 respectively.
 
-    public int Winner => GetWinner();
+\begin{lstlisting}
+private int[,] Cells = new int[3, 3];
+private int turn = 1; // 1 -> p1, 2 -> p2
+\end{lstlisting}
+\\
+The game board, represented by \texttt{Cells} property, is initially all zeros. Over the course of the game, it will contain values 0, 1 or 2.
 
-    public int CurrentPlayer => turn;
+We will now implement all the interfaces above. We start by implementing the \textbf{IValidMoves\textless{}int\textgreater{}} iterface. To get all the valid locations, i.e Cells marked by 0, we can encode the Cell's i and j position by the following equation
+\begin{equation}
+\label{eq:Move}
+    Move(C_{ij}) = i + 3 * j
+\end{equation}
 
-    public int Opponent => turn % 2 + 1;
+As an example, consider the cell $C_{1,2}$. From equation \ref{eq:Move}, we have that $Move(C_{1,2}) = 1 + 3 * 2 = 7$.
 
-    public IEnumerable<int> GetValidMoves() {
-        for(int i =  0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                if (Cells[i, j] == 0)
-                    yield return i + 3 * j;
-    }
-
-    public double Evaluate(bool currentMaximizer) {
-        var winner = GetWinner();
-        if (winner == CurrentPlayer) return 1.0;
-        if (winner == Opponent) return -1.0;
-        //other complex unfinished game states
-        return 0.0;      
-    }
-
-    public void Move(int move) {
-        Place(move, turn);
-    }
-
-    public void UndoMove(int move) {
-        Place(move, 0);
-    }
-
-    public TicTacToe DeepCopy() {
-        var t = new TicTacToe();
-        t.Cells = Cells; //copy by value
-        t.turn = turn;
-        return t;
-    }
-
-    private void Place(int move, int item) {
-        int i = move % 3;
-        int j = move % 3;
-        Cells[i, j] = item;
-        turn = turn % 2 + 1;
-    }
-
-    int GetWinner() {
-        //check if someone won the game, and if so, return
-    }
-
-    bool CheckWin() {
-        //check all 3 consecutive adjecent squares (including
-        //diagonals), and return true if they're filled by the
-        //same player.
-    }
+\begin{lstlisting}
+public IEnumerable<int> GetValidMoves() {
+    for(int i =  0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            if (Cells[i, j] == 0)
+                yield return i + 3 * j;
 }
 \end{lstlisting}
+\\
+We now write a method \textit{Place} that takes in two arguments, move and mark, move being an integral value repesented by equation \ref{eq:Move}, and mark being one of 0, 1, 2. 1 and 2.
+On each placement, we can also retrieve the winner(if any) and get information on whether the game terminated, so we implement both the \textbf{ITerminal.HasFinished} and \textbf{IWinner.Winner} properties. To check if the game has finished we check if 3 adjacent sides of the game board are filled by the same player. These include diagonals too.
+We define \textbf{Winner} to hold 4 possible values - 1 and 2 indicating player 1 and player 2 victory respectively, 0 indicating a draw and -1 indicating that the game is still in progress.
+Before all these, we firstly need to decompose the move we encoded by equation \ref{eq:Move} to i and j values. To do so from given move $Move(C_{ij})$, we can use the following equations:
+\begin{equation}
+    i = Move(C_{ij}) \mod 3
+\end{equation}
+\begin{equation}
+    j = \frac{Move(C_{ij})}{3}
+\end{equation}
+We then place one of 'X' or 'O' signs, (or remove them if we want to undo the last action), check if any player won, and if not, switch turns.
 
+\begin{lstlisting}
+public bool HasFinished => CheckWin();
+
+// 0 draw, 1 -> p1, 2 -> p2, -1 game in progress
+private int _winner = -1; 
+
+public int Winner => _winner;
+
+private void Place(int move, int item) {
+    int i = move % 3;
+    int j = move / 3;
+    Cells[i, j] = item;
+    CheckWin();
+    turn = turn % 2 + 1;
+}
+
+void CheckWin() {
+    //check all 3 consecutive adjecent squares (including
+    //diagonals), and return true if they're filled by the
+    //same player.
+    // update the _winner variable based on this
+}
+
+\end{lstlisting}
+\\
+We can then implement the \texttt{Move} and \texttt{UndoMove} methods. Both these methods use the \texttt{Place} method.
+We also switch turns after a successfull Move/UndoMove operation.
+\begin{lstlisting}
+ public void Move(int move) {
+    Place(move, turn);
+}
+
+public void UndoMove(int move) {
+    Place(move, 0);
+}
+\end{lstlisting}
+\\
+We also need to implement the \texttt{CurrentPlayer} and \texttt{Opponent} properties implemented by the \textbf{IPlayer} and \textbf{IOpponent} interfaces respectively. We simply use the value held by the \textbf{turn} variable in our implementation to return it. The \textbf{turn} variable holds the index of the current player, so for the opponent, we simply return the value not held by the \textbf{turn} variable.
+
+\begin{lstlisting}
+public int CurrentPlayer => turn;
+
+public int Opponent => turn % 2 + 1;    
+\end{lstlisting}
+\\
+To have the Tic-Tac-Toe implementation work smoothly with the Minimax algorithm, we also implement the \textbf{IStaticEvaluation.Evaluate()} method.
+\begin{lstlisting}
+public double Evaluate ( bool currentMaximizer ) {
+    if ( _winner == CurrentPlayer ) return 1.0;
+    if ( _winner == Opponent ) return -1.0;
+    return 0.0;
+}
+\end{lstlisting}
+\\
+Finally, we implement the \textbf{IDeepCopy} interface. This interface is used by the \ac{MCTS} algorithm, especially during the simulation phase so as to not change the original game state or properties references in any way possible.
+
+\begin{lstlisting}
+public TicTacToe DeepCopy() {
+    var t = new TicTacToe();
+    //shallow copy of struct(int in our case) is
+    //fine since no reference is copied
+    t.Cells = (int[,])Cells.Clone();
+    t.turn = turn;
+    return t;
+}
+\end{lstlisting}
+\\
 We can now use the Minimax, Monte Carlo Tree Search, Minimax Alpha-beta pruning, Parallel Minimax Alpha-beta pruning, Random agents to play the game of tic-tac-toe. For example:
 
 \begin{lstlisting}
@@ -420,3 +472,46 @@ tt.Move(mctsBestMove);
 \end{lstlisting}
 
 This way, we can play the Tic-Tac-Toe game between 2 smart or trivial agents until the game finishes.
+
+\section{Quoridor Game Implementation}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.95\linewidth]{../img/uml_core.png}
+    \caption{A UML diagram depicting relationship in the core library}
+    \label{fig:core_uml}
+\end{figure}
+
+\subsection{Project Structure}
+
+The solution consists of six fundamental projects, each written in \ac{Csharp}.
+
+\begin{itemize}
+    \item \textbf{Quoridor.Core}\\
+        This library project contains the core game logic for Quoridor, and implements all interfaces to allow \ac{AI} algorithms to run.
+        
+    \item \textbf{Quoridor.AI}\\
+        This library project includes all the fundamental interfaces and a generic \ac{AI} algorithms implemented using these interfaces.
+
+    \item \textbf{Quoridor.Common}\\
+        This library project includes all common helpers, such as XML parser helper, logging helper, etc.
+
+    \item \textbf{Quoridor.Tests}\\
+        This NUnit test project includes all unit tests for robust development.
+
+    \item \textbf{Quoridor.ConsoleApp}\\
+        A CLI tool that runs simulations and allows user to play against an opponent with a visual interface.
+
+    \item \textbf{Quoridor.DesktopApp}\\
+        A WinForms application that allows user to play against one another or against various \ac{AI}.
+\end{itemize}
+
+These projects are inter-connected by references. For example from figure \ref{fig:proj_dep}, \textbf{Quoridor.AI} is a standalone library that contains all the interfaces, which is referenced by all other projects.
+All project dependency structures are depicted in figure \ref{fig:proj_dep}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.95\linewidth]{../img/project_structure.png}
+    \caption{A project dependency diagram}
+    \label{fig:proj_dep}
+\end{figure}
