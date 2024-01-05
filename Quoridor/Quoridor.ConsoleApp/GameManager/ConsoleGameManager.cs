@@ -94,12 +94,19 @@ namespace Quoridor.ConsoleApp.GameManager
                     var info = _settings.Strategies[i];
                     var player = _gameEnvironment.Players[i];
                     var winRate = (double)(100 * info.GamesWon) / _settings.NumberOfSimulations;
+                    var avgMoveTime = info.TotalMoveTimeMs / info.TotalGameMoves;
                     _settings.OutputDest.WriteLine(@$"Player {player} : {info.Strategy.Name} won {
-                        info.GamesWon}/{_settings.NumberOfSimulations} games. Win rate : {winRate.ToString("0.##")}%");
+                        info.GamesWon}/{_settings.NumberOfSimulations} games. Win rate : {
+                        winRate.ToString("0.##")}%. Average move time(ms) : {avgMoveTime.ToString("0.##", CultureInfo.InvariantCulture)}");
                 }
             }
             if (_settings.BranchingFactor)
             {
+                var totalMoves = _settings.Strategies.Sum(x => x.TotalGameMoves);
+                var avgTotalMoves = totalMoves / _settings.NumberOfSimulations;
+                _settings.OutputDest.WriteLine($"Toal moves made across {_settings.NumberOfSimulations} games : {totalMoves}");
+                _settings.OutputDest.WriteLine($"Average total moves per game : {avgTotalMoves.ToString(CultureInfo.InvariantCulture)}");
+
                 var totalAvg = _totalAverageBranchingFactor / _settings.NumberOfSimulations;
                 _settings.OutputDest.WriteLine(@$"Average branching factor : {totalAvg.ToString(CultureInfo.InvariantCulture)}");
             }
@@ -140,9 +147,12 @@ namespace Quoridor.ConsoleApp.GameManager
             var watch = System.Diagnostics.Stopwatch.StartNew();
             var result = info.Strategy.BestMove(_gameEnvironment, _gameEnvironment.CurrentPlayer);
             watch.Stop();
+            info.TotalMoveTimeMs += watch.ElapsedMilliseconds;
 
             if (!_settings.BranchingFactor && !_settings.Simulate && _settings.Verbose && info.Strategy is not HumanAgentConsole)
+            {
                 _settings.OutputDest.WriteLine($"Time taken to get best move: {watch.ElapsedMilliseconds / 1000.0} seconds");
+            }
 
             Process(result.BestMove, info);
         }
@@ -160,6 +170,7 @@ namespace Quoridor.ConsoleApp.GameManager
                 //if move was successful, update the number of moves and game states
                 info.SingleGameStates += possibleMoves;
                 info.SingleGameMoves++;
+                info.TotalGameMoves++;
             }
             catch(Exception ex)
             {
