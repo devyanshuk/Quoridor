@@ -1,7 +1,7 @@
 \chapter{Background}
 \label{background}
 
-In this chapter, we give a brief overview of different \ac{AI} techniques that have been considered for implementing the agent for Quoridor including the minimax algorithm.
+In this chapter, we give a brief overview of different \gls{AI} techniques that have been considered for implementing the agent for Quoridor including the minimax algorithm.
 
 \section{Zero-sum game}
 A zero-sum game is defined as a game where an advantage to one side means an equal loss to the opponent, resulting in the sum of zero. In zero sum games such as chess, tic-tac-toe, an advantage or a win for a team would mean a disadvantage or a loss for another team. 
@@ -125,13 +125,13 @@ The above defined methods to reduce the computational complexity of the minimax 
     \label{fig:MCTS1}
 \end{figure}
 
-\ac{MCTS} \cite{Coulom2006Efficient} is a heuristic tree search algorithm popular in decision-making processes, mostly popular in strategic games such as chess and Go to solve the game tree. This algorithm is mostly popular in scenarios where the game tree space is too large to traverse. One problem with the minimax algorithm is that it requires a robust and accurate evaluation function to evaluate a given position in the game. This problem can be even more relevant when the game tree space is too large making it difficult to find the evaluation of a position.
+\gls{MCTS} \cite{Coulom2006Efficient} is a heuristic tree search algorithm popular in decision-making processes, mostly popular in strategic games such as chess and Go to solve the game tree. This algorithm is mostly popular in scenarios where the game tree space is too large to traverse. One problem with the minimax algorithm is that it requires a robust and accurate evaluation function to evaluate a given position in the game. This problem can be even more relevant when the game tree space is too large making it difficult to find the evaluation of a position.
 
-The basic idea of the \ac{MCTS} algorithm is that is narrows down on certain areas of the game tree, such that the exhaustive traversal and search of the tree is not required. The algorithm achieves this by taking random samples in the tree space and building a search tree based on it. For example, for a given position in tic-tac-toe, the \ac{MCTS} algorithm can be executed randomly a large number of times. Based on the statistics of the game wins and losses based on selection of certain moves, the weights are allocated to the children nodes in the graph.
+The basic idea of the \gls{MCTS} algorithm is that is narrows down on certain areas of the game tree, such that the exhaustive traversal and search of the tree is not required. The algorithm achieves this by taking random samples in the tree space and building a search tree based on it. For example, for a given position in tic-tac-toe, the \gls{MCTS} algorithm can be executed randomly a large number of times. Based on the statistics of the game wins and losses based on selection of certain moves, the weights are allocated to the children nodes in the graph.
 
-An example of the \ac{MCTS} algorithm is presented in Figure \ref{fig:MCTS1}. The game is evaluated from the given position (e.g., the root node in the graph) for players and opponenent turns. The policy for the game can be random (e.g., determined by a random variable with certain distribution such as the uniform random distribution). Each node is labelled with a fraction where the denominator represents the total number of game runs through the node and the numerator represents the total number of wins for the player based on the game run through the node. For example, the game is simulated a total of 8 times in the example where the player wins 4 of the runs. The player wins 3/6 when taking an action while 1/2 when taking another action and so on.
+An example of the \gls{MCTS} algorithm is presented in Figure \ref{fig:MCTS1}. The game is evaluated from the given position (e.g., the root node in the graph) for players and opponenent turns. The policy for the game can be random (e.g., determined by a random variable with certain distribution such as the uniform random distribution). Each node is labelled with a fraction where the denominator represents the total number of game runs through the node and the numerator represents the total number of wins for the player based on the game run through the node. For example, the game is simulated a total of 8 times in the example where the player wins 4 of the runs. The player wins 3/6 when taking an action while 1/2 when taking another action and so on.
 
-The \ac{MCTS} algorithm builds upon the following framework:
+The \gls{MCTS} algorithm builds upon the following framework:
 \begin{enumerate}
     \item Selection: This step involves the algorithm choosing a move based on either a good move determined in previous iterations or a exploratory new move. In figure \ref{fig:MCTS1}, in the first player's turn, an action gives 3/6 chances of winning based on previous iterations whereas another gives 1/2 winning chances. The player selects a node that has highest possibility of winning, which in this case is equal. The player can also choose a new move that may be already explored to avoid not exploring further options.
     \item Expansion: This step involves the algorithm to add a new node to the game tree determined during the selection process. A node can simply be a valid move starting from the node from where no simulation step has been played out. In figure \ref{fig:MCTS2}, an unevaluated option (e.g., node inside the dotted box) is explored and simulated.
@@ -146,7 +146,7 @@ The \ac{MCTS} algorithm builds upon the following framework:
     \label{fig:MCTS2}
 \end{figure}
 
-The advantage of \ac{MCTS} algorithm over the minimax algorithm is that the \ac{MCTS} algorithm does not require any evaluation function as the weights are determined based on multiple simulation runs. On the contrary, the \ac{MCTS} algorithm requires multiple runs through the game to determine the weights.
+The advantage of \gls{MCTS} algorithm over the minimax algorithm is that the \gls{MCTS} algorithm does not require any evaluation function as the weights are determined based on multiple simulation runs. On the contrary, the \gls{MCTS} algorithm requires multiple runs through the game to determine the weights.
 
 \section{A-star algorithm}
 

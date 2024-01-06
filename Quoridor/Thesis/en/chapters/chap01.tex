@@ -11,7 +11,7 @@ The Quoridor game is played in turns between the opponents where in each turn th
 Walls are a fundamental element of the game, allowing players to strategically block their opponent's path and influence the course of the game. Each wall spans across two squares on the board and occupies exactly four squares either horizontally or vertically, effectively creating a barrier between them. At the beginning, each player starts
 with a set number of walls that they can use during their turn.
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \centering
     \includegraphics[scale=0.25]{../img/GameBoard/initial.png}
     \caption{A 5x5 game board}
@@ -40,7 +40,7 @@ Considering an example in figure \ref{fig:InitialGameBoard}, with these notation
 After representing the Quoridor board, the next step for defining notations for the game is to define the moves. Let us represent the move for a player as $M$.
 
 \begin{equation}\label{eqn:movement}
-M(C_{ij}) = ji \text{, where,} j \in \mathbb{K} \text{ and, } i \in \mathbb{R}     
+M(C_{ij}) = ji \text{, where, } j \in \mathbb{K} \text{ and, } i \in \mathbb{R}     
 \end{equation}
 
 Unlike in chess, in Quoridor, there is only one pawn for each side. Hence, for the side, for moving the pawn, the starting position of the pawn is not required. Hence, as mention in equation\eqref{eqn:movement}, the movement of the pawn to the cell $C_{j, i}$ can simply be defined by the notation $ji$. The movement of the pawn A, in figure \ref{fig:InitialGameBoard} from its position from cell $C_{1, c}$ to the position of B in $C_{5,c}$ through the cells $C_{2, c}$, $C_{3, c}$ and $C_{4, c}$ can be defined with moves $c2$, $c3$, $c4$ and $c4$ requiring a total of 4 moves.
@@ -57,7 +57,7 @@ In the above equations, the wall is represented with respect to a reference cell
 
 In the notations defined as per Glendenning's notations and Quoridor Strat's notations, there is a difference when it comes to the wall represnetation even though the mathematical formulation is the same as presented in equation \eqref{eqn:wall1}. 
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \begin{subfigure}{0.4\textwidth}
       \includegraphics[width=\textwidth]{../img/GameBoard/wall_repr.png}
       \caption{Glendenning's Notation: \textbf{c3h}}
@@ -78,7 +78,7 @@ Even though there notations are widely used, they are very easy to get confused 
 and unless specified explicitly, it is difficult to tell which representation is being used. This ambiguity in notation necessitates a new notations, in particular for the wall placement to remove any confusion. For this purpose, in this thesis, we introduce a new notation for the purpose, particularly, of wall placement representation as follows:
 
 \begin{equation}\label{eqn:Wall2}
-W(C_{ij}) = jiD \text{ , where } i \in R, j \in K \text{ ,and, } D \in \{N, S, E, W\}    
+W(C_{ij}) = jiD \text{ , where, } i \in \mathbb{R}, j \in \mathbb{K} \text{ ,and, } D \in \{N, S, E, W\}    
 \end{equation}
 
 In this new notation, we increase the size of the set $D$ from horizontal and vertical representation to north, south, east and west representations indicated by the characters 'N', 'S', 'E' and 'W'. This ensures that instead of an ambiguous vertical and horizontal wall representation with  respect to a cell, we can now define the direction explicitly. This wall additionally also implies that the wall in the 'N' and 'S' direction covers the reference cell, i.e., $C_{i, j}$ and the cell right to the reference cell, i.e., $C_{i, j+1}$ where $j+1$-th column represents the column on the right of the $j$-th column. Similarly, the wall in the 'E' and 'W' directions implies that the wall covers the reference cell $C_{i, j}$ and the cell below the reference cell, i.e., $C_{i+1, j}$ where $i+1$-row represents the row below the $i$-th row.
@@ -103,7 +103,7 @@ In this section, we formally define the rules of the game Quoridor, in particula
         board.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \begin{subfigure}{0.4\textwidth}
       \includegraphics[width=\textwidth]{../img/GameBoard/arbitrary_state.png}
       \caption{Valid game state}
@@ -145,7 +145,7 @@ Figure \ref{fig:WallBlocked} invalid.
     \end{itemize}
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \begin{subfigure}{0.2\textwidth}
       \includegraphics[width=\textwidth]{../img/GameBoard/move01.png}
     \end{subfigure}

@@ -77,6 +77,14 @@
   basicstyle=\ttfamily
 }
 
+\newacronym{AI}{AI}{Artificial Intelligence}
+\newacronym{XR}{XR}{extended reality}
+\newacronym{RTS}{RTS}{real-time strategy}
+\newacronym{MCTS}{MCTS}{Monte-Carlo tree search}
+\newacronym{Csharp}{C\#}{C Sharp}
+\newacronym{OOP}{OOP}{Object Oriented Programming}
+
+
 %%% Basic information on the thesis
 
 % Thesis title in English (exactly as in the formal assignment)
@@ -131,13 +139,7 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 \hypersetup{breaklinks=true}
 
 % Definitions of macros (see description inside)
-\include{macros}
 
-\newacronym{AI}{AI}{Artificial Intelligence}
-\newacronym{XR}{XR}{extended reality}
-\newacronym{RTS}{RTS}{real-time strategy}
-\newacronym{MCTS}{MCTS}{Monte-Carlo tree search}
-\newacronym{Csharp}{C\#}{C Sharp}
 
 \lstset{
     frame=tb,
@@ -157,7 +159,7 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 
 %%% Each chapter is kept in a separate file
 \include{preface}
-\include{chapters/background}
+% \include{chapters/background}
 \include{chapters/chap01}
 \include{chapters/chap02}
 \include{chapters/chap03}
@@ -176,8 +178,11 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-\chapwithtoc{List of Abbreviations}
+
+\renewcommand{\glossarypreamble}{\glsfindwidesttoplevelname[\currentglossary]}
+\setglossarystyle{alttree}
 \printglossaries
+
 
 %%% Attachments to the bachelor thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments

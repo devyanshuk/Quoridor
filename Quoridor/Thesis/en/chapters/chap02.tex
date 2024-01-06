@@ -57,7 +57,7 @@ The branching factor is greatly influenced by the state of the board in Quoridor
 
 As an example, the figure below represents a game states with the maximum and minimum branching factors:
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \begin{subfigure}{0.4\textwidth}
       \includegraphics[width=\textwidth]{../img/GameBoard/maximum_branching_factor.png}
       \caption{Maximum : 37}
@@ -93,9 +93,9 @@ We, therefore, would like to estimate an average branching factor for boards of 
 
 We already know from equation \ref{eq:WallPlacements} that the maximum branching factor of the game tree is exponential in order of $N$ and from Figure \ref{fig:MinBranchingFactor}, we can deduce that the minimum branching factor is 1 (since we can replicate a similar game state for any game state).
 
-To find an estimate of the average branching factor $B_avg$, we use the Algorithm \ref{alg:AverageBranchingFactor}
+To find an estimate of the average branching factor $B_{avg}$, we use the Algorithm \ref{alg:AverageBranchingFactor}
 
-\begin{algorithm}[H]
+\begin{algorithm}[!ht]
 \caption{Average branching factor}
 \label{alg:AverageBranchingFactor}
 \DontPrintSemicolon
@@ -127,9 +127,9 @@ To find an estimate of the average branching factor $B_avg$, we use the Algorith
 }
 \end{algorithm}
 
-We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Semi-random} agents, each for boards of dimensions 3, 5, 7 and 9, and the results of the average branching factor can be seen in figure \ref{fig:BranchingFactor}.
+We then simulate \textbf{1000} games between \textbf{Minimax} and \textbf{Semi-random} agents, each for boards of dimensions 3, 5, 7 and 9, and for depths 1, 2 and 3, and the results of the average branching factor can be seen in figure \ref{fig:BranchingFactor}.
 
-\begin{figure}[h]
+\begin{figure}[!ht]
     \centering
     \includegraphics[scale=0.6]{../img/branching_factor.png}
     \caption{Branching factor for boards of different sizes}
@@ -138,7 +138,7 @@ We then simulate \textbf{1000} games between \textbf{Minimax AB} and \textbf{Sem
 
 From figure \ref{fig:BranchingFactor}, like with the maximum branching factor, we can see a similar exponential trend of the average branching factors in order of N. Furthermore, based on only the four dimensions and their averages and maximum branching factors, the average branching factor seems to be almost half the maximum branching factor.
 
-The average branching factor for board of dimension 9x9 was about \textbf{62}, which is very close to the value proposed by \citep{Glendenning2002MasteringQ}
+The average branching factor for board of dimension 9x9 was about \textbf{61}, which is very close to the value proposed by \citep{Glendenning2002MasteringQ}
 
 \section{State space complexity}
 
@@ -193,7 +193,7 @@ The game tree complexity refers to the number of possible games that can be play
 An example of the game tree complexity can be illustrated through the game of tic-tac-toe. In the game tree, player A has 9 positions to put the mark (e.g., X or 0) on. Subsequently, in the second move, player B can put the mark on 8 spaces as one has been taken away in the first move and so on. Hence, the game tree complexity of tic-tac-toe can be defined as $9 \times 8 \times \cdots \times 1 = 9! = 362380$. In comparison to the state space complexity of tic-tac-toe, the game tree complexity is higher as a position arising through different orders of play is counted as one state with the state space complexity and multiple game tree positions with the game tree complexity. 
 
 
-In complex games like Quoridor, the game-tree complexity $G$ can be estimated by raising the average branching factor $B_{avg}$ to a power of the total number of moves by the players $D_{avg}$ \cite{Mertens2006Quoridor}, which is given by the following equation: 
+In complex games like Quoridor, the game-tree complexity $G$ can be estimated by raising the average branching factor $B_{avg}$ to a power of the total number of moves by the players $D_{avg}$ \citep{Mertens2006Quoridor}, which is given by the following equation: 
 \begin{equation}
     G = B_{avg}^{D_{avg}}
 \end{equation}
