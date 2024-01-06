@@ -100,13 +100,15 @@ namespace Quoridor.ConsoleApp.GameManager
                         winRate.ToString("0.##")}%. Average move time(ms) : {avgMoveTime.ToString("0.##", CultureInfo.InvariantCulture)}");
                 }
             }
-            if (_settings.BranchingFactor)
+            if (_settings.Simulate)
             {
                 var totalMoves = _settings.Strategies.Sum(x => x.TotalGameMoves);
                 var avgTotalMoves = totalMoves / _settings.NumberOfSimulations;
                 _settings.OutputDest.WriteLine($"Toal moves made across {_settings.NumberOfSimulations} games : {totalMoves}");
                 _settings.OutputDest.WriteLine($"Average total moves per game : {avgTotalMoves.ToString(CultureInfo.InvariantCulture)}");
-
+            }
+            if (_settings.BranchingFactor)
+            {
                 var totalAvg = _totalAverageBranchingFactor / _settings.NumberOfSimulations;
                 _settings.OutputDest.WriteLine(@$"Average branching factor : {totalAvg.ToString(CultureInfo.InvariantCulture)}");
             }

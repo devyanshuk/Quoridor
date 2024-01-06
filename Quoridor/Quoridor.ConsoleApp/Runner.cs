@@ -2,6 +2,7 @@
 using System.IO;
 using Castle.Windsor;
 using CLAP.Validation;
+using System.Globalization;
 using System.Collections.Generic;
 
 using Quoridor.AI;
@@ -97,9 +98,9 @@ namespace Quoridor.ConsoleApp
             int Seed,
 
             [Description("Exploration parameter for UCT")]
-            [DefaultValue(1.41)]
+            [DefaultValue("1.41")]
             [Aliases("exploration")]
-            double C,
+            string C,
 
             [Description("Simulation limit for MCTS")]
             [DefaultValue(1000)]
@@ -121,6 +122,8 @@ namespace Quoridor.ConsoleApp
             // for large tree, logs might be very big, so we disable it.
             Logger.Disable = true;
 
+            double c = double.Parse(C, CultureInfo.InvariantCulture);
+
             if (BranchingFactor) Simulate = true;
 
             _container.Resolve<IBoard>().SetDimension(Dimension);
@@ -139,9 +142,9 @@ namespace Quoridor.ConsoleApp
             //add selected ai/human strategy
             var mctsAgent = EnumHelper.ParseEnum<AITypes>(MctsAgent.ToUpper());
             settings.Strategies.Add(
-                GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy1.ToUpper()), mctsAgent, Depth, Seed, C, MctsSim));
+                GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy1.ToUpper()), mctsAgent, Depth, Seed, c, MctsSim));
             settings.Strategies.Add(
-                GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy2.ToUpper()), mctsAgent, Depth, Seed, C, MctsSim));
+                GetStrategyInfo(EnumHelper.ParseEnum<AITypes>(Strategy2.ToUpper()), mctsAgent, Depth, Seed, c, MctsSim));
 
             var gameEnv = _container
                 .Resolve<IGameFactory>()
