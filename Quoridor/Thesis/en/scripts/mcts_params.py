@@ -51,7 +51,7 @@ def draw_sim_time_graph(vals, args):
     [(exploration parameter, mcts simulation, avg time per move, games won / total games)]
     [(1.44, 10, 498.67, 7), (1.44, 30, 2586.59, 37), (1.44, 60, 5150.84, 33), (1.44, 90, 7385.0, 44), (1.44, 120, 10115.54, 39), (1.44, 150, 12678.84, 41), (1.44, 180, 16528.45, 39), (1.44, 210, 17606.21, 42), (1.44, 240, 16972.91, 41)]
     """
-    exploration_parameter, simulations, avg_time_per_move, games_won = zip(*vals)
+    _, simulations, avg_time_per_move, games_won = zip(*vals)
 
     fig, ax1 = plt.subplots()
     ax1.plot(simulations, games_won, color='tab:blue', label=f'Games won / {args.simulations}')
@@ -74,7 +74,27 @@ def draw_sim_time_graph(vals, args):
     plt.show()
 
 def draw_exp_param_time_graph(vals, args):
-    pass
+    exploration_parameter, _, avg_time_per_move, games_won = zip(*vals)
+
+    fig, ax1 = plt.subplots()
+    ax1.plot(exploration_parameter, games_won, color='tab:blue', label=f'Games won / {args.simulations}')
+    ax1.set_xlabel('Exploration parameter')
+    ax1.set_ylabel(f'Games won / {args.simulations}', color='tab:blue')
+    ax1.tick_params(axis='y', labelcolor='tab:blue')
+    ax1.set_xticks(exploration_parameter)
+    ax1.grid(True)
+
+    ax2 = ax1.twinx()
+    ax2.set_xticks(exploration_parameter)
+    ax2.plot(exploration_parameter, avg_time_per_move, color='tab:orange', label='Average time per move (ms)')
+    ax2.set_ylabel('Average time per move (ms)', color='tab:orange')
+    ax2.tick_params(axis='y', labelcolor='tab:orange')
+
+    fig.tight_layout()
+    fig.legend(loc="lower right", bbox_to_anchor=(0.87, 0.14))
+
+    plt.savefig('../../img/mcts_exploration_param_grid_search.png')
+    plt.show()
 
    
 def main(args):
@@ -116,6 +136,4 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true", default=False, help='verbose flag. diaplay braching factor, time results')
     parser.add_argument("--dim", type=int, default=5, help='dimension to examine mcts win rate and times for')
     args = parser.parse_args()
-    #main(args)
-    vals = [(1.44, 10, 498.67, 7), (1.44, 30, 2586.59, 37), (1.44, 60, 5150.84, 33), (1.44, 90, 7385.0, 44), (1.44, 120, 10115.54, 39), (1.44, 150, 12678.84, 41), (1.44, 180, 16528.45, 39), (1.44, 210, 17606.21, 42), (1.44, 240, 16972.91, 41)]
-    draw_sim_time_graph(vals, args)
+    main(args)
