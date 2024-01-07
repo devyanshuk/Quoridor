@@ -51,7 +51,8 @@ def draw_sim_time_graph(vals, args):
     [(exploration parameter, mcts simulation, avg time per move, games won / total games)]
     [(1.44, 10, 498.67, 7), (1.44, 30, 2586.59, 37), (1.44, 60, 5150.84, 33), (1.44, 90, 7385.0, 44), (1.44, 120, 10115.54, 39), (1.44, 150, 12678.84, 41), (1.44, 180, 16528.45, 39), (1.44, 210, 17606.21, 42), (1.44, 240, 16972.91, 41)]
     """
-    _, simulations, avg_time_per_move, games_won = zip(*vals)
+    vals_sorted = sorted(vals, key=lambda x: x[1])
+    _, simulations, avg_time_per_move, games_won = zip(*vals_sorted)
 
     fig, ax1 = plt.subplots()
     ax1.plot(simulations, games_won, color='tab:blue', label=f'Games won / {args.simulations}')
@@ -74,24 +75,27 @@ def draw_sim_time_graph(vals, args):
     plt.show()
 
 def draw_exp_param_time_graph(vals, args):
-    exploration_parameter, _, avg_time_per_move, games_won = zip(*vals)
+    """
+    [(1.0, 90, 8496.05, 43), (1.1, 90, 8520.55, 37), (1.3, 90, 8379.74, 44), (1.2, 90, 8919.14, 35), (1.4, 90, 7997.69, 45), (1.6, 90, 8259.62, 34), (1.5, 90, 8118.65, 40), (1.7, 90, 7920.58, 46), (1.8, 90, 3251.63, 39)]
+    """
+    vals_sorted = sorted(vals, key=lambda x: x[0])
+    exploration_parameter, _, avg_time_per_move, games_won = zip(*vals_sorted)
 
     fig, ax1 = plt.subplots()
     ax1.plot(exploration_parameter, games_won, color='tab:blue', label=f'Games won / {args.simulations}')
     ax1.set_xlabel('Exploration parameter')
     ax1.set_ylabel(f'Games won / {args.simulations}', color='tab:blue')
     ax1.tick_params(axis='y', labelcolor='tab:blue')
-    ax1.set_xticks(exploration_parameter)
+    #ax1.set_xticks(exploration_parameter)
     ax1.grid(True)
 
     ax2 = ax1.twinx()
-    ax2.set_xticks(exploration_parameter)
     ax2.plot(exploration_parameter, avg_time_per_move, color='tab:orange', label='Average time per move (ms)')
     ax2.set_ylabel('Average time per move (ms)', color='tab:orange')
     ax2.tick_params(axis='y', labelcolor='tab:orange')
 
     fig.tight_layout()
-    fig.legend(loc="lower right", bbox_to_anchor=(0.87, 0.14))
+    fig.legend(loc="lower left", bbox_to_anchor=(0.105, 0.11))
 
     plt.savefig('../../img/mcts_exploration_param_grid_search.png')
     plt.show()
@@ -130,9 +134,9 @@ if __name__ == "__main__":
     parser.add_argument("--sim_agent", type=str, default="parallelminimaxab", help='simulation agent for mcts')
     parser.add_argument('--depth', type=int, default=1, help='minimax depth')
     parser.add_argument('--s2', type=str, default="minimaxab", help='Strategy for player 2')
-    parser.add_argument('--best_mcts_simulation', type=int, default=100, help='Best simulation from experiment using --examine_simulations')
+    parser.add_argument('--best_mcts_simulation', type=int, default=90, help='Best simulation from experiment using --examine_simulations')
     parser.add_argument('--simulations', type=int, default=50, help='number of experiments to run for each value')
-    parser.add_argument('--examine_simulations', action="store_true", default=True, help='Check win rates and time against different simulations')
+    parser.add_argument('--examine_simulations', action="store_true", default=False, help='Check win rates and time against different simulations. If false, it will find results for all exploration parameters')
     parser.add_argument("--verbose", action="store_true", default=False, help='verbose flag. diaplay braching factor, time results')
     parser.add_argument("--dim", type=int, default=5, help='dimension to examine mcts win rate and times for')
     args = parser.parse_args()
