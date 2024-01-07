@@ -161,7 +161,8 @@ namespace Quoridor.ConsoleApp
                 case AITypes.MCTS:
                     {
                         var selectionStrategy = new UCT<Movement, IPlayer, IGameEnvironment>(c);
-                        var moveStrategy = GetStrategy(sim, depth, seed);
+                        //if minimax is selected, use depth of 1. that way, it'll use a greedy agent that's relatively faster
+                        var moveStrategy = GetStrategy(sim, 1, seed);
                         return new StrategyInfo {
                             Strategy = new MonteCarloTreeSearch<Movement, IGameEnvironment, IPlayer>(
                                 mctSim, selectionStrategy, moveStrategy)};
