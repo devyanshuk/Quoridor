@@ -14,7 +14,7 @@ namespace Quoridor.AI.MCTS
         private double Value(Node<TMove, TPlayer, TGame> node)
         {
             var winRate = (double)node.Wins / node.Count;
-            return winRate + c * Math.Log((double)node.Parent.Count / node.Count);
+            return winRate + c * Math.Sqrt(Math.Log(node.Parent.Count) / node.Count);
         }
     }
 }

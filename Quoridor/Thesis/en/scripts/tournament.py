@@ -63,10 +63,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--agents', type=str, default="random,minimaxab", help='Strategies for tournament')
+    parser.add_argument('--agents', type=str, default="random,parallelminimaxab,semirandom,astar", help='Strategies for tournament')
     parser.add_argument('--depth', type=int, default=1, help='minimax depth')
     parser.add_argument('--simulations', type=int, default=1000, help='Number of simulations')
     parser.add_argument("--verbose", action="store_true", default=False, help='verbose flag. diaplay braching factor, time results')
-    parser.add_argument("--dims_to_examine", type=str, default="5", help='dimensions to examine branching factor and times for')
+    parser.add_argument("--dims_to_examine", type=str, default="7,9", help='dimensions to examine branching factor and times for')
     args = parser.parse_args()
     main(args)
