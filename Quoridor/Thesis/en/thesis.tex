@@ -54,7 +54,6 @@
 \usepackage{subcaption}
 \usepackage[ruled]{algorithm2e}
 \usepackage[acronym,toc,shortcuts,nonumberlist]{glossaries}
-\makeglossaries
 \usepackage{amsmath}
 
 
@@ -83,6 +82,8 @@
 \newacronym{MCTS}{MCTS}{Monte-Carlo tree search}
 \newacronym{Csharp}{C\#}{C Sharp}
 \newacronym{OOP}{OOP}{Object Oriented Programming}
+
+\makeglossaries
 
 
 %%% Basic information on the thesis
@@ -122,7 +123,7 @@ Dedication.
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Quoridor presents a challenging terrain for strategic decision-making, making it a suitable testing ground for various AI algorithms. This thesis explores the implementation and evaluation of three distinct AI algorithms, namely A*, Minimax with Alpha-Beta Pruning, and Monte Carlo Tree Search (MCTS), within the realm of Quoridor gameplay.
+Quoridor presents a challenging terrain for strategic decision-making, making it a suitable testing ground for various Artificial Intelligence (AI) algorithms. This thesis explores the implementation of generic interfaces for AI agents and finally evaluation the AI agents in the game, namely minimax with alpha-beta pruning, Monte Carlo Tree Search (MCTS) and A-star within the realm of Quoridor gameplay. In the thesis, we develop the AI interface that can be easily integrated into any other game. 
 
 The research begins with a comprehensive overview of the Quoridor game, its rules and strategies. Subsequently, we delve into the theoretical foundations and practical implementation details of the aforementioned AI algorithms and conduct a thorough evaluation in an effort to determine the best one in this context.
 }
@@ -178,9 +179,6 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-
-\renewcommand{\glossarypreamble}{\glsfindwidesttoplevelname[\currentglossary]}
-\setglossarystyle{alttree}
 \printglossaries
 
 

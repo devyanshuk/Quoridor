@@ -1,106 +1,146 @@
-\chapter{Implementation}
+\chapter{Implementation}\label{Implementation}
 
-In this chapter, we delve into the practical aspects of creating \gls{AI} agents capable of tackling abstract strategy games. The focus is on constructing adaptable, game-agnostic systems that can be applied to a variety of games, ranging from the simplicity of Tic-tac-toe to the profound strategic depths of Go, with our primary case study being the game of Quoridor.
+In this chapter, we delve into the practical aspects of creating \gls{AI} agents capable of tackling abstract strategy games. The focus is on constructing adaptable interfaces that can be applied to a variety of games, ranging from the simplicity of Tic-tac-toe to the profound strategic depths of Go, with our primary case study being the game of Quoridor.
 
 \gls{Csharp}, is selected as the language of choice, mainly for its robustness, versatility, and strong support for object-oriented programming paradigms. \gls{Csharp}'s rich feature set makes it an excellent tool for developing sophisticated \gls{AI} frameworks that require a blend of performance, maintainability and readability.
 
 \section{Interfaces}
-The architecture of our implementation leverages interfaces, fundamental constructs in object-oriented design that define contracts for implementing classes. These interfaces specify a set of methods related to game mechanics, which are vital for the operation of \gls{AI} agents. Through the use of generic parameters \textbf{TPlayer}, \textbf{TMove}, and \textbf{TGame}, these interfaces offer a framework that is adaptable to various game entities such as players, moves, and game states.
+\label{game_interface_def}
+The architecture of our implementation leverages interfaces, which specify a set of methods relevant to game mechanics. They form the backbone of our \gls{AI} systems, ensuring that the algorithms are versatile and can be adapted to new games with minimal changes to the underlying codebase. An example of such interface usage can be seen in Section \ref{TicTacToe}
 
-The fundamental interfaces and their contents in our implementation include the following:
+Through the use of generic parameters \textbf{TPlayer}, \textbf{TMove}, and \textbf{TGame}, these interfaces offer a framework that is adaptable to various game entities such as players, moves, and game states.
+
+Before describing the game-specific interfaces, we first introduce the generic \textbf{IAIStrategy\textless{}TMove, TGame, TPlayer\textgreater{}} interface, which acts as a common interface for all our \gls{AI} agents.
+\begin{lstlisting}
+interface IAIStrategy<TMove, TGame, TPlayer>
+{
+    string Name { get; }
+    AIStrategyResult<TMove> BestMove(TGame game, TPlayer player);
+}
+
+class AIStrategyResult<TMove>
+{
+    double Value { get; set; }
+    TMove BestMove { get; set; }
+}
+\end{lstlisting}
+This interface provides a common property \textbf{Name}, a \texttt{string} representing the name of the agent, and a method \textbf{BestMove} that takes in a game and the current player in the game, and returns a tuple, \textbf{BestMove} (parametrized over generic type \textbf{TMove}) being the best move for the current player in the given game state and \textbf{Value}, a \texttt{double} type representing the value corresponding to the best move selected by the \gls{AI} agent.
+For example, for the Minimax algorithm, the Value corresponding to the best move would be the state with the highest payoff function, which could be used for debugging purposes.
+\\
+The following interfaces are used within the \textbf{BestMove} method for each \gls{AI} agent, and are meant to be defined explicitly by the user within their game.
+
+\begin{lstlisting}
+interface IValidMoves<TMove>
+{
+    IEnumerable<TMove> GetValidMoves();
+}
+\end{lstlisting}
+
+The \textbf{IValidMoves\textless{}TMove\textgreater{}} interface is the most fundamental interface used by (almost) all our \gls{AI} systems. Parametrized over the generic type \textbf{TMove}, this interface provides access to all valid moves (of a user-defined \textbf{TMove} type), e.g from the current game state, which our implemented \ac{AI} algorithms evaluate and find the best move.
 
 \begin{lstlisting}
 interface IPlayer<TPlayer>
 {
-    /*
-     *Retrieves the active player in the game.
-     *Parametrized over TPlayer instance
-     */
     TPlayer CurrentPlayer { get; }
-}
-
-interface IDeepCopy<T>
-{
-    /*
-     *Create a deep copy of an instance, (e.g. of a game
-     *state, allowing for safe simulations and backtracking)
-     *without altering the actual object.
-     */
-    T DeepCopy();
-}
-
-interface IStaticEvaluation
-{
-    /*
-     *Computes a heuristic evaluation of the current game state,
-     *indicating the desirability of the state for the player who
-     *is currently maximizing or minimizing the game value
-    */
-    public double Evaluate(bool currentMaximizer);
-}
-
-
-
-interface ITerminal
-{
-    /*
-    * A property that checks whether the game has
-    * reached a terminal state.
-    */
-    bool HasFinished { get; }
-}
-
-interface IValidMoves<TMove>
-{
-    /*
-    *Returns all the valid moves that can
-    *be made from the current state.
-    */
-    IEnumerable<TMove> GetValidMoves();
 }
 
 interface IOpponent<TPlayer>
 {
-    /*
-    * Retrieves the active opponent in the game state,
-    * parametrized over TPlayer
-    */
     TPlayer Opponent { get; }
 }
-
-interface INeighbors<TMove>
-{
-    /*Yields the neighboring positions or states from a given
-    *position pos, crucial for deter-mining potential player actions
-    */
-    IEnumerable<TMove> Neighbors(TMove pos);
-}
-
-interface IMove<TMove>
-{
-    // Applies a move to the game state
-    void Move(TMove move);
-
-    /*
-    *Reverts a move, restoring the
-    *game state to its previous condition
-    */
-    void UndoMove(TMove move);
-}
-
-interface IRandomizableMoves<TMove>
-{
-    /*
-     *Returns all the valid moves (that guide the current game state
-     *towards the terminal state) that can be made from the current
-     *state and can be used by the random agent
-    */
-    public IEnumerable<TMove> RandomizableMoves();
-}
-
 \end{lstlisting}
 
-They form the backbone of the \gls{AI} system in our implementation, ensuring that the agents are versatile and can be adapted to new games with minimal changes to the underlying codebase.
+Since we are focussed on abstract \textbf{Two-player}, Zero-sum games, we also provide the \textbf{IPlayer\textless{}TPlayer\textgreater{}} and \textbf{IOpponent\textless{}TPlayer\textgreater{}} interfaces, both parametrized over the generic \textbf{TPlayer} type.
+The \gls{MCTS} algorithm, for example, uses these interfaces during the simulation and back-propagation phases.
+\begin{lstlisting}
+TPlayer Simulation(TGame game)
+{
+    while(!game.HasFinished)
+    {
+        var move = _moveStrategy.BestMove(game, game.CurrentPlayer).BestMove;
+        game.Move(move);
+    }
+    return game.Winner;
+}
+\end{lstlisting}
+During the Simulation phase, the \gls{MCTS} algorithm uses e.g the Random agent, which implements the \textbf{IAIStrategy} interface, therefore providing access to the aforementioned \textbf{BestMove} method, which requires \textbf{CurrentPlayer} to be passed to it.
+
+\begin{lstlisting}
+void BackPropagation(Node<TMove, TPlayer, TGame> node, TPlayer winner)
+{
+    var current = node;
+    while (current != null)
+    {
+        current.Count++;
+        if (current.State.Opponent.Equals(winner))
+            current.Wins++;
+
+        current = current.Parent;
+    }
+}
+\end{lstlisting}
+Each node is expanded by making a move, and we keep a track of the player making the move in the node. After making the move in the game, we \textbf{Switch} the player turn. So the \textbf{CurrentPlayer} and \textbf{Opponent} gets switched too.
+
+\begin{lstlisting}
+interface IDeepCopy<T>
+{
+    T DeepCopy();
+}
+\end{lstlisting}
+Although \gls{Csharp} has the \textbf{ICloneable\textless{}T\textgreater{}} interface provides a \textbf{T Clone()} method that we could use instead of our defined \textbf{IDeepCopy\textless{}T\textgreater{}} interface, the method we define leaves no room for ambiguity on shallow vs deep copying of relevant objects.
+This method is used by e.g Parallel Minimax in order to ensure the original game state don't get changed by any means while exploring the game tree by making several moves.
+
+\begin{lstlisting}
+interface ITerminal
+{
+    bool HasFinished { get; }
+}
+\end{lstlisting}
+Another important information for a game is whether the game reached the terminal state (win, loss, draw). This information helps update evaluations of game states and also notifies the algorithms to stop looking further. For example, in the Simulation phase of the \gls{MCTS} algorithm we described above, we see the usage of the \textbf{HasFinished} property. The Simulation phase performs moves until the game reaches a terminal state.
+
+\begin{lstlisting}
+interface IStaticEvaluation
+{
+    public double Evaluate(bool currentMaximizer);
+}
+\end{lstlisting}
+The \textbf{IStaticEvaluation} interface computes the heuristic evaluation of the current game state, indicating the desirability of the state for the player who is currently maximizing or minimizing the game value. This is used by the \textbf{Minimax} algorithm to statically evaluate game states instead of exploring them when the specified depth has been reached.
+\begin{lstlisting}
+ MinimaxStep(TGame game, bool maximizingPlayer, int depth)
+    if (depth <= 0 || game.HasFinished)
+    {
+        return game.Evaluate(maximizingPlayer);
+    }
+\end{lstlisting}
+As we see from the base case of the recursive \textbf{MinimaxStep} method, we statically evaluate game states instead of recursing further and later compare them to find the best move.
+\begin{lstlisting}
+interface IMove<TMove>
+{
+    void Move(TMove move);
+
+    void UndoMove(TMove move);
+}
+\end{lstlisting}
+The \textbf{IMove\textless{}TMove\textgreater{}} interface is yet another fundamental interface that allows games to progress further. To further evaluate game states, \gls{AI} algorithms must make different moves from current game state, then run any evaluation function and make decisions based on that. The \textbf{Move} method provides access to do exactly that.\\
+The \textbf{UndoMove} method complements the \textbf{Move} method in that the algorithms can track back to the original game state using the \textbf{UndoMove} method before returning the best move it found based on different game state evaluation.
+
+\begin{lstlisting}
+interface INeighbors<TMove>
+{
+    IEnumerable<TMove> Neighbors(TMove pos);
+}
+\end{lstlisting}
+The \textbf{INeighbors\textless{}TMove\textgreater{}} interface yields the neighboring positions or states from a given position (parametrized using the generic \textbf{TMove} type) crucial for determining potential player actions. This is used by the \textbf{A*} algorithm to find the shortest path to the goal.
+
+\begin{lstlisting}
+interface IRandomizableMoves<TMove>
+{
+    public IEnumerable<TMove> RandomizableMoves();
+}
+\end{lstlisting}
+The \textbf{IRandomizableMoves\textless{}TMove\textgreater{}} interface returns all the valid moves (that guide the current game state towards the terminal state) that can be made from the current state and can be used by the random agent.
+In context of the Quoridor game, if we move randomly on each turn, there's a possibility of never reaching the goal row. So, we would instead like to have an option to place wall randomly, but move towards the goal. So, we define the \textbf{IRandomizableMoves} interface and return all possible walls that can be placed in the board, and use a different approach for pawn movements.
+
 
 \section{Agents}
 
@@ -109,23 +149,26 @@ In this section, we discuss the generic \gls{AI} agent implementation, namely Ra
 \subsection{Random Agent}
 We consider a random agent as a baseline for comparing the performance of the other implemented agents. 
 
-The random agent uses the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface to get a list of all valid moves, and then picks move at random. The pseudocode for the random agent along with the interface is given below:
-
+The random agent uses the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface to get a list of all valid moves, and then picks move at random. The class definition for the Random Strategy is given by:
 \begin{lstlisting}
-public class RandomStrategy<TMove, TGame, TPlayer>(int seed)
-where TGame : IValidMoves<TMove>
-{    
-    public TMove BestMove(TGame game, TPlayer player)
-    {
-        // IValidMoves<TMove>
-        var validMoves = game.GetValidMoves();
+public class RandomStrategy<TMove, TGame, TPlayer>(int seed) :
+    IAIStrategy<TMove, TGame, TPlayer>
+        where TGame : IValidMoves<TMove>
+\end{lstlisting}
 
-        //pick a random number corresponsing to the index of the move
-        var randIndex = _random.Next(0, validMoves.Count());
+As the Random Strategy implements the \textbf{IAIStrategy\textless{}TMove, TGame, TPlayer\textgreater{}} interface, it has a property \textbf{Name} of \texttt{string} type and the \textbf{BestMove(TGame game, TPlayer player)} method that returns the best move and the value that accompanies with it is the seed provided while initializing the random nubmer generator. The pseudocode for the Random agent is given below.
 
-        //return the random move
-        return validMoves.ElementAt(randIndex)
-    }
+\begin{lstlisting}   
+public string Name => "Random";
+
+public AIStrategyResult<TMove> BestMove(
+    TGame game, TPlayer player)
+{
+    //IValidMoves<TMove>
+    var validMoves = game.GetValidMoves();
+
+    var randIndex = random number between 0 and validMoves.Count();
+    return { BestMove = validMoves[randIndex], Value = seed };
 }
 \end{lstlisting}
 
@@ -133,41 +176,57 @@ As described above, the Random Agent picks a move from the set of valid moves ba
 
 \subsection{Semi-Random agent}
 
-There are cases where we want to return a random move, but we don't want the game to continue forever by the random agent possibly returning move that never end in a terminal state. In this case, we want to guide the random agent to produce a random move, but also make sure the game will terminate eventually. This algorithm is especially useful for the Simulation step of the \gls{MCTS} algorithm as an approach to shorten the game length to reach the terminal state.
+There are cases where we want to return a random move, but we don't want the game to continue forever by the random agent possibly returning move that never end in a terminal state. In this case, we want to guide the random agent to produce a random move, but also make sure the game will terminate eventually.
 
-For this purpose, we define the Semi-Random agent defined by the following code. 
+The semi-random agent uses the \textbf{IRandomizableMoves\textless{}TMove\textgreater{}}. It also takes in a strategy to get the best move and then add it to the list of randomizable moves.
 
 \begin{lstlisting}
-public class SemiRandomStrategy<TGame, TMove, TPlayer>
-    where TPlayer : IAStarPlayer<TMove>
-    where TGame : INeighbors<TMove>, IRandomizableMoves<TMove>
-{
-    public TMove BestMove(TGame game, TPlayer player)
-    {
-        //IRandomizableMoves<TMove>
-        //these moves, when used won't result in a possible infinite game
-        possibleMoves = game.RandomizableMoves();
-
-        //non-randomizable move. This move might create infinite game loop if not 
-        //used strategically, eg. pawn moves in Quoridor.
-        nonRandomizableMove = _strategy.BestMove(game, player);
-
-        //add the non-randomizable move to the list of all moves
-        possibleMoves.Add(nonRandomizableMove);
-
-        //return a random move
-        var randIndex = _random.Next(0, possibleMoves.Count);
-        return possibleMoves[randIndex];
-    }
-|
+public class SemiRandomStrategy<TGame, TMove, TPlayer> :
+    IAIStrategy<TMove, TGame, TPlayer>
+        where TGame : IRandomizableMoves<TMove>
 \end{lstlisting}
 
-\textcolor{red}{Elaborate a bit more on the semirandom strategy, what is strategy.bestmove, what is randomizable move, what is non randomizable move in the context of the game}
+Then, in the \textbf{BestMove} method, it firstly gets the list of moves that can be randomized, finds the best move from a list of non-randomizable move set and then produces a random move from these two. The pseudocode from the \textbf{Semi-Random} algorithm is given below:
 
+\begin{lstlisting}
+public TMove BestMove(TGame game, TPlayer player)
+{
+    //IRandomizableMoves<TMove>
+    //these moves won't result in a possible infinite game
+    possibleMoves = game.RandomizableMoves();
+
+    //non-randomizable move. This move might create infinite game
+    //loop if not used strategically, eg. pawn moves in Quoridor.
+    nonRandomizableMove = _strategy.BestMove(game, player);
+
+    //add the non-randomizable move to the list of all moves
+    possibleMoves.Add(nonRandomizableMove);
+
+    return random move from possibleMoves
+}
+\end{lstlisting}
+
+Adding more context to the Quoridor example in the \textbf{IRandomizableMoves\textless{}TMove\textgreater{}} interface description in section \ref{game_interface_def}, the Semi-Random algorithm in Quoridor would process and return the best move the following way:
+
+\begin{lstlisting}
+//IRandomizable<TMove>
+//No pawn placement positions here
+unplaced_walls = game.GetRandomizableMoves();
+
+//IPlayer.CurrentPlayer
+//Shortest path to the goal row
+best_pawn_move = AStar.BestMove(game, game.CurrentPlayer);
+
+possible_moves = unplaced_walls + [best_pawn_move];
+random_index = random nubmer from 0 to possible_moves;
+return { BestMove = possible_moves[random_index], Value = random_seed };
+\end{lstlisting}
+
+This algorithm is especially useful for the Simulation step of the \gls{MCTS} algorithm as an approach to shorten the game length to reach the terminal state in context of Quoridor game.
 
 \subsection{Minimax Agent}
 
-Minimax agent is another agent that we have implemented in the game that provides the move to the agent based on minimax algorithm which is described and exemplified below.
+Minimax agent is another agent that we have implemented in the game that provides the move to the agent based on minimax algorithm.
 
 Mathematically, a minimax algorithm can be defined by the following equation:
 \begin{equation}\label{eq:mmax}
@@ -192,9 +251,11 @@ As defined in the equation \eqref{eq:mmax}, the minimax algorithm comprises of t
     \label{fig:minimax1}
 \end{figure}
 
-In Figure \ref{fig:minimax1}, consists of nodes that define either player's or the opponent's actions. For each action, there can be an evaluation where higher evaluation may mean it is favouring the player. For example, an action of the player causing two possible evaluations of 10 and 20 would mean the player would have higher advantage choosing the action leading to evaluation of 20. 
+The Figure \ref{fig:minimax1} consists of nodes that define either player's or the opponent's actions. For each action, there can be an evaluation where higher evaluation may mean it is favouring the player. For example, an action of the player causing two possible evaluations of 10 and 20 would mean the player would have higher advantage choosing the action leading to evaluation of 20. 
 
-The minimax algorithm starts with a game tree with possible moves of the player and opponent. The evaluation of the leaf nodes positions are assigned, for example 5 and 10 in the figure. The player chooses a move to maximize the evaluation on their turn whereas the opponent wants to minimize the evaluation. The player chooses a move with an evaluation of 10 (between 10 and 5, maximizing its evaluation) and labels the action as 10. The player then determines that the opponent chooses an action that minimizes the evaluation, choosing an action with evaluation of 10 rather than 30. The player labels the parent node as 10 indicating that with best play, the player can achieve an evaluation of 10 from that node. The player then chooses the node with evaluation of 10 when choosing between 10 and 2, maximizing its evaluation and subsequently labels the parent node as 10. The red line shows the path the player determines as optimal leading to a decision choosing the the action labelled with evaluation of 10.
+The minimax algorithm starts with a game tree with possible moves of the player and opponent. The evaluation of the leaf nodes positions are assigned, for example 5 and 10 in the figure. The player chooses a move to maximize the evaluation on their turn whereas the opponent wants to minimize the evaluation. The player chooses evaluation of 10 (between 10 and 5) on its turn and subsequently evaluation of 10 (between 10 and 30) in the opponent's turn. The red line shows the path the player determines as optimal leading to a decision choosing the the action labelled with evaluation of 10.
+
+\textcolor{red}{Explain evaluation function for minimax and link it to the graph}
 
 As the graph of a game can be large, one way to limit the search space for implementing the minimax algorithm is consider a depth-limited version of the algorithm. In this version, the algorithm only considers a part game tree with limited depth of the graph. Increasing the depth increases the accuracy of the decision at the cost of computational complexity. In terms of game, this depth may be equivalent to "looking ahead only a few moves".
 
@@ -211,13 +272,25 @@ In our implementation, the minimax algorithm is implemented with further optimiz
 
 In many cases, there may be the actions of the player in the search tree that can be evaluated worse than another action already evaluated. In such cases, where the better move or action has already been determined, it may not be useful to further evaluate the subsequent moves of the player and the opponent. Hence, the alpha-beta pruning reduces the game complexity by not further evaluating the branches of the node with evaluation worse than what has already been determined with another node.
 
-As its name suggests, the alpha beta algorithm maintains two values, alpha and beta values. The alpha value stores the minimum score the player is assured to get while the beta value records the maximum score the opponent is assured to get. Whenever the evaluation of the minimum score of the player is higher than the maximum score after the subsequent move of the opponent (or in other words alpha > beta), the alpha-beta pruning algorithm stops evaluating the opponents position. This reduces the number of nodes in the search tree and hence reduces the complexity of the minimax algorithm.
+As its name suggests, the alpha beta algorithm maintains two values, alpha and beta values. The alpha value stores the minimum score the player is assured to get while the beta value records the maximum score the opponent is assured to get. Whenever the evaluation of the minimum score of the player is higher than the maximum score after the subsequent move of the opponent (or in other words alpha $>$ beta), the alpha-beta pruning algorithm stops evaluating the opponents position. This reduces the number of nodes in the search tree and hence reduces the complexity of the minimax algorithm.
 
 In Figure \ref{fig:minimax2}, if the player determines that 
 \begin{equation}
-    Z = max (10, Y) = max (10,  min (2, X))
+    Z = max (10, Y) = max (10,  min (2, X)),
 \end{equation}
-, the value of X does not influence the value of $Y$ or $Z$ as $Y = min(2, X) \leq 2$ and hence $Z = max(10, \leq 2) = 10$. In this case, the player may not evaluate the branch $X$ or branch $Y$ further reducing the game tree and hence the computational complexity of the algorithm. 
+the value of X does not influence the value of $Y$ or $Z$ as $Y = min(2, X) \leq 2$ and hence $Z = max(10, \leq 2) = 10$. In this case, the player may not evaluate the branch $X$ or branch $Y$ further reducing the game tree and hence the computational complexity of the algorithm. 
+
+
+The minimax algorithm (and the alpha-beta pruning optimization of it)  uses the \textbf{IValidMoves\textless{}TMove\textgreater{}} interface to get a list of all moves, \textbf{IMove\textless{}TMove\textgreater{}} interface to perform moves, get a static evaluation (therefore needing the \textbf{IStaticEvaluation} interface) of the game state and undo moves. It also requires the \textbf{ITerminal} interface to check if the game reached the terminal state, and an access to the \textbf{IPlayer\textless{}TPlayer\textgreater{}} interface, especially during the static evaluation in order to know which player to evaluate the board for.
+
+The class definition for Minimax would then be the following:
+
+\begin{lstlisting}
+ public class Minimax<TPlayer, TMove, TGame>(int Depth) :
+    IAIStrategy<TMove, TGame, TPlayer>
+        where TGame :  ITerminal, IMove<TMove>, IStaticEvaluation,
+            IValidMoves<TMove>, IPlayer<TPlayer>
+\end{lstlisting}
 
 Below, we list the implementation of the minimax algorithm with alpha beta pruning implementation:
 
@@ -235,11 +308,7 @@ public TMove MinimaxStep(
     {
         // IMove<TMove>
         game.Move(move);
-
-        //recursively call the MinimaxStep functino and update the
-        //best score and move
         result = MinimaxStep(game, depth - 1, !maximizingPlayer);
-        
         // IMove<TMove>
         game.UndoMove(move);
 
@@ -279,43 +348,27 @@ In the above implementation, the parameter depth is introduced to only consider 
 \subsubsection{Parallel minimax}
 Another way to improve the time complexity of the minimax algorithm is to parallelize the algorithm. The minimax algorithm involves in evaluating multiple nodes of the game tree. The way to parallelize such algorithm is to run different processes, in this case, evaluation of the position associated with different nodes, in different threads. This ensures that even though computational complexity may remain the same, the time complexity of the algorithm is distributed over multiple threads and possibly multiple processors.
 
-The above defined methods to reduce the computational complexity of the minimax algorithm can be combined together. For example, the minimax algorithm can be depth limited and/or run with alpha-beta pruning and/or run in parallel as shown in the following implemented class.
+The above defined methods to reduce the computational complexity of the minimax algorithm can be combined together. For example, the minimax algorithm can be depth limited and/or run with alpha-beta pruning and/or run in parallel as shown in the following pseudocode:
 
 \begin{lstlisting}
-public class ParallelMinimaxABPruning<TPlayer, TMove, TGame>(int Depth) : IAIStrategy<TMove, TGame, TPlayer>
-        where TGame : IMinimaxGame<TPlayer, TMove>, IDeepCopy<TGame>
+Parallel.ForEach(validMoves, (move, loopState) =>
+{
+    //IDeepCopy<T>
+    var clonedGame = game.DeepCopy();
+    clonedGame.Move(move);
+
+    var result = ParallelMinimaxStep(clonedGame, alpha, beta, depth - 1, !maximizingPlayer);
+
+    lock (_lock)
     {
-        private readonly object _lock = new();
-        
-        (*@{\hspace*{.5cm}\vdots}@*)
-        
-        private AIStrategyResult<TMove> ParallelMinimaxStep(TGame game, double alpha, double beta, int depth, bool maximizingPlayer)
-        {
-            (*@{\hspace*{.5cm}\vdots}@*)
-            Parallel.ForEach(validMoves, (move, loopState) =>
-            {
-                var clonedGame = game.DeepCopy();
-                clonedGame.Move(move);
-
-                var result = ParallelMinimaxStep(clonedGame, alpha, beta, depth - 1, !maximizingPlayer);
-
-                lock (_lock)
-                {
-                    if (maximizingPlayer)
-                    {
-                        (*@{\hspace*{.5cm}\vdots}@*)
-                    }
-                    else
-                    {
-                        (*@{\hspace*{.5cm}\vdots}@*)
-                    }
-                }
-            });
-            return bestMove;
-        }
+        bestMove = Update(result, bestMove);
     }
+});
+return bestMove;
 \end{lstlisting}
 
+
+\textbf{Parallel Minimax} additionally requires the \textbf{IDeepCopy\textless{}T\textgreater{}} interface to ensure the original game state doesn't get altered in any way. The other two variants of Minimax algorithms were only using the  \textbf{IMove\textless{}TMove\textgreater{}} interface since one thread was responsible for changing the game state sequentially so undoing a move would cancel out the applied move effectively.
 
 \subsection{Monte-Carlo tree search agent}
 
@@ -330,9 +383,9 @@ public class ParallelMinimaxABPruning<TPlayer, TMove, TGame>(int Depth) : IAIStr
 
 The \gls{MCTS} algorithm builds upon the following framework:
 \begin{enumerate}
-    \item \textbf{Selection:} This step involves the algorithm choosing a move based on either a good move determined in previous iterations or a exploratory new move. In figure \ref{fig:MCTS1}, in the first player's turn, an action gives 3/6 chances of winning based on previous iterations whereas another gives 1/2 winning chances. The player selects a node that has highest possibility of winning, which in this case is equal. The player can also choose a new move that may be already explored to avoid not exploring further options.
+    \item \textbf{Selection:} This step involves the algorithm choosing a move based on either a good move determined in previous iterations or a exploratory new move. For example, in figure \ref{fig:MCTS1}, in the first player's turn, an action gives 3/6 chances of winning based on previous iterations whereas another gives 1/2 winning chances. The player selects a node that has highest possibility of winning, which in this case is equal. The player can also choose a new move that may be already explored to avoid not exploring further options.
     \item \textbf{Expansion:} This step involves the algorithm to add a new node to the game tree determined during the selection process. A node can simply be a valid move starting from the node from where no simulation step has been played out. In figure \ref{fig:MCTS2}, an unevaluated option (e.g., node inside the dotted box) is explored and simulated.
-    \item \textbf{Simulation:} This step involves in playing out the game using policy. One of the policies can simply be a random policy (e.g., choosing a move based on certain distribution).
+    \item \textbf{Simulation:} This step involves the agent playing out the game using policy. One of the policies can simply be a random policy (e.g., choosing a move based on certain distribution).
     \item \textbf{Back propagation:} Finally, based on the simulation step, this step involves in the algorithm updating the nodes. In figure \ref{fig:MCTS2}, the red arrows show the back propagation step as a result of exploration and simulation step where the probabilities or the weights of the nodes are updated as a result of exploration and simulation steps.
 \end{enumerate}
 
@@ -388,48 +441,66 @@ A-Star is a search algorithm for traversing from the source node to the destinat
     f = g + h
 \end{equation}
 
+We begin by describing the \textbf{IPlayer\textless{}TPlayer\textgreater{}} interface as follows:
+\begin{lstlisting}
+public interface IAStarPlayer<TMove>
+{
+    TMove GetCurrentMove();
+    bool IsGoal(TMove move);
+    double CalculateHeuristic(TMove move);
+}
+\end{lstlisting}
+It is parametrized over the generic \textbf{TMove} type. The first method \textbf{TMove GetCurrentMove()} provides the current user-defined position (of type TMove). This could be e.g position in the game board.\\
+The \textbf{IsGoal(TMove move)} method checks if the new move is a goal, i.e the player's goal move. E.g in context of Quoridor, where \textbf{Vector2} is used as \textbf{TMove}, each player has a \textbf{IsGoal(Vector2 pos)} that checks if the position is one of player's goal row.\\
+The \textbf{CalculateHeuristic(TMove move)} is the heuristic function - the cost of the cheapest path from the current position to the goal. In Quoridor, for example, we use \textbf{Manhattan Distance} as the heuristic.\\
+Suppose player $P$ is at at cell $C_{xy}$ and player $Q$ starts at cell $C_{ab}$, and let $n$ be the Quoridor board dimension.\\
+Player $P$'s goal is to reach row $n$ regardless of the column it is at, and Player $Q$'s goal is to reach row $1$.
+So, the heuristic function for player $P$, $H_P$ is given by
+\begin{equation}
+\label{eq:playerPHeuristic}
+    H_P = | n - x |
+\end{equation}
+and the heuristic function for player $Q$, $H_Q$ is given by
+\begin{equation}
+\label{eq:playerQHeuristic}
+    H_Q = a
+\end{equation}
+
+Before we describe the class signature for the \textbf{A*} algorithm, we would want the user-defined \textbf{TMaze} type to implement the \textbf{INeighbors\textless{}TMove\textgreater{}} interface to get access to neighboring moves (e.g positions), given a move (or position).
 
 \begin{lstlisting}
-
 public class AStar<TMove, TMaze, TPlayer>
     where TPlayer : IAStarPlayer<TMove>
     where TMaze : INeighbors<TMove>
+\end{lstlisting}
+
+\begin{lstlisting}
+public AIStrategyResult<TMove> BestMove(TMaze maze, TPlayer player)
 {
-    public TMove BestMove(TMaze maze, TPlayer player)
+    openSet = { start }
+    var closedSet =  { }
+
+    while (openSet is not empty)
     {
-        (*@{\hspace*{.5cm}\vdots}@*)
-        var openSet = new HashSet<Node<TMove>>() { start  };
-        var closedSet = new HashSet<Node<TMove>>();
-        (*@{\hspace*{.5cm}\vdots}@*)
+        nodeWithLowestFscore = node in openset with lowest f-score value
 
-        while (openSet.Count() > 0)
-        {
-            //get the node from the open set with the lowest f-score value
-            var nodeWithLowestFscore = openSet.MinBy(s => s.FValue);
-            currNode = nodeWithLowestFscore;
+        //IAStarPlayer<TMove>
+        if player.IsGoal(nodeWithLowestFScore):
+            return nodeWithLowestFScore
 
-            //put this node in closed set and remove it from open set
-            closedSet.Add(nodeWithLowestFscore);
-            openSet.Remove(nodeWithLowestFscore);
-
-            (*@{\hspace*{.5cm}\vdots}@*)
-            
-            //INeighbors<TMove>
-            foreach (var neighbor in maze.Neighbors(currNode.CurrMove))
+        closedSet.Add(nodeWithLowestFscore);
+        openSet.Remove(nodeWithLowestFscore);
+        
+        //INeighbors<TMove>
+        foreach (neighbor in maze.Neighbors(nodeWithLowestFScore))
+        if (!openSet.Contains(neighbor) || neighborNode.G < G)
             {
-            (*@{\hspace*{.5cm}\vdots}@*)
-            if (!openSet.Contains(neighborNode) || neighborNode.GValue < gScore)
-                {
-                    neighborNode.GValue = gScore;
-                    neighborNode.HValue = player.CalculateHeuristic(neighbor);
-                    neighborNode.FValue = gScore + neighborNode.HValue;
-                    (*@{\hspace*{.5cm}\vdots}@*)
-                }
+                neighbor.G = G;
+                //IAStarPlayer<TMove>
+                neighbor.H = player.CalculateHeuristic(neighbor);
+                neighbor.F = G + neighbor.H;
             }
-        }
-        (*@{\hspace*{.5cm}\vdots}@*)
     }
-
 \end{lstlisting}
 
 The A-star algorithm starts by maintaining two sets \textit{openSet} and \textit{closedSet}. \textit{openSet} consists of nodes with children not yet visited and \textit{closedSet} consists of nodes with children nodes explored already. The node with lowest cost function ("f" score) is explored and marked as the \textit{currentNode} from the \textit{openSet}. Subsequently, the 'f' scores of the neighbours of the \textit{currentNode} is calculated. This algorithm runs until the destination node in the tree is reached.
@@ -443,7 +514,7 @@ The interfaces with our implementation as described earlier  are parametrized ov
 
 \begin{lstlisting}
 public class TicTacToe :
-    ITerminal, //Minimax, MCTS
+    ITerminal, //used by Minimax, used by MCTS
     IValidMoves<int>, //Minimax, MCTS
     IMove<int>, //Minimax, MCTS
     IPlayer<int>, //Minimax, MCTS
@@ -588,7 +659,9 @@ This way, we can play the Tic-Tac-Toe game between 2 smart or trivial agents unt
 \end{figure}
 
 As seen in figure \ref{fig:core_uml}, the \texttt{GameEnvironment} class implements all interfaces necessary for \gls{AI} integration.
-In contrast to the \textbf{Tic-Tac-Toe} implementation we saw earlier in section \ref{TicTacToe} where \texttt{int} type was used for the \texttt{TMove} parameter, we use a reference type \texttt{Movement} for the \texttt{TMove} parameter, since we need to consider wall placement, player movement, which is very difficult to encode and decode as integral values.
+
+In contrast to the \textbf{Tic-Tac-Toe} implementation we saw earlier in section \ref{TicTacToe} where \texttt{int} type was used for the \texttt{TMove} parameter, we use a reference type \texttt{Movement} for the \texttt{TMove} parameter, since we need to consider wall placement and player movement, which is difficult to encode and decode as integral values.
+
 \begin{lstlisting}
 public abstract class Movement{}
 
@@ -596,6 +669,7 @@ public class Vector2 : Movement{...}
 
 public class Wall : Movement{...};
 \end{lstlisting}
+
 This approach makes it easier to identify movement types and therefore easily perform Move/Unmove operations on the game and much more.
 
 We will now describe the core elements of the interfaces that we integrated for this game.
@@ -630,9 +704,22 @@ public void Move(Movement move) {
 }
 \end{lstlisting}
 
-As for the static evaluation function required by the Minimax algorithm, we use the following features of the game:
+Assume a Quoridor game instance of 2 players $P$ and $Q$, with $P$ starting at cell $C_{1c}$ and $Q$ starting at cell $C_{Nc}$, where $N$ is the dimension of the game board.\\
+Suppose $P$ is at cell $C_{xy}$ and $Q$ is at cell $C_{uv}$ at an arbitrary game state $G_s$, and let $S_P$ be the shortest path from $C_{xy}$ to $C_{N*}$ and let $S_Q$ be the shortest path from $C_{uv}$ to $C_{0*}$.\\
+Let $W_P$ denote the number of walls left for player $P$ and let $W_Q$ denote the number of walls left for player $Q$ at state $G_s$.
+
+Then, the static evaluation function for player for player $P$, $F_P$ in game state $G_s$ is given by:
+
+\begin{equation}
+    F_P = S_P - S_Q + W_P - W_Q
+\end{equation}
+
+So, for the static evaluation function, we consider the following 4 features:
 \begin{itemize}
-    \item 
+    \item Shortest distance to goal for player P
+    \item Shortest distance to goal for player Q
+    \item Number of walls left for player P
+    \item Number of walls left for player Q
 \end{itemize}
 
 \subsection{Project Structure}

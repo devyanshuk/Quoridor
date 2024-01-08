@@ -1,20 +1,21 @@
 \chapter{Game Analysis}
+\label{GameAnalysis}
 
-In Chapter \ref{GameDescription}, we briefly explored the rules and gameplay mechanics of Quoridor.
+In Chapter \ref{GameDescription}, we explored the rules and gameplay mechanics of Quoridor.
 As we progress, this chapter aims to deepen our understanding by analyzing Quoridor from a
 theoretical and computational perspective.
 
-In this chapter will classify Quoridor within the realm of strategic games, examine its game tree,
+In this chapter, we will classify Quoridor within the realm of strategic games, examine its game tree,
 state-space and tree complexity, and explore the implications of these factors on gameplay and
 artificial intelligence application.
 
 \section{Classification of Quoridor}
 
 Quoridor can be characterized as a discrete, deterministic, zero-sum, sequential, game with perfect
-information \citep{Glendenning2002MasteringQ} , and therefore, a combinatorial game \citep{GameTheoryBook}. 
+information \citep{Glendenning2002MasteringQ}, and therefore, a combinatorial game \citep{GameTheoryBook}. 
 
 \subsection{Discrete}
-In every turn of the game, each player has a finite number of moves and wall placements. These are limited by the game state (already placed walls and moved pawns) and the rules of the game. The game-tree of Quoridor has finite number of nodes (e.g figure \ref{fig:GameTree}).
+In every turn of the game, each player has a finite number of moves and wall placements. These are limited by the game state (already placed walls and moved pawns) and the rules of the game. The game-tree of Quoridor has finite number of nodes (e.g Figure \ref{fig:GameTree}).
 
 \subsection{Deterministic}
 Quoridor has no random elements or chance involved in the gameplay. Every outcome and situation
@@ -34,7 +35,7 @@ edges represent action/move.
 
 Game trees are integral to the framework of \textbf{adversarial search problems}, where they are employed to systematically explore and evaluate the possible outcomes of different strategies, and forecast future states of the game based on current and potential moves.
 
-The following depicts a (partial) game tree for the Quoridor game with a board of size 3x3:
+Figure \ref{fig:GameTree} depicts a (partial) game tree for the Quoridor game with a board of size 3x3.
 
 \begin{figure}[!ht]
     \centering
@@ -43,7 +44,7 @@ The following depicts a (partial) game tree for the Quoridor game with a board o
     \label{fig:GameTree}
 \end{figure}
 
-As depicted in the figure \ref{fig:GameTree}, the first level of the game consists in player A located in the cell $C_{1, b}$ making a choice for the first move which may consist in the player either moving to a square or placing a wall to deter the opponent. The second level of the game then consist in player B  
+As depicted in the figure, the first level of the game consists in player A located in the cell $C_{1, b}$ making a choice for the first move which may consist in the player either moving to a square or placing a wall to deter the opponent. The second level of the game then consist in player B  
 
 
 \subsection{Branching Factor}
@@ -81,19 +82,18 @@ For a board of size NxN with no wall(s) placed, $N-1$ walls can be placed in eac
 \end{equation}
 
 Coming back to figure \ref{fig:MaxBranchingFactor}, since the board has no walls placed, we now see that A has $5 + 2(5-1)^2 = 37$ possible moves they can perform, ergo, the branching factor of the game state represented by Figure \ref{fig:MaxBranchingFactor} is \textbf{37}, which is also the maximum branching factor for board sized 5x5.
-\newline
-\newline
+
 However, in Figure \ref{fig:MinBranchingFactor}, player A has no available slot for wall-placement, and the already present walls block A from moving anywhere except for cell \textbf{$C_{3, c}$}. Hence, the branching factor for the game state represented by Figure \ref{fig:MinBranchingFactor} is 1.
 
 \subsubsection{Average Branching Factor}
 
 In sub-section \ref{BranchingFactor}, we saw that the branching factor is not uniform due factors like wall-placements and positioning of the player greatly influencing it.
 
-We, therefore, would like to estimate an average branching factor for boards of different lengths to see if varying board dimension has any affect in the average branching factor.
+We, therefore, would like to estimate an average branching factor for boards of different lengths to see if varying board dimension has any effect in the average branching factor.
 
 We already know from equation \ref{eq:WallPlacements} that the maximum branching factor of the game tree is exponential in order of $N$ and from Figure \ref{fig:MinBranchingFactor}, we can deduce that the minimum branching factor is 1 (since we can replicate a similar game state for any game state).
 
-To find an estimate of the average branching factor $B_{avg}$, we use the Algorithm \ref{alg:AverageBranchingFactor}
+To find an estimate of the average branching factor $B_{avg}$, we proposed the Algorithm \ref{alg:AverageBranchingFactor}
 
 \begin{algorithm}[!ht]
 \caption{Average branching factor}
@@ -138,7 +138,7 @@ We then simulate \textbf{1000} games between \textbf{Minimax} and \textbf{Semi-r
 
 From figure \ref{fig:BranchingFactor}, like with the maximum branching factor, we can see a similar exponential trend of the average branching factors in order of N. Furthermore, based on only the four dimensions and their averages and maximum branching factors, the average branching factor seems to be almost half the maximum branching factor.
 
-The average branching factor for board of dimension 9x9 was about \textbf{61}, which is very close to the value proposed by \citep{Glendenning2002MasteringQ}
+The average branching factor for board of dimension 9x9 was about \textbf{61}, which is very close to the value proposed by \citep{Glendenning2002MasteringQ} which was 60.
 
 \section{State space complexity}
 
@@ -155,7 +155,7 @@ For a board of Dimension NxN, the first pawn can be placed in $N^2$ possible loc
 
 As for walls, from equation \ref{eq:WallPlacements}, we know that there are $2(N-1)^2$ ways of placing walls on the board, both horizontally and vertically. Since we know that each wall occupies 2 cells, we will assume that placing the wall anywhere in the board takes away the possibility of placing walls at 4 different places, even though this is not particularly true at the edges. As each placed wall takes two cells, placing a wall, for e.g., horizontally, means that further walls cannot be placed in the location of the wall, walls starting from the cell left and right to the cell of the wall and a wall placed vertically through the placed wall. Every placed wall hence takes away 4 spaces for wall placement. The same example is also valid for a vertically placed wall. Hence assuming that $j$ walls are placed from a given game state, the total number of branches of the game state for wall placement may be $2(N-1)^2 - 4j$,
 
-Furthermore, for a given board dimension (e.g., NxN), there is a fixed number of walls in the game $N_w$. For example, for the standard 9x9 board with 81 total squares, $N_W = 20$. We can extrapolate the number of walls that may be available for boards of other dimensions too based on the number of squares. For example, for 3x3 board, $N_W = 2$, for 5x5 board $N_w$ = 5, for 7x7 board $N_W = 11$.
+Furthermore, for a given board dimension (e.g., NxN), there is a fixed number of walls in the game $N_w$. For example, for the standard 9x9 board with 81 total squares, $N_W = 16$. We can extrapolate the number of walls that may be available for boards of other dimensions too based on the number of squares. For example, for 3x3 board, $N_W = 2$, for 5x5 board $N_w$ = 8, for 7x7 board $N_W = 12$.
 
 In the game tree, there may be a path where a total of $N_W$ walls are used. In such scenario, the total number of branches $L_{N_w}$ in the tree can be defined by the following equation:
 \begin{equation}
@@ -198,24 +198,44 @@ In complex games like Quoridor, the game-tree complexity $G$ can be estimated by
     G = B_{avg}^{D_{avg}}
 \end{equation}
 
+The average depth $D_{avg}$ simulated for different dimensions of the game can be found below:
+\begin{align*}
+    &D_{avg, \text{3x3}} = 11\\
+    &D_{avg, \text{5x5}} = 47\\
+    &D_{avg, \text{7x7}} = 72\\
+    &D_{avg, \text{9x9}} = 97
+\end{align*}
+
+Subsequently, we can now determine the game tree complexity based on the determined $B_{avg}$ and $D_{avg}$. The game tree complexity for different dimensions can be written as:
+\begin{align*}
+    &G_\text{3x3} = 8.58 * 10^9\\
+    &G_\text{5x5} = 9.94 * 10^{58}\\
+    &G_\text{7x7} = 5.56 * 10^{113}\\
+    &G_\text{9x9} = 1.50 * 10^{173}
+\end{align*}
+
+
+
+
 \section{Comparison with other games}
 
 \begin{table}[ht]
     \centering
      \begin{tabular}{|c|c|c|c|}\hline
-          & $\log(S)$ & $\log(G)$ & $B_{avg}$\\ \hline 
+          & $\log_{10}(S)$ & $\log_{10}(G)$ & $B_{avg}$\\ \hline 
           Tic-tac-toe  & 3   & 5   & 4    \\ \hline
+  \textbf{Quoridor 3x3} & 3  & 10  & 8  \\ \hline
           Connect-four & 13  & 21  & 4    \\ \hline
+  \textbf{Quoridor 5x5} & 10  & 59 & 18  \\ \hline
+  \textbf{Quoridor 7x7}  & 22  & 113 & 38  \\ \hline
           Chess        & 44  & 123 & 35   \\ \hline
-          Quoridor 3x3     & 3  &  & 8  \\ \hline
-          Quoridor 5x5     & 10  &  & 18  \\ \hline
-          Quoridor 7x7    & 22  &  & 38  \\ \hline
-          Quoridor 9x9     & 42  & 162 & 62  \\ \hline        
+  \textbf{Quoridor 9x9}     & 42  & 173 & 61  \\ \hline        
           Go           & 170 & 360 & 250 \\ \hline
      \end{tabular}
      \caption{State space, game tree and branching factor comparison between well-known games}
+     \label{tab:comparison}
  \end{table}
 
- In the above table, we present the logarithm of the state space complexity ($\log(S)$), the game state complexity ($\log(G)$) and the average branching factor ($B_avg$) of some popular games from the literature \citep{Mertens2006Quoridor}.
+ In the Table \ref{tab:comparison}, we present the logarithm of the state space complexity ($\log(S)$), the game state complexity ($\log(G)$) and the average branching factor ($B_avg$) of some popular games from the literature \citep{Mertens2006Quoridor}.
 
- As we can see from the above table, the 
+ As we can see from the above table, \textcolor{red}{the} 

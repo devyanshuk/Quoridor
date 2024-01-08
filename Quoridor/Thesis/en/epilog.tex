@@ -1,2 +1,12 @@
-\chapter*{Conclusion}
-\addcontentsline{toc}{chapter}{Conclusion}
+\chapter{Conclusion}\label{Conclusion}
+% \addcontentsline{toc}{chapter}{Conclusion}
+
+In conclusion, in this thesis, we considered a zero-sum strategy game of Quoridor and implemented various AI agents for the game. The main focus of our work was to create a generic interface based implementation for the game such that the agents could be seamlessly used for other games as well.
+
+In chapter \ref{GameDescription}, we formalize the notations for the game including the cells of the game board, movements and wall placements and using them, we formally describe the rules of the game. Additionally, in the chapter, we also propose an improvement upon the notation for wall placement to remove the ambiguity on the notations used in the current literature.
+
+In chapter \ref{GameAnalysis}, we describe the game tree of the game Quoridor. We provide metrics to quantify the complexity of the game in terms of state space and game tree complexity. During our analysis, we determined that the state space complexity increases exponentially as a function of the board dimension and is dominated by the complexity of wall placement. We also approximated the game tree complexity in terms of average branching factor and the average depth. Finally, we compared the complexities against other popular games such as Tic-tac-toe, Chess, Go and Connect-Four and determined \textcolor{red}{that}.
+
+In chapter \ref{Implementation}, we explained our implementation of the interfaces which are the fundamental part of our work. Further, we explain the various agents that we have implemented including the minimax agent, Monte-carlo agent and A-star agent for Quoridor using the interfaces. We further illustrated with an example of another strategy game Tic-tac-toe how the interfaces could be seamlessly integrated as agents for other games as well. 
+
+Finally in chapter \ref{Experiments}, we presented the numerical simulations of our game considering various aforementioned agents. We simulated for the time complexity per move as a metric of quantifying the complexity of the game for different agents and the results of the agents playing against each other. \textcolor{red}{We show that}
