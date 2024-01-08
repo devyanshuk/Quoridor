@@ -135,7 +135,6 @@ Figure \ref{fig:WallBlocked} invalid.
 
     \item \textbf{Jump}
     \begin{itemize}
-        \item Two pawns cannot occupy the same square at a time. As mentioned above, for a player to move to a cell, the cell need to be empty. 
         \item If an opponent is at to the cell a player intends to move in the same direction of the opponent, the player can jump over the opponent provided there is no wall between the opponent or behind the opponent they intend to jump over. For example, in the first picture in figure \ref{fig:PossibleMoves} the player B can move to either of the squared highlighted in green. The player can move to east, west or south direction or can jump in the north direction over the player A from square $C_{4,c}$ to the square $C_{2,c}$ as there are no walls between the squares $C_{4,c}$, $C_{3,c}$ or $C_{2,c}$.
         
         \item If there is a wall between the opponent and the jumping square, the player can jump to a cell on either side of the opponent's cell, given the cell is accessible from the opponent's cell (i.e., there are no walls). In the section picture from left in the figure, for example, the player B cannot jump over player A to the cell $C_{2, c}$ due to the wall placement \textbf{c3N}. The player in this case can jump over to the cells on either the east side (i.e., cell $C_{3, b}$) or the west side (i.e., cell $C_{3, d}$) of the player A given there are no walls in between $C_{3, c}$ and $C_{3, b}$, and $C_{3, c}$ and $C_{3, d}$ respectively.

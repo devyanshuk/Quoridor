@@ -214,7 +214,7 @@ Subsequently, we can now determine the game tree complexity based on the determi
     &G_\text{9x9} = 1.50 * 10^{173}
 \end{align*}
 
-
+From this, we can infer that the game state complexity for Quoridor, like the state space complexity, also increases exponentially with the increase in the dimension of the game.
 
 
 \section{Comparison with other games}
@@ -238,4 +238,5 @@ Subsequently, we can now determine the game tree complexity based on the determi
 
  In the Table \ref{tab:comparison}, we present the logarithm of the state space complexity ($\log(S)$), the game state complexity ($\log(G)$) and the average branching factor ($B_avg$) of some popular games from the literature \citep{Mertens2006Quoridor}.
 
- As we can see from the above table, \textcolor{red}{the} 
+ As we can see from the above table, Quoridor with board dimension 3x3 has the state space complexity and the game tree complexity similar to that of Tic-tac-toe. It can also be inferred that the Quoridor game with dimension 9x9 has similar complexity compared to chess.
+ 
