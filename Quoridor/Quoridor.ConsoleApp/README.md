@@ -265,6 +265,29 @@ Game  over. Player B : MCTS won in 5 moves. Player A : HumanAgentConsole lost. 5
 
 As we can see above in the gameplay, we used wall-placement command and used a series of moves, but the MCTS agent won the game.
 
+---
+### Changing the displayed board characters
+
+You can change the board characters to anything of your liking. To do so, navigate to the [ConfigTemplates/BoardCharacters.xml](https://github.com/devyanshuk/Quoridor/blob/main/Quoridor/Quoridor.ConsoleApp/ConfigTemplates/BoardCharacters.xml) file, and update it as per your liking.
+
+```xml
+<BoardChars>
+    <CellProperties>
+        <CellWidth>5</CellWidth>
+    </CellProperties>
+    <BorderSeparators>
+        <HorizontalBorderSeparator>=</HorizontalBorderSeparator>
+        <VerticalBorderSeparator>|</VerticalBorderSeparator>
+        <IntersectionBorderSeparator>+</IntersectionBorderSeparator>
+    </BorderSeparators>
+    <WallSeparators>
+        <HorizontalWallSeparator>■</HorizontalWallSeparator>
+        <VerticalWallSeparator>█</VerticalWallSeparator>
+    </WallSeparators>
+</BoardChars>
+```
+
+---
 ### Tests
 
 To run tests, navigate to the __Quoridor.Tests/__ directory and type in the __dotnet test__ command.
