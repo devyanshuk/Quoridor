@@ -83,14 +83,14 @@ Also, to change any game settings, navigate to the [ConfigTemplates/DesktopApp.x
 
 This represents the parameters on startup. For example, on startup, the first strategy is Human by default and the second strategy is Minimax AB with a depth of 2 by default.
 To change strategy to something else on startup, you need to modify the xml element. You can use one of (you can modify the parameters to your need)
-- <HumanStrategy Description="Human"/>
-- <AStarStrategy Description="A*"/>
-- <RandomStrategy Description="Random" Seed="42"/>
-- <SemiRandomStrategy Description="Semi-Random" Seed="42" />
-- <MinimaxABStrategy Description="Minimax AB" Depth="2"/>
-- <MinimaxStrategy Description="Minimax" Depth="2" />
-- <ParallelMinimaxABStrategy Description="Parallel Minimax" Depth="2" />
-- <MctsStrategy Description="MCTS" C="1.41" Simulations="1000">
+- \<HumanStrategy Description="Human"/>
+- \<AStarStrategy Description="A*"/>
+- \<RandomStrategy Description="Random" Seed="42"/>
+- \<SemiRandomStrategy Description="Semi-Random" Seed="42" />
+- \<MinimaxABStrategy Description="Minimax AB" Depth="2"/>
+- \<MinimaxStrategy Description="Minimax" Depth="2" />
+- \<ParallelMinimaxABStrategy Description="Parallel Minimax" Depth="2" />
+- \<MctsStrategy Description="MCTS" C="1.41" Simulations="1000">
 
 
 ### Playing the game
