@@ -673,7 +673,7 @@ public void Move(Movement move) {
 
 \subsection{Project Structure}
 
-The solution consists of six fundamental projects, each written in \gls{Csharp}.
+The solution consists of six fundamental projects, each written in \gls{Csharp}. The code for the project can be found in Appendix \ref{app:repository}, and the programmer's documentation can be found in Appendix \ref{app:programmerdoc}
 
 \begin{itemize}
     \item \textbf{Quoridor.Core}\\
@@ -689,10 +689,11 @@ The solution consists of six fundamental projects, each written in \gls{Csharp}.
         This NUnit test project includes all unit tests for robust development.
 
     \item \textbf{Quoridor.ConsoleApp}\\
-        A CLI tool that runs simulations and allows user to play against an opponent with a visual interface.
+        A CLI tool that runs simulations and allows user to play against an opponent with a visual interface. The link to the user documentation of ConsoleApp can be found in Appendix \ref{app:consoleapp}.
 
     \item \textbf{Quoridor.DesktopApp}\\
-        A WinForms application that allows user to play against one another or against various \gls{AI}.
+        A WinForms application that allows user to play against one another or against various \gls{AI}. The link to the user documentation of ConsoleApp can be found in Appendix \ref{app:desktopapp}.
+
 \end{itemize}
 
 These projects are inter-connected by references. For example from Figure \ref{fig:proj_dep}, \textbf{Quoridor.AI} is a standalone library that contains all the interfaces, which is referenced by all other projects.
