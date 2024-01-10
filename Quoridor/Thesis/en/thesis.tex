@@ -54,7 +54,7 @@
 \usepackage{subcaption}
 \usepackage[ruled]{algorithm2e}
 \usepackage[acronym,toc,shortcuts,nonumberlist]{glossaries}
-\usepackage{amsmath}
+\usepackage{diagbox}
 
 
 \usepackage{color}
@@ -95,7 +95,7 @@
 \def\ThesisAuthor{Devyanshu Koirala}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{2023}
+\def\YearSubmitted{2024}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
@@ -123,7 +123,7 @@ Dedication.
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Quoridor presents a challenging terrain for strategic decision-making, making it a suitable testing ground for various Artificial Intelligence (AI) algorithms. This thesis explores the implementation of generic interfaces for AI agents and finally evaluation the AI agents in the game, namely minimax with alpha-beta pruning, Monte Carlo Tree Search (MCTS) and A-star within the realm of Quoridor gameplay. In the thesis, we develop the AI interface that can be easily integrated into any other game. 
+Quoridor presents a challenging terrain for strategic decision-making, making it a suitable testing ground for various Artificial Intelligence (AI) algorithms. This thesis explores the implementation of generic interfaces for AI agents and finally evaluation the AI agents in the game, namely Minimax, Monte Carlo Tree Search (MCTS) and A-star within the realm of Quoridor gameplay. In the thesis, we develop the AI interface that can be easily integrated into any other game. 
 
 The research begins with a comprehensive overview of the Quoridor game, its rules and strategies. Subsequently, we delve into the theoretical foundations and practical implementation details of the aforementioned AI algorithms and conduct a thorough evaluation in an effort to determine the best one in this context.
 }
@@ -142,14 +142,6 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 % Definitions of macros (see description inside)
 
 
-\lstset{
-    frame=tb,
-    escapeinside={(*@}{@*)},
-    basicstyle={\fontsize{9}{12}\ttfamily},
-    breaklines=true,
-}
-
-
 % Title page and various mandatory informational pages
 \begin{document}
 \include{title}
@@ -160,11 +152,12 @@ The research begins with a comprehensive overview of the Quoridor game, its rule
 
 %%% Each chapter is kept in a separate file
 \include{preface}
-% \include{chapters/background}
-\include{chapters/chap01}
-\include{chapters/chap02}
-\include{chapters/chap03}
-\include{chapters/chap04}
+\include{chapters/game_description}
+\include{chapters/related_works}
+\include{chapters/game_analysis}
+\include{chapters/background}
+\include{chapters/implementation}
+\include{chapters/experiments}
 \include{epilog}
 
 %%% Bibliography

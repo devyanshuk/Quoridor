@@ -8,7 +8,7 @@ def run_subprocess(dim, s1, s2, args):
         "dotnet",
         "run",
         "play",
-        f"-s1={s1}",
+        f"-s1=mcts",
         f"-s2={s2}",
         f"-depth={args.depth}",
         "-sim",
@@ -49,9 +49,7 @@ def main(args):
         futures = []
         for dim in dims_to_examine:
             for s1 in agents:
-                for s2 in agents:
-                    if s1 != s2:
-                        futures.append(executor.submit(run_subprocess, dim, s1, s2, args))
+                futures.append(executor.submit(run_subprocess, dim, "mcts", s1, args))
 
         for future in concurrent.futures.as_completed(futures):
             dim, f_s, s_s, games_won_by_f_s = future.result()
@@ -63,10 +61,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--agents', type=str, default="random,parallelminimaxab,semirandom,astar", help='Strategies for tournament')
+    parser.add_argument('--agents', type=str, default="random,semirandom,astar", help='Strategies for tournament')
     parser.add_argument('--depth', type=int, default=1, help='minimax depth')
-    parser.add_argument('--simulations', type=int, default=1000, help='Number of simulations')
+    parser.add_argument('--simulations', type=int, default=100, help='Number of simulations')
     parser.add_argument("--verbose", action="store_true", default=False, help='verbose flag. diaplay braching factor, time results')
-    parser.add_argument("--dims_to_examine", type=str, default="7,9", help='dimensions to examine branching factor and times for')
+    parser.add_argument("--dims_to_examine", type=str, default="5", help='dimensions to examine branching factor and times for')
     args = parser.parse_args()
     main(args)

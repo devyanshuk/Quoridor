@@ -1,0 +1,17 @@
+\chapter{Related Works}
+
+Compared to some other strategy games such as Chess and Go, Quoridor has not been extensively studied in the literature. The authors in \citep{Brenner2015Artificial} developed an \gls{MCTS} approach for Quoridor. Recently, in \citep{Iwanaga2022Analysis}, the authors performed an analysis of the game for a miniature 5 by 5 board.
+
+For this thesis, we consider the following works as our inspiration:
+
+\begin{itemize}
+    \item \textbf{Mastering Quoridor \citep{Glendenning2002MasteringQ}}\\
+    The author of the thesis paper and assesses various algorithms like Negamax, Alpha-beta Negamax among others. Additionally, they utilized a genetic algorithm to refine the weights within a linear weighted evaluation function, employing 10 distinct features suggested by the author, some of which include player's position towards their goal side, the opponent's position towards their respective goal, the remaining count of walls available to the player, etc.
+
+    \item \textbf{A Quoridor-playing Agent \citep{Mertens2006Quoridor}}\\
+    The author of this paper delves deep into the theoretical aspects of Quoridor, providing an upper-bound on the state-space and the game-tree complexities, which we use as a foundation in Chapter \ref{GameAnalysis}.
+    Furthermore, they also develop a Quoridor playing agent based on the Minimax algorithm.
+    
+\end{itemize}
+
+In sharp contrast to the aforementioned works, our thesis takes a distinctly different path by delving deeply into the architectural aspects of AI. Our approach emphasizes abstraction to the greatest extent possible, with an eye on facilitating seamless integration into a broad spectrum of games. We prioritize creating an interface that is adaptable to diverse game environments, setting our research apart from the game-specific focus of the prior works.
