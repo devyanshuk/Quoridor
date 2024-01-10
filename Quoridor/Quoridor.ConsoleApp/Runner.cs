@@ -56,13 +56,13 @@ namespace Quoridor.ConsoleApp
             int NumWalls,
 
             [Description("First strategy")]
-            [DefaultValue("Minimax")]
+            [DefaultValue("parallelminimaxab")]
             [StrategyValidation]
             [Aliases("s1")]
             string Strategy1,
 
             [Description("Second strategy")]
-            [DefaultValue("Human")]
+            [DefaultValue("mcts")]
             [StrategyValidation]
             [Aliases("s2")]
             string Strategy2,
@@ -98,17 +98,17 @@ namespace Quoridor.ConsoleApp
             int Seed,
 
             [Description("Exploration parameter for UCT")]
-            [DefaultValue("1.41")]
+            [DefaultValue("1.7")]
             [Aliases("exploration")]
             string C,
 
             [Description("Simulation limit for MCTS")]
-            [DefaultValue(1000)]
+            [DefaultValue(90)]
             [Aliases("mctsims")]
             int MctsSim,
 
             [Description("Agent to perform MCTS simulation")]
-            [DefaultValue("semirandom")]
+            [DefaultValue("parallelminimaxab")]
             [StrategyValidation]
             [Aliases("agent")]
             string MctsAgent,

@@ -423,7 +423,6 @@ Suppose player $P$ is at at cell $C_{x,y}$ and player $Q$ starts at cell $C_{a,b
 Player $P$'s goal is to reach row $n$ regardless of the column it is at, and Player $Q$'s goal is to reach row $1$.
 So, the heuristic function for player $P$, $H_P$ is given by
 \begin{equation}
-\label{eq:playerPHeuristic}
     H_P = | n - x |
 \label{eq:playerPHeuristic}
 \end{equation}
@@ -617,12 +616,12 @@ This way, we can play the Tic-Tac-Toe game between 2 smart or trivial agents unt
 
 \section{Quoridor Game Implementation}\label{sec:gameimplementation}
 
-\begin{Figure}[!ht]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=.95\linewidth]{../img/uml_core.png}
     \caption{A UML diagram depicting relationship in the core library}
     \label{fig:core_uml}
-\end{Figure}
+\end{figure}
 
 As seen in Figure \ref{fig:core_uml}, the \texttt{GameEnvironment} class implements all interfaces necessary for \gls{AI} integration.
 
@@ -699,9 +698,9 @@ The solution consists of six fundamental projects, each written in \gls{Csharp}.
 These projects are inter-connected by references. For example from Figure \ref{fig:proj_dep}, \textbf{Quoridor.AI} is a standalone library that contains all the interfaces, which is referenced by all other projects.
 All project dependency structures are depicted in Figure \ref{fig:proj_dep}.
 
-\begin{Figure}[!ht]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=.95\linewidth]{../img/project_structure.png}
     \caption{Quoridor project dependency diagram}
     \label{fig:proj_dep}
-\end{Figure}
+\end{figure}

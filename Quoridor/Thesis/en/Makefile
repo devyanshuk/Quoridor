@@ -6,6 +6,7 @@ all: thesis.pdf abstract.pdf
 thesis.pdf: thesis.tex $(wildcard *.tex) bibliography.bib thesis.xmpdata
 	pdflatex $<
 	bibtex thesis
+	makeglossaries thesis
 	pdflatex $<
 	pdflatex $<
 
