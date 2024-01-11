@@ -86,6 +86,8 @@ __Methods__
 
 # 2. Quoridor.Common
 
+The Quoridor.Common library project contains all common functionality used by other projects, including Xml deserialization, logging, enum parser, etc. The Xml deserialization logic is used by, for example, the Quoridor.ConsoleApp project to deserialize the board charaters, and the desktop application use it to initialize the game settings (for a small snippet, see Sub-Section __3.2__)
+
 ## 2.1 NuGet packages
 - [log4net version 2.0.15](https://www.nuget.org/packages/log4net)
     used for logging purposes
@@ -122,6 +124,8 @@ Examples include deserializing [ConsoleApp xml](https://github.com/devyanshuk/Qu
 ---
 
 ## 3. Quoridor.DesktopApp
+
+The Quoridor.Desktop application is a WinForms project written to provide users with an interactive gui. This project was also extensively used for taking screenshots of various gameplay scenarios in our research work.
 
 ## 3.1 NuGet packages
 - [Castle.Windsor Version 5.1.1](https://www.nuget.org/packages/Castle.Windsor)
@@ -187,8 +191,3 @@ public List<Strategy> SelectedStrategies { get; set; }
 ```
 
 It contains explicit definitions for all defined types. Adding a self-defined agent would require appending a similar attributes here and other places that are defined explicitly this way.
-
-
-
-
-
