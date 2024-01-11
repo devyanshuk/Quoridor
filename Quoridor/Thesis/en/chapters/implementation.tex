@@ -246,11 +246,11 @@ foreach(var move in game.GetValidMoves())
 return bestMove;
 \end{lstlisting}
 
-As explained in Section \ref{sec:minimax}, the minimax algorithm involves in evaluating certain positions for the player and the opponent and based on the evaluation. In our implementation, we consider the following evaluation function for the minimax agent.
+As explained in Section \ref{sec:minimax}, the minimax algorithm involves in evaluating certain positions for the player and the opponent and is based on the evaluation. In our implementation, we consider the following evaluation function for the minimax agent.
 
 Assume a Quoridor game instance of 2 players $P$ and $Q$, with $P$ starting at cell $C_{1,c}$ and $Q$ starting at cell $C_{N,c}$, where $N$ is the dimension of the game board.
 
-Suppose $P$ is at cell $C_{x,y}$ and $Q$ is at cell $C_{u,v}$ in an arbitrary game state $G_s$, and let $S_P$ be the shortest path from $C_{x,y}$ to P's goal row $C_{N,*}$ and let $S_Q$ be the shortest path from $C_{u,v}$ to Q's goal row $C_{0,*}$.\\
+Suppose $P$ is at cell $C_{x,y}$ and $Q$ is at cell $C_{u,v}$ in an arbitrary game state $G_s$, and let $S_P$ be the shortest path from $C_{x,y}$ to P's goal row $C_{N,*}$ and let $S_Q$ be the shortest path from $C_{u,v}$ to Q's goal row $C_{1,*}$.\\
 Let $W_P$ denote the number of walls left for player $P$ and let $W_Q$ denote the number of walls left for player $Q$ at state $G_s$.
 
 Then, we define our static evaluation function for player $P$, $F_P$ in game state $G_s$ as:
@@ -268,7 +268,7 @@ So, for the static evaluation function in our implementation of the Quoridor gam
 \end{itemize}
  
 
-In our implementation, the minimax algorithm is implemented with further optimizations including the alpha-beta pruning and the parallel version of the algorithm as described below:
+In our implementation, the minimax algorithm is implemented with further optimizations including the alpha-beta pruning and the parallel version of the algorithm as described in the following sub-sections:
 
 \subsubsection{Alpha-beta pruning implementation}
 The Alpha-beta pruning variant of Minimax uses the same interface as the aforementioned Minimax implementation. So, we present the pseudocode highlighting the core logic of this variant of Minimax.
@@ -594,6 +594,8 @@ public TicTacToe DeepCopy() {
 }
 \end{lstlisting}
 
+\subsection{Usage}
+
 We can now use the Minimax, Monte Carlo Tree Search, Minimax Alpha-beta pruning, Parallel Minimax Alpha-beta pruning, Random agents to play the game of tic-tac-toe. For example:
 
 \begin{lstlisting}
@@ -689,10 +691,12 @@ The solution consists of six fundamental projects, each written in \gls{Csharp}.
         This NUnit test project includes all unit tests for robust development.
 
     \item \textbf{Quoridor.ConsoleApp}\\
-        A CLI tool that runs simulations and allows user to play against an opponent with a visual interface. The link to the user documentation of ConsoleApp can be found in Appendix \ref{app:consoleapp}.
+        A CLI tool that runs simulations and allows user to play against an opponent with a visual interface. The link to the user documentation of Console application can be found in Appendix \ref{app:consoleapp}.
 
     \item \textbf{Quoridor.DesktopApp}\\
-        A WinForms application that allows user to play against one another or against various \gls{AI}. The link to the user documentation of ConsoleApp can be found in Appendix \ref{app:desktopapp}.
+        A WinForms application that allows user to play against one another or against various \gls{AI} agents. All the screenshots of the game board in this paper were taken from this Desktop application.
+        
+        The link to the user documentation of the Desktop application can be found in Appendix \ref{app:desktopapp}.
 
 \end{itemize}
 

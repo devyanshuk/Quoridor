@@ -1,9 +1,11 @@
 \chapter{Conclusion}\label{Conclusion}
 % \addcontentsline{toc}{chapter}{Conclusion}
 
-In conclusion, in this thesis, we considered a zero-sum strategy game of Quoridor and implemented various AI agents for the game. The main focus of our work was to create a generic interface based implementation for the game such that the agents could be seamlessly used for other games as well, and perform experiments on the game of Quoridor to show how to find the ideal parameters for the Minimax and the Monte Carlo Tree Search algorithm.
+In this thesis, we considered a zero-sum strategy game of Quoridor and implemented various AI agents for the game. The main focus of our work was to create a generic interface based implementation for the game such that the agents could be seamlessly used for other games as well, and perform experiments on the game of Quoridor to show how to find the ideal parameters for the Minimax and the Monte Carlo Tree Search algorithm.
 
 In Chapter \ref{GameDescription}, we formalized the notations for the game including the cells of the game board, movements and wall placements and using them, we formally described the rules of the game. Additionally, we also proposed an improvement upon the notation for wall placement to remove the ambiguity on the notations used in the current literature.
+
+In Chapter \ref{relatedworks}, we performed a literature survey of \gls{AI} implementation of Quoridor. In the Chapter, we also acknowledged the sources that we considered as an inspiration for our thesis. 
 
 In Chapter \ref{GameAnalysis}, we described the game tree of the game Quoridor. We provided metrics to quantify the complexity of the game in terms of state space and game tree complexity. During our analysis, we determined that the state space complexity increases exponentially as a function of the board dimension and is dominated by the complexity of wall placement. We also approximated the game tree complexity in terms of average branching factor and the average depth. Finally, we compared the complexities against other popular games such as Tic-tac-toe, Chess, Go and Connect-Four and determined Quoridor of dimension 3 has a complexity comparable to that of Tic-tac-toe, Quoridor of dimension 9 has complexity comparable to Chess.
 

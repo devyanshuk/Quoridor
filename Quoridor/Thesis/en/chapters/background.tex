@@ -62,7 +62,7 @@ Another way to improve the time complexity of the minimax algorithm is to parall
 
 
 \subsection{Monte-Carlo Tree Search}\label{sec:MCTS}
-\gls{MCTS} \citep{Coulom2006Efficient} is a heuristic tree search algorithm popular in decision-making processes, mostly popular in strategic games where the game tree space is too large to traverse. One problem with the minimax algorithm is that it requires a robust and accurate evaluation function to evaluate a given position in the game. This problem can be even more relevant when the game tree space is too large making it difficult to find the evaluation of a position. The basic idea of the \gls{MCTS} algorithm is that is narrows down on certain areas of the game tree, such that the exhaustive traversal and search of the tree is not required. The algorithm achieves this by taking random samples in the tree space and building a search tree based on it.
+\gls{MCTS} \citep{Coulom2006Efficient} is a heuristic tree search algorithm popular in decision-making processes, mostly popular in strategic games where the game tree space is too large to traverse. One problem with the minimax algorithm is that it requires a robust and accurate evaluation function to evaluate a given position in the game. This problem can be even more relevant when the game tree space is too large making it difficult to find the evaluation of a position. The basic idea of the \gls{MCTS} algorithm is that it narrows down on certain areas of the game tree, such that the exhaustive traversal search of the tree is not required. The algorithm achieves this by taking random samples in the tree space and building a search tree based on it.
 
 \begin{figure}[!ht]
     \centering

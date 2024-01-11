@@ -6,7 +6,7 @@ In this chapter, we define our experiment, the parameters involved in it for dif
 
 We use the console application to run all our experiments.
 
-As an example, we we provide the following arguments to the console application simulate 100 games between Parallel-Minimax with a depth of 1 and Semi-Random agents on a game board of dimension 5x5:
+As an example, we provide the following arguments to the console application to simulate 100 games between Parallel-Minimax with a depth of 1 and Semi-Random agents on a game board of dimension 5x5:
 
 \begin{lstlisting}[language=bash]
 $dotnet run play -s1=parallelminimaxab -s2=semirandom -dimension=5 -depth=1 -sim -numsim=100
@@ -22,13 +22,13 @@ Toal moves made across 100 games : 1781
 Average total moves per game : 17
 \end{lstlisting}
 
-The link to the documentation for more sample commands for the console app can be found in Appendix \ref{app:consoleapp}.
+From the result above, we see that Parallel Minimax took \textbf{1781} moves across 100 games, with an average time of \textbf{3.04 ms} per move, and with an average win rate of \textbf{99\%}.
 
-From the result above, we see that Parallel Minimax took \textbf{1781} moves across 100 games, with an average time per move of \textbf{3.04 ms} per move, and with an average win rate of \textbf{99\%}.
+The link to the documentation for more sample commands for the console application can be found in Appendix \ref{app:consoleapp}.
 
 In this thesis, the average time per move complexity can be defined as the average time taken by the agent to go through each move. The average is performed with respect to the total number of moves made by a particular agent in a game.
 
-\section{Minimax depth tuning}
+\section{Experiment 1 : Minimax depth tuning}
 
 We first consider the implementation of the Minimax algorithm with the depth limited version, alpha-beta pruning version and the parallel version for different Quoridor board dimensions and demonstrate the time complexity of the implemented agents in terms of average time per move. 
 
@@ -42,7 +42,7 @@ For the following experiment, we run all of the 3 implemented variants of the Mi
     \label{fig:minimax_performance_comp}
 \end{figure}
 
-In Figure \ref{fig:minimax_performance_comp}, we can see the average time per move of the Minimax algorithm along with its optimized variants on different board dimensions. In the figure, the dimension refers to the board dimension. For e.g., dimension 3 refers to a board size of 3x3 and so on. Considering the board of large dimension (e.g., 7 and 9), without further optimization, the complexity of implementing the algorithm for Quoridor is prohibitively high. For example, for depth 3, the move time complexity for the board with dimension 7 is 82 seconds and that for dimension 9 is 244 seconds.
+In Figure \ref{fig:minimax_performance_comp}, we can see the average time per move of the Minimax algorithm along with its optimized variants on different board dimensions. In the figure, the dimension refers to the board dimension. For e.g., dimension 3 refers to a board size of 3x3 and so on. Considering the board of large dimension (e.g., 7 and 9), without further optimization, the complexity of implementing the Minimax algorithm for Quoridor is prohibitively high. For example, for depth 3, the move time complexity for the board with dimension 7 is 82 seconds and that for dimension 9 is 244 seconds.
 
 From the figure, it can be inferred that for depth 1, the minimax algorithm without any further optimizations including alpha-beta or parallel implementation performs the fastest. The reason for this is straightforward, as for depth 1, the algorithm only evaluates one further move. In such case, there is not further improvement with alpha beta as we anyways need to evaluate all the nodes. The additional condition checking for the alpha beta implementation for this depth increases the average time per move without any gains. Similarly, the complexity of implementing the parallel algorithm outweighs the simple sequential evaluation hence increasing the time complexity per move without any impact on the performance.
 
@@ -73,9 +73,11 @@ However, for depths more than 1, it can be seen that the time complexity for eac
      \label{tab:complexity}
  \end{table}
 
-In Table \ref{tab:complexity}, we present the relative move time complexity of the different algorithms with reference to the minimax algorithm for the same depth. Here, we can see that, especially for depth 2 and depth 3, the time minimax algorithm when using the alpha beta pruning and further parallel implementation reduces significantly. This is especially relevant when considering the large dimension of the Quoridor board as the move time complexity is significantly high. Here, optimization is required for running the algorithm in relatively manageable time.
+In Table \ref{tab:complexity}, we present the relative move time complexity of the different algorithms with reference to the minimax algorithm for the same depth. Here, we can see that, especially for depth 2 and depth 3, the minimax algorithm, when using the alpha beta pruning and further parallel implementation takes significantly less time. This is especially relevant when considering the large dimension of the Quoridor board as the move time complexity is significantly high. Here, optimization is required for running the algorithm in relatively manageable time.
 
-\section{Experiment 1 : 3x3 board}
+So, in the experiments that follow, we will use the Parallel Minimax algorithm.
+
+\section{Experiment 2 : 3x3 board}
 
 In this section, we perform various simulations to find out the best parameters for the \gls{MCTS} algorithm, and use those to run head-to-head simulations between all agents to find out the best performing one for the 3x3 game board.
 
@@ -137,13 +139,13 @@ With these parameters, we can now compare various agents on a board of dimension
     MCTS        &   90   &    74.3     &  100 &   74    &      \\ \hline
      \end{tabular}
      \caption{Agent comparison for dimension 3x3. The values in the
-table represent the total win percentage of the agent in the row of the table when competing against the agent in the column of the table}
+table represent the total win percentage of the agent in the row of the table when competing against the agent in the column of the table.}
      \label{tab:agent_eval_3x3}
  \end{table}
 
-\section{Experiment 2 : 5x5 board}
+\section{Experiment 3 : 5x5 board}
 
-Following the results of the 3x3 board experiment, as presented in Table \ref{tab:agent_eval_3x3}, we would also like to find out the ideal \gls{MCTS} parameters for the 5x5 variant and run a head-to-head tournament betweeen all our implemented agents.
+Following the results of the 3x3 board experiment as presented in Table \ref{tab:agent_eval_3x3}, we would also like to find out the ideal \gls{MCTS} parameters for the 5x5 variant and run a head-to-head tournament betweeen all our implemented agents.
 
 \subsection{MCTS parameter tuning}
 
@@ -171,7 +173,7 @@ Likewise, in Figure \ref{fig:mcts_exp_simulations}, we use 90 iterations we dedu
 
 \subsection{Results}
  
- Firstly, we can observe that the random, as expected, does poorly against all the agents. However, in the 3x3 board, the random agent still wins a third of the time again semi-random agent and a few times against the even the A-star and the minimax agents. From the table, it can also be observed that the MCTS agent performs the best in the 3x3 board as it almost does not lose any games against the any other agents.
+ Firstly, we can observe that the Random agent, as expected, does poorly against all other agents. However, in the 3x3 board, the Random agent still wins a third of the time again Semi-Random agent and a few times against the even the A-star and the Minimax agents. From the table, it can also be observed that the \gls{MCTS} agent performs the best in the 3x3 board as it almost does not lose any games against the any other agents.
 
 \begin{table}[!ht]
     \centering
@@ -184,15 +186,15 @@ Likewise, in Figure \ref{fig:mcts_exp_simulations}, we use 90 iterations we dedu
     MCTS        &   100  &    100      & 56.7&   92    &      \\ \hline
      \end{tabular}
      \caption{Agent comparison for dimension 5x5. The values in the
-table represent the total win percentage of the agent in the row of the table when competing against the agent in the column of the table}
+table represent the total win percentage of the agent in the row of the table when competing against the agent in the column of the table.}
      \label{tab:agent_eval_5x5}
  \end{table}
 
  In Table \ref{tab:agent_eval_5x5}, we present the result of the tournament when considering a Quoridor board of dimension 5. For this board dimension, we again consider the total number of simulation runs as 1000. For the minimax agent, we considered the depth as 2. For the \gls{MCTS} simulation, we considered the determined optimal exploration parameter of 1.7 and ran 90 simulations per move.
  
- From the table, we can observe that considering a board of larger dimension compared to before, we can see that both random and the semi-random agents performs poorly in a larger board. Since the dimension of the board is larger, the random and semi-random agents require a large number of good moves in a sequence to win and this is less likely when the required number of moves is high. From the table, we can also see that the MCTS algorithm performs best against all the algorithms winning more than 90\% of its games except for the A-star agent where it wins more than half of its games. Another surprising factor is that the A-star algorithm which only considers the distance from the start position and end position as the main cost functions performs much better than the minimax algorithm.  
+ From the table, we can observe that considering a board of a larger dimension, both the Random and the Semi-Random agents perform poorly since they require a large number of good moves in a sequence to win, which is less-likely to happen. From the table, we can also see that the \gls{MCTS} algorithm performs best against all the algorithms, winning more than 90\% of its games except for the A-star agent where it wins more than half of its games. Another surprising factor is that the A-star algorithm which only considers the distance from the start position and end position as the main cost functions performs much better than the minimax algorithm.  
 
-\section{Experiment 3: 7x7 board}
+\section{Experiment 4: 7x7 board}
 
 For the \gls{MCTS} agent, since the average move time was 34.4 seconds with the available simulation hardware, we could only perform 100 simulations. Additionally, the simulation run time also prevented us from using an optimized parameter. Hence, we used the theoretical optimal parameter of $\sqrt{2}$ \citep{kocsis2006bandit} for this dimension. For the minimax agent, we considered the implementation with depth 2. 
 
@@ -207,12 +209,12 @@ For the \gls{MCTS} agent, since the average move time was 34.4 seconds with the 
     MCTS        &    100    & 100  &  3   &        44 &      \\ \hline
      \end{tabular}
      \caption{Agent comparison for dimension 7x7. The values in the
-table represent the total win percentage of the agent in the row of the table when competing against the agent in the column of the table}
+table represent the total win percentage of the agent in the row of the table when competing against the agent in the column of the table.}
      \label{tab:agent_eval_7x7}
  \end{table}
  
 In Table \ref{tab:agent_eval_7x7}, we illustrate the result of the tournament when considering a board of dimension 7x7. For this dimension we also ran 1000 simulations for all the agents except for the \gls{MCTS} agent. 
 
-Here, the performance of the random agent is even more significantly worse compared to the previous boards as it fails to win any games against A-star, minimax and MCTS agents. Unlike the previous smaller boards, in this instance, the minimax algorithm performs much better against A-star algorithm as it wins almost all of its games. From this, we can conclude that the strategical play with the minimax algorithm for larger board is much more significant than the simple cost function oriented traversal strategy of the A-star algorithm. Likewise, the MCTS algorithm wins almost 3 out of every 4 games both when starting first and starting second.
+Here, the performance of the random agent is significantly worse compared to the previous boards as it fails to win any games against A-star, minimax and MCTS agents. Unlike the previous smaller boards, in this instance, the minimax algorithm performs much better against A-star algorithm as it wins almost all of its games. From this, we can conclude that the strategical play with the minimax algorithm for larger board is much more significant than the simple cost function oriented traversal strategy of the A-star algorithm.
  
-From the above tournament simulation presented in Table \ref{tab:agent_eval_7x7}, we can conclude that the board dimension does have an effect on the strategy that might be used. For board of smaller dimensions such as 3 and 5, simpler strategies such as  random and semi-random in some cases can be enough to get some wins against more strategical agents such as the minimax agent. However, as the board dimension gets higher such as 7 and 9, the required strategy is very prominently visible as semi-random and random agents win almost no games against the other agents.
+From the above tournament simulation presented in Table \ref{tab:agent_eval_7x7}, we can conclude that the board dimension does have an effect on the strategy that might be used. For board of smaller dimensions such as 3 and 5, simpler strategies such as  random and semi-random in some cases can be enough to get some wins against more strategical agents such as the minimax agent. However, as the board dimension gets higher, the required strategy is very prominently visible as semi-random and random agents win almost no games against the other agents.
