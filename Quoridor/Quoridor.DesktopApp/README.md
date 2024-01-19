@@ -100,7 +100,7 @@ To change strategy to something else on startup, you need to modify the xml elem
     
 #### Placing a wall
     Click on any cell that does not contain a player. You will see a red line appear and disappear with a certain opacity velocity. Click on that cell more, and you'll see a change in the orientation of the (possible) wall.
-    Finally, press the 'w' key to place the wall.
+    Finally, press the right mouse button to place the wall.
     
 #### Moving an AI Agent
     When it's the AI agent's turn, press the 'm' key to move the agent.
